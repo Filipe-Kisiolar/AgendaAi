@@ -1,6 +1,7 @@
 package kisiolar.filipe.Viviane.Ai.Compromissos;
 
-import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.CompromissosRecorrentesModel;
+import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOCompromissosRecorrentes;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 
@@ -20,12 +21,12 @@ public class DTOCompromissos {
 
     private LocalTime horaFinal;
 
-    private CompromissosRecorrentesModel compromissosRecorrente;
+    private DTOCompromissosRecorrentes compromissosRecorrente;
 
     public DTOCompromissos() {
     }
 
-    public DTOCompromissos(Long id, String nome, String descricao, String local, LocalDate dia, LocalTime horaInicial, LocalTime horaFinal, CompromissosRecorrentesModel compromissosRecorrente) {
+    public DTOCompromissos(Long id, String nome, String descricao, String local, LocalDate dia, LocalTime horaInicial, LocalTime horaFinal, DTOCompromissosRecorrentes compromissosRecorrente) {
         this.id = id;
         this.nome = nome;
         this.descricao = descricao;
@@ -92,11 +93,11 @@ public class DTOCompromissos {
         this.horaFinal = horaFinal;
     }
 
-    public CompromissosRecorrentesModel getCompromissosRecorrente() {
+    public DTOCompromissosRecorrentes getCompromissosRecorrente() {
         return compromissosRecorrente;
     }
 
-    public void setCompromissosRecorrente(CompromissosRecorrentesModel compromissosRecorrente) {
+    public void setCompromissosRecorrente(DTOCompromissosRecorrentes compromissosRecorrente) {
         this.compromissosRecorrente = compromissosRecorrente;
     }
 }

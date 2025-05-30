@@ -1,6 +1,6 @@
 package kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes;
 
-import kisiolar.filipe.Viviane.Ai.Compromissos.CompromissosModel;
+import kisiolar.filipe.Viviane.Ai.Compromissos.DTOCompromissos;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -27,12 +27,12 @@ public class DTOCompromissosRecorrentes {
 
     private LocalDate dataFimRecorrencia;
 
-    private List<CompromissosModel> compromissosGerados;
+    private List<DTOCompromissos> compromissosGerados;
 
     public DTOCompromissosRecorrentes() {
     }
 
-    public DTOCompromissosRecorrentes(Long id, String nome, String descricao, String local, LocalTime horaInicial, LocalTime horaFinal, List<DayOfWeek> diasDaSemana, LocalDate dataInicioRecorrencia, LocalDate dataFimRecorrencia, List<CompromissosModel> compromissosGerados) {
+    public DTOCompromissosRecorrentes(Long id, String nome, String descricao, String local, LocalTime horaInicial, LocalTime horaFinal, List<DayOfWeek> diasDaSemana, LocalDate dataInicioRecorrencia, LocalDate dataFimRecorrencia, List<DTOCompromissos> compromissosGerados) {
         this.id = id;
         this.nome = nome;
         this.descricao = descricao;
@@ -117,11 +117,11 @@ public class DTOCompromissosRecorrentes {
         this.dataFimRecorrencia = dataFimRecorrencia;
     }
 
-    public List<CompromissosModel> getCompromissosGerados() {
+    public List<DTOCompromissos> getCompromissosGerados() {
         return compromissosGerados;
     }
 
-    public void setCompromissosGerados(List<CompromissosModel> compromissosGerados) {
+    public void setCompromissosGerados(List<DTOCompromissos> compromissosGerados) {
         this.compromissosGerados = compromissosGerados;
     }
 }
