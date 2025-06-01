@@ -1,5 +1,6 @@
 package kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import kisiolar.filipe.Viviane.Ai.Compromissos.CompromissosModel;
 import jakarta.persistence.*;
 import java.time.DayOfWeek;
@@ -7,6 +8,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
+@Entity
 public class CompromissosRecorrentesModel {
 
     @Id
@@ -41,6 +43,7 @@ public class CompromissosRecorrentesModel {
     private LocalDate dataFimRecorrencia;
 
     @OneToMany(mappedBy = "compromissoRecorrente", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<CompromissosModel> compromissosGerados;
 
     public CompromissosRecorrentesModel() {

@@ -6,6 +6,7 @@ import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.CompromissosRecorrente
 import java.time.LocalDate;
 import java.time.LocalTime;
 
+@Entity
 public class CompromissosModel {
 
     @Id

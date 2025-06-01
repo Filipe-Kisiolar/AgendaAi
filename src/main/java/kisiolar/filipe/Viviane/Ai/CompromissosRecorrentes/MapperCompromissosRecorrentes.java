@@ -3,6 +3,7 @@ package kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes;
 import kisiolar.filipe.Viviane.Ai.Compromissos.CompromissosModel;
 import kisiolar.filipe.Viviane.Ai.Compromissos.DTOCompromissos;
 import kisiolar.filipe.Viviane.Ai.Compromissos.MapperCompromissos;
+import kisiolar.filipe.Viviane.Ai.Compromissos.MapperCompromissosHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -13,8 +14,6 @@ import java.util.stream.Collectors;
 @Component
 public class MapperCompromissosRecorrentes {
 
-    @Autowired
-    MapperCompromissos mapperCompromissos;
 
     public CompromissosRecorrentesModel map(DTOCompromissosRecorrentes dtoCompromissosRecorrentes){
         CompromissosRecorrentesModel compromissosRecorrentesModel = new CompromissosRecorrentesModel();
@@ -22,7 +21,7 @@ public class MapperCompromissosRecorrentes {
         //prevenir NullPointException
         if (dtoCompromissosRecorrentes.getCompromissosGerados() != null){
             compromissosGerados = dtoCompromissosRecorrentes.getCompromissosGerados().stream().
-                    map(mapperCompromissos ::map).
+                    map(MapperCompromissosHelper ::map).
             collect(Collectors.toList());
         }
 
@@ -47,7 +46,7 @@ public class MapperCompromissosRecorrentes {
         //prevenir NullPointerException
         if (compromissosRecorrentesModel.getCompromissosGerados() != null) {
             compromissosGeradosDTO = compromissosRecorrentesModel.getCompromissosGerados().stream().
-            map(mapperCompromissos ::map).
+            map(MapperCompromissosHelper ::map).
             collect(Collectors.toList());
         }
 
