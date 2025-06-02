@@ -7,6 +7,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 
 @Entity
+@Table(name = "compromissos")
 public class CompromissosModel {
 
     @Id

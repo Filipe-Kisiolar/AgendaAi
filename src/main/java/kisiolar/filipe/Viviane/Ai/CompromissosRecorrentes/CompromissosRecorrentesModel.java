@@ -9,6 +9,7 @@ import java.time.LocalTime;
 import java.util.List;
 
 @Entity
+@Table(name = "compromissos_recorrentes")
 public class CompromissosRecorrentesModel {
 
     @Id
@@ -32,6 +33,10 @@ public class CompromissosRecorrentesModel {
     private LocalTime horaFinal;
 
     @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(
+    name = "compromissos_recorrentes_dias_da_semana", // Nome exato da tabela criada no SQL
+    joinColumns = @JoinColumn(name = "compromissos_recorrentes_id") // FK existente na tabela
+    )
     @Enumerated(EnumType.STRING)
     @Column(name = "dias_da_semana")
     private List<DayOfWeek> diasDaSemana;
