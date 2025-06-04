@@ -11,11 +11,13 @@ import org.mapstruct.*;
 )
 public interface MapperCompromissosRecorrentes {
 
-
     CompromissosRecorrentesModel map(DTOCompromissosRecorrentes dtoCompromissosRecorrentes);
 
     DTOCompromissosRecorrentes map(CompromissosRecorrentesModel compromissosRecorrentesModel);
 
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "compromissosGerados", ignore = true)
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    void atulializacao(DTOUpdateCompromissosRecorrentes dto, @MappingTarget CompromissosRecorrentesModel entity);
+    void atualizacao(DTOUpdateCompromissosRecorrentes dto, @MappingTarget CompromissosRecorrentesModel entity);
 }
+

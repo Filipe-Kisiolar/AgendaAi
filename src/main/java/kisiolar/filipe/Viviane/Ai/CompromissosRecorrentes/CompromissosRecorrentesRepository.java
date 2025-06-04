@@ -9,5 +9,5 @@ import java.util.Optional;
 public interface CompromissosRecorrentesRepository extends JpaRepository<CompromissosRecorrentesModel,Long> {
     Optional<CompromissosRecorrentesModel> findByNome(String nome);
 
-    List<CompromissosRecorrentesModel> findByDiaDaSemana(DayOfWeek diaDaSemana);
+    List<CompromissosRecorrentesModel> findByDiasDaSemana(DayOfWeek diaDaSemana);
 }

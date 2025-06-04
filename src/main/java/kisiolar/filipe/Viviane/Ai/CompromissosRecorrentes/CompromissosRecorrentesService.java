@@ -2,11 +2,13 @@ package kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes;
 
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.time.DayOfWeek;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Service
 public class CompromissosRecorrentesService{
     //TODO:usar @transacional quando for fazer requisisao com mapper
     @Autowired
@@ -40,7 +42,7 @@ public class CompromissosRecorrentesService{
 
     @Transactional
     public List<DTOCompromissosRecorrentes> buscarCompromissoPorDiaDaSemana(DayOfWeek dia){
-        List<CompromissosRecorrentesModel> lista = compromissosRecorrentesRepository.findByDiaDaSemana(dia);
+        List<CompromissosRecorrentesModel> lista = compromissosRecorrentesRepository.findByDiasDaSemana(dia);
 
         return  lista.stream().
                 map(mapperCompromissosRecorrentes ::map).
@@ -56,7 +58,7 @@ public class CompromissosRecorrentesService{
 
     public DTOCompromissosRecorrentes alterarCompromisso(long id,DTOUpdateCompromissosRecorrentes dtoUpdateCompromissosRecorrentes){
         CompromissosRecorrentesModel compromissosRecorrentesModel = compromissosRecorrentesRepository.findById(id).orElse(null);
-        mapperCompromissosRecorrentes.atulializacao(dtoUpdateCompromissosRecorrentes,compromissosRecorrentesModel);
+        mapperCompromissosRecorrentes.atualizacao(dtoUpdateCompromissosRecorrentes,compromissosRecorrentesModel);
         compromissosRecorrentesRepository.save(compromissosRecorrentesModel);
 
         return mapperCompromissosRecorrentes.map(compromissosRecorrentesModel);

@@ -2,11 +2,13 @@ package kisiolar.filipe.Viviane.Ai.Compromissos;
 
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Service
 public class CompromissosService {
     //TODO:usar @transacional quando for fazer requisisao com mapper
     @Autowired
