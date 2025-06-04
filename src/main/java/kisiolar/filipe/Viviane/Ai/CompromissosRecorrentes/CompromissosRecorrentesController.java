@@ -18,7 +18,7 @@ public class CompromissosRecorrentesController {
     @Autowired
     private CompromissosRecorrentesService compromissosRecorrentesService;
 
-    @GetMapping("/listarCompromissos")
+    @GetMapping("/listarcompromissos")
     public ResponseEntity<?> listarCompromissos(){
         List<DTOCompromissosRecorrentes> listarcompromissos = compromissosRecorrentesService.listarCompromissos();
         if (listarcompromissos.isEmpty()){
@@ -46,8 +46,8 @@ public class CompromissosRecorrentesController {
     }
 
     @GetMapping("/listarcompromissosdiadasemana/{diadasemana}")
-    public ResponseEntity<List<DTOCompromissosRecorrentes>> listarCompromissosPorDiaDaSemana(@PathVariable DayOfWeek dia){
-        List<DTOCompromissosRecorrentes> lista = compromissosRecorrentesService.buscarCompromissoPorDiaDaSemana(dia);
+    public ResponseEntity<List<DTOCompromissosRecorrentes>> listarCompromissosPorDiaDaSemana(@PathVariable DayOfWeek diadasemana){
+        List<DTOCompromissosRecorrentes> lista = compromissosRecorrentesService.buscarCompromissoPorDiaDaSemana(diadasemana);
 
         return ResponseEntity.ok(lista);
     }

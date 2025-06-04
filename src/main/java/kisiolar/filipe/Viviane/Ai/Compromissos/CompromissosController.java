@@ -48,7 +48,7 @@ public class CompromissosController {
         return ResponseEntity.ok(lista);
     }
 
-    @GetMapping("/listarcompromisosdodia/{dia}")
+    @GetMapping("/listarcompromissosdodia/{dia}")
     public ResponseEntity<List<DTOCompromissos>> listarCompromissosDoDia(@PathVariable @DateTimeFormat(iso=DateTimeFormat.ISO.DATE)
                                                                              LocalDate dia){
         List<DTOCompromissos> lista = compromissosService.listarCompromissosDoDia(dia);
