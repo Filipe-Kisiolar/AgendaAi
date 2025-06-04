@@ -2,6 +2,7 @@ package kisiolar.filipe.Viviane.Ai.Compromissos;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -48,7 +49,8 @@ public class CompromissosController {
     }
 
     @GetMapping("/listarcompromisosdodia/{dia}")
-    public ResponseEntity<List<DTOCompromissos>> listarCompromissosDoDia(@PathVariable LocalDate dia){
+    public ResponseEntity<List<DTOCompromissos>> listarCompromissosDoDia(@PathVariable @DateTimeFormat(iso=DateTimeFormat.ISO.DATE)
+                                                                             LocalDate dia){
         List<DTOCompromissos> lista = compromissosService.listarCompromissosDoDia(dia);
 
         return ResponseEntity.ok(lista);
