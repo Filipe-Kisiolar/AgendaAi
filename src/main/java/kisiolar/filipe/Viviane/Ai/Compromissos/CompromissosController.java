@@ -13,14 +13,14 @@ import java.util.List;
 import java.util.Map;
 
 @Controller
-@RequestMapping("/comprmissos")
+@RequestMapping("/compromissos")
 public class CompromissosController {
 
     @Autowired
     CompromissosService compromissosService;
 
 
-    @GetMapping("/listarCompromissos")
+    @GetMapping("/listarcompromissos")
     public ResponseEntity<?> listarCompromissos(){
         List<DTOCompromissos> listarcompromissos = compromissosService.listarCompromissos();
         if (listarcompromissos.isEmpty()){
@@ -54,17 +54,18 @@ public class CompromissosController {
         return ResponseEntity.ok(lista);
     }
 
-    @PostMapping("/crarcompromisso")
+    @PostMapping("/criarcompromisso")
     public ResponseEntity<DTOCompromissos> criarCompromisso(@RequestBody DTOCompromissos dtoCompromissos){
         compromissosService.criarCompromisso(dtoCompromissos);
 
         return ResponseEntity.ok(dtoCompromissos);
     }
 
-    @PutMapping("/alterarcompromisso/{id}")
-    public ResponseEntity<DTOCompromissos> alterarCompromisso(@PathVariable long id,@RequestBody DTOCompromissos dtoCompromissos){
+    @PatchMapping("/alterarcompromisso/{id}")
+    public ResponseEntity<DTOCompromissos> alterarCompromisso(@PathVariable long id,@RequestBody DTOUpdateCompromissos update){
+        DTOCompromissos compromissoAlterado = compromissosService.alterarCompromisso(id,update);
 
-        return ResponseEntity.ok(dtoCompromissos);
+        return ResponseEntity.ok(compromissoAlterado);
     }
 
     @DeleteMapping("/deletarcompromisso/{id}")

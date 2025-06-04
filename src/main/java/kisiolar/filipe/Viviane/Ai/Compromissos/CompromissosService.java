@@ -10,10 +10,10 @@ import java.util.stream.Collectors;
 public class CompromissosService {
     //TODO:usar @transacional quando for fazer requisisao com mapper
     @Autowired
-    CompromissosRepository compromissosRepository;
+    private CompromissosRepository compromissosRepository;
 
     @Autowired
-    MapperCompromissos mapperCompromissos;
+    private MapperCompromissos mapperCompromissos;
 
     @Transactional
     public List<DTOCompromissos> listarCompromissos(){
@@ -26,7 +26,7 @@ public class CompromissosService {
 
     @Transactional
     public DTOCompromissos buscarCompromissoPorId(long id){
-        CompromissosModel compromissosModel = compromissosRepository.getById(id);
+        CompromissosModel compromissosModel = compromissosRepository.findById(id).orElse(null);
 
         return mapperCompromissos.map(compromissosModel);
     }
@@ -54,7 +54,13 @@ public class CompromissosService {
         return dtoCompromissos;
     }
 
-    //TODO: fazer a funcao de alterar compromisso(criar o dtoupdate e etc...)
+    public DTOCompromissos alterarCompromisso(long id,DTOUpdateCompromissos dtoUpdateCompromissos){
+        CompromissosModel compromissosModel = compromissosRepository.findById(id).orElse(null);
+        mapperCompromissos.atualizacao(dtoUpdateCompromissos,compromissosModel);
+        compromissosRepository.save(compromissosModel);
+
+        return mapperCompromissos.map(compromissosModel);
+    }
 
     public void deletarCompromissoPorId(long id){
         //devo reaftorar depois para caso nao exista esse id

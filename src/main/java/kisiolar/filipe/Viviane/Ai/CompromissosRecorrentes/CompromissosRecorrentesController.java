@@ -6,6 +6,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,6 +46,13 @@ public class CompromissosRecorrentesController {
         return ResponseEntity.ok(dtoCompromissosRecorrentes);
     }
 
+    @GetMapping("/listarcompromissosdiadasemana/{diadasemana}")
+    public ResponseEntity<List<DTOCompromissosRecorrentes>> listarCompromissosPorDiaDaSemana(@PathVariable DayOfWeek dia){
+        List<DTOCompromissosRecorrentes> lista = compromissosRecorrentesService.buscarCompromissoPorDiaDaSemana(dia);
+
+        return ResponseEntity.ok(lista);
+    }
+
     @PostMapping("/criarcompromisso")
     public ResponseEntity<DTOCompromissosRecorrentes> criarCompromisso(@RequestBody DTOCompromissosRecorrentes dtoCompromissosRecorrentes){
         compromissosRecorrentesService.criarCompromisso(dtoCompromissosRecorrentes);
@@ -51,9 +60,11 @@ public class CompromissosRecorrentesController {
         return ResponseEntity.ok(dtoCompromissosRecorrentes);
     }
 
-    @PutMapping("/alterarcompromisso/{id}")
-    public ResponseEntity<DTOCompromissosRecorrentes> alterarCompromisso(@PathVariable long id,@RequestBody DTOCompromissosRecorrentes dtoCompromissosRecorrentes){
-        return ResponseEntity.ok(dtoCompromissosRecorrentes);
+    @PatchMapping("/alterarcompromisso/{id}")
+    public ResponseEntity<DTOCompromissosRecorrentes> alterarCompromisso(@PathVariable long id,@RequestBody DTOUpdateCompromissosRecorrentes updateCompromissosRecorrentes){
+        DTOCompromissosRecorrentes compromissoAlterado = compromissosRecorrentesService.alterarCompromisso(id,updateCompromissosRecorrentes);
+
+        return ResponseEntity.ok(compromissoAlterado);
     }
 
     @DeleteMapping("/deletarcompromisso/{id}")

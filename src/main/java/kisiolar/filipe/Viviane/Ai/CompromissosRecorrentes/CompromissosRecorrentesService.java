@@ -1,6 +1,5 @@
 package kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes;
 
-
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -55,7 +54,13 @@ public class CompromissosRecorrentesService{
         return dtoCompromissosRecorrentes;
     }
 
-    //TODO: fazer a funcao de alterar compromisso(criar o dtoupdate e etc...)
+    public DTOCompromissosRecorrentes alterarCompromisso(long id,DTOUpdateCompromissosRecorrentes dtoUpdateCompromissosRecorrentes){
+        CompromissosRecorrentesModel compromissosRecorrentesModel = compromissosRecorrentesRepository.findById(id).orElse(null);
+        mapperCompromissosRecorrentes.atulializacao(dtoUpdateCompromissosRecorrentes,compromissosRecorrentesModel);
+        compromissosRecorrentesRepository.save(compromissosRecorrentesModel);
+
+        return mapperCompromissosRecorrentes.map(compromissosRecorrentesModel);
+    }
 
     public void deletarCompromissoPorId(long id){
         //devo reaftorar depois para caso nao exista esse id

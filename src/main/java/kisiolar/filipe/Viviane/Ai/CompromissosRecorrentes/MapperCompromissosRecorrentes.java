@@ -2,8 +2,7 @@ package kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes;
 
 
 import kisiolar.filipe.Viviane.Ai.Compromissos.MapperCompromissos;
-import org.mapstruct.Mapper;
-import org.mapstruct.ReportingPolicy;
+import org.mapstruct.*;
 
 @Mapper(
         componentModel = "spring",
@@ -13,9 +12,10 @@ import org.mapstruct.ReportingPolicy;
 public interface MapperCompromissosRecorrentes {
 
 
-    public CompromissosRecorrentesModel map(DTOCompromissosRecorrentes dtoCompromissosRecorrentes);
+    CompromissosRecorrentesModel map(DTOCompromissosRecorrentes dtoCompromissosRecorrentes);
 
-    public DTOCompromissosRecorrentes map(CompromissosRecorrentesModel compromissosRecorrentesModel);
+    DTOCompromissosRecorrentes map(CompromissosRecorrentesModel compromissosRecorrentesModel);
 
-
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    void atulializacao(DTOUpdateCompromissosRecorrentes dto, @MappingTarget CompromissosRecorrentesModel entity);
 }

@@ -1,13 +1,15 @@
 package kisiolar.filipe.Viviane.Ai.Compromissos;
 
 
-import org.mapstruct.Mapper;
-import org.mapstruct.ReportingPolicy;
+import org.mapstruct.*;
 
 @Mapper(componentModel = "spring",unmappedTargetPolicy = ReportingPolicy.ERROR)
 public interface MapperCompromissos {
 
-    public CompromissosModel map(DTOCompromissos dtoCompromissos);
+     CompromissosModel map(DTOCompromissos dtoCompromissos);
 
-    public DTOCompromissos map(CompromissosModel compromissosModel);
+     DTOCompromissos map(CompromissosModel compromissosModel);
+
+     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+     void atualizacao(DTOUpdateCompromissos dto, @MappingTarget CompromissosModel entity);
 }
