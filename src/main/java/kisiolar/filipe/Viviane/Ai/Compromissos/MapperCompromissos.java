@@ -4,16 +4,16 @@ package kisiolar.filipe.Viviane.Ai.Compromissos;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.MapperCompromissosRecorrentes;
 import org.mapstruct.*;
 
-@Mapper(componentModel = "spring",
-        uses = {MapperCompromissosRecorrentes.class},
-        unmappedTargetPolicy = ReportingPolicy.ERROR)
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.ERROR)
 public interface MapperCompromissos {
+     @Mapping(target = "id",ignore = true)
+     @Mapping(target = "compromissoRecorrente", ignore = true)
+     CompromissosModel map(DTOCreateCompromissos dtoCompromissos);
+
+     DTOSaidaCompromissos map(CompromissosModel compromissosModel);
 
      @Mapping(target = "compromissoRecorrente", ignore = true)
-     CompromissosModel map(DTOCompromissos dtoCompromissos);
-
-     @Mapping(target = "compromissosRecorrente", ignore = true)
-     DTOCompromissos map(CompromissosModel compromissosModel);
+     CompromissosModel map(DTOSaidaCompromissos dto);
 
      @Mapping(target = "id", ignore = true)
      @Mapping(target = "compromissoRecorrente", ignore = true)

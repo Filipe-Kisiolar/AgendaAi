@@ -1,6 +1,8 @@
 package kisiolar.filipe.Viviane.Ai.Compromissos;
 
 import jakarta.transaction.Transactional;
+import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.CompromissosRecorrentesModel;
+import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.CompromissosRecorrentesRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,10 +17,13 @@ public class CompromissosService {
     private CompromissosRepository compromissosRepository;
 
     @Autowired
+    private CompromissosRecorrentesRepository compromissosRecorrentesRepository;
+
+    @Autowired
     private MapperCompromissos mapperCompromissos;
 
     @Transactional
-    public List<DTOCompromissos> listarCompromissos(){
+    public List<DTOSaidaCompromissos> listarCompromissos(){
         List<CompromissosModel> lista = compromissosRepository.findAll();
         return lista.stream().
                 map(mapperCompromissos::map).
@@ -27,14 +32,14 @@ public class CompromissosService {
     }
 
     @Transactional
-    public DTOCompromissos buscarCompromissoPorId(long id){
+    public DTOSaidaCompromissos buscarCompromissoPorId(long id){
         CompromissosModel compromissosModel = compromissosRepository.findById(id).orElse(null);
 
         return mapperCompromissos.map(compromissosModel);
     }
 
     @Transactional
-    public List<DTOCompromissos> listarCompromissosPorNome(String nome){
+    public List<DTOSaidaCompromissos> listarCompromissosPorNome(String nome){
         List<CompromissosModel> lista = compromissosRepository.findByNome(nome);
 
         return lista.stream().
@@ -43,20 +48,32 @@ public class CompromissosService {
     }
 
     @Transactional
-    public List<DTOCompromissos> listarCompromissosDoDia(LocalDate dia){
+    public List<DTOSaidaCompromissos> listarCompromissosDoDia(LocalDate dia){
         List<CompromissosModel> lista = compromissosRepository.findByDia(dia);
         return lista.stream().
                 map(mapperCompromissos::map).
                 collect(Collectors.toList());
     }
 
-    public DTOCompromissos criarCompromisso(DTOCompromissos dtoCompromissos){
-        compromissosRepository.save(mapperCompromissos.map(dtoCompromissos));
+    public DTOSaidaCompromissos criarCompromisso(DTOCreateCompromissos dtoCreateCompromissos) {
+        CompromissosModel compromissosModel = mapperCompromissos.map(dtoCreateCompromissos);
 
-        return dtoCompromissos;
+        if  (dtoCreateCompromissos.getCompromissoRecorrenteId() != 0) {
+            CompromissosRecorrentesModel compromissosRecorrentesModel = compromissosRecorrentesRepository
+                    .findById(dtoCreateCompromissos.getCompromissoRecorrenteId())
+                    .orElseThrow(() -> new RuntimeException("Compromisso recorrente não encontrado"));
+
+            compromissosModel.setCompromissoRecorrente(compromissosRecorrentesModel);
+        }
+
+        compromissosRepository.save(compromissosModel);
+
+        return mapperCompromissos.map(compromissosModel);
     }
 
-    public DTOCompromissos alterarCompromisso(long id,DTOUpdateCompromissos dtoUpdateCompromissos){
+
+
+    public DTOSaidaCompromissos alterarCompromisso(long id,DTOUpdateCompromissos dtoUpdateCompromissos){
         CompromissosModel compromissosModel = compromissosRepository.findById(id).orElse(null);
         mapperCompromissos.atualizacao(dtoUpdateCompromissos,compromissosModel);
         compromissosRepository.save(compromissosModel);

@@ -4,11 +4,9 @@ package kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes;
 import kisiolar.filipe.Viviane.Ai.Compromissos.MapperCompromissos;
 import org.mapstruct.*;
 
-@Mapper(
-        componentModel = "spring",
-        uses = {MapperCompromissos.class},
-        unmappedTargetPolicy = ReportingPolicy.ERROR
-)
+@Mapper(componentModel = "spring",
+        uses = MapperCompromissos.class,
+        unmappedTargetPolicy = ReportingPolicy.ERROR)
 public interface MapperCompromissosRecorrentes {
 
     CompromissosRecorrentesModel map(DTOCompromissosRecorrentes dtoCompromissosRecorrentes);
