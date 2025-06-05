@@ -1,6 +1,7 @@
 package kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes;
 
 import jakarta.transaction.Transactional;
+import kisiolar.filipe.Viviane.Ai.Compromissos.CompromissosRepository;
 import kisiolar.filipe.Viviane.Ai.Compromissos.CompromissosService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,9 +15,11 @@ import java.util.stream.Collectors;
 @Service
 public class CompromissosRecorrentesService{
     //TODO:usar @transacional quando for fazer requisisao com mapper
+    //TODO:NAO deixar o inicio da recorrencia,o final da recorrencia a data e o horario e os dias como opcionais
     @Autowired
     private CompromissosRecorrentesRepository compromissosRecorrentesRepository;
-
+    @Autowired
+    private CompromissosRepository compromissosRepository;
     @Autowired
     private CompromissosService compromissosService;
 
@@ -61,22 +64,29 @@ public class CompromissosRecorrentesService{
         //salvar o compromisso e ja guarda-lo
         CompromissosRecorrentesModel compromissoRecorrente = compromissosRecorrentesRepository.save(mapperCompromissosRecorrentes.map(dtoCompromissosRecorrentes));
 
-        //cria automaticamente compromissos a partir de um compromisso recorrente
-        long diferencaEntreDias = ChronoUnit.DAYS.between(compromissoRecorrente.getDataInicioRecorrencia(),compromissoRecorrente.getDataFimRecorrencia());
-        LocalDate dataDeInicio = compromissoRecorrente.getDataInicioRecorrencia();
-        for(long i = 0;i<= diferencaEntreDias;i++){
-            //confere se o dia esta dentro dos dias da semana q algo repete
-            if(compromissoRecorrente.getDiasDaSemana().contains(dataDeInicio.plusDays(i).getDayOfWeek())) {
-                compromissosService.criarCompromisso(mapperCompromissosRecorrentes.mapGerarCompromisso(compromissoRecorrente, dataDeInicio.plusDays(i)));
-            }
-        }
+        //chama o metodo criado para gerar os compromissos atrelados
+        criarCompromissosPorRecorrencia(compromissoRecorrente);
+
         return dtoCompromissosRecorrentes;
     }
 
+    @Transactional
     public DTOCompromissosRecorrentes alterarCompromisso(long id,DTOUpdateCompromissosRecorrentes dtoUpdateCompromissosRecorrentes){
         CompromissosRecorrentesModel compromissosRecorrentesModel = compromissosRecorrentesRepository.findById(id).orElse(null);
+
+        //apaga os compromissos anteriores
+        if(!compromissosRecorrentesModel.getCompromissosGerados().isEmpty()){
+        compromissosRepository.deleteAll(compromissosRecorrentesModel.getCompromissosGerados());
+        compromissosRecorrentesModel.getCompromissosGerados().clear();
+        }
+
         mapperCompromissosRecorrentes.atualizacao(dtoUpdateCompromissosRecorrentes,compromissosRecorrentesModel);
-        compromissosRecorrentesRepository.save(compromissosRecorrentesModel);
+        //salva as alteracoes do compromisso recorrente e o guarda em uma variavel
+        CompromissosRecorrentesModel compromissoSalvo = compromissosRecorrentesRepository.save(compromissosRecorrentesModel);
+
+        //cria os novos compromissos a partir do compromisso recorrente atualizado
+        criarCompromissosPorRecorrencia(compromissoSalvo);
+
 
         return mapperCompromissosRecorrentes.map(compromissosRecorrentesModel);
     }
@@ -85,4 +95,18 @@ public class CompromissosRecorrentesService{
         //devo reaftorar depois para caso nao exista esse id
         compromissosRecorrentesRepository.deleteById(id);
     }
+
+    //cria automaticamente compromissos a partir de um compromisso recorrente
+    public void criarCompromissosPorRecorrencia(CompromissosRecorrentesModel compromissosModel){
+        CompromissosRecorrentesModel compromissoRecorrente = compromissosRecorrentesRepository.findById(compromissosModel.getId()).orElse(null);
+
+        long diferencaEntreDias = ChronoUnit.DAYS.between(compromissoRecorrente.getDataInicioRecorrencia(),compromissoRecorrente.getDataFimRecorrencia());
+        LocalDate dataDeInicio = compromissoRecorrente.getDataInicioRecorrencia();
+            for(long i = 0;i<= diferencaEntreDias;i++){
+            //confere se o dia esta dentro dos dias da semana q algo repete
+            if(compromissoRecorrente.getDiasDaSemana().contains(dataDeInicio.plusDays(i).getDayOfWeek())) {
+                compromissosService.criarCompromisso(mapperCompromissosRecorrentes.mapGerarCompromisso(compromissoRecorrente, dataDeInicio.plusDays(i)));
+            }
+          }
+        }
 }

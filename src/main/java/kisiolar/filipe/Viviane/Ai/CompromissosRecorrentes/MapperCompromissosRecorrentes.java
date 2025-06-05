@@ -29,11 +29,6 @@ public interface MapperCompromissosRecorrentes {
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void atualizacao(DTOUpdateCompromissosRecorrentes dto, @MappingTarget CompromissosRecorrentesModel entity);
 
-    //map para alterar um compromisso a partir de um compromisso recorrente
-    @Mapping(target = "diasDaSemana", ignore = true)
-    @Mapping(target = "dataInicioRecorrencia", ignore = true)
-    @Mapping(target = "dataFimRecorrencia", ignore = true)
-    DTOUpdateCompromissos autualicaoDosCompromissosGerados(DTOUpdateCompromissosRecorrentes updateCompromissosRecorrentes);
 
 }
 
