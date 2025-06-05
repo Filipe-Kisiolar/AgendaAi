@@ -1,10 +1,13 @@
 package kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes;
 
 import jakarta.transaction.Transactional;
+import kisiolar.filipe.Viviane.Ai.Compromissos.CompromissosService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -13,6 +16,9 @@ public class CompromissosRecorrentesService{
     //TODO:usar @transacional quando for fazer requisisao com mapper
     @Autowired
     private CompromissosRecorrentesRepository compromissosRecorrentesRepository;
+
+    @Autowired
+    private CompromissosService compromissosService;
 
     @Autowired
     private MapperCompromissosRecorrentes mapperCompromissosRecorrentes;
@@ -51,8 +57,19 @@ public class CompromissosRecorrentesService{
 
 
     public DTOCompromissosRecorrentes criarCompromisso(DTOCompromissosRecorrentes dtoCompromissosRecorrentes){
-        compromissosRecorrentesRepository.save(mapperCompromissosRecorrentes.map(dtoCompromissosRecorrentes));
 
+        //salvar o compromisso e ja guarda-lo
+        CompromissosRecorrentesModel compromissoRecorrente = compromissosRecorrentesRepository.save(mapperCompromissosRecorrentes.map(dtoCompromissosRecorrentes));
+
+        //cria automaticamente compromissos a partir de um compromisso recorrente
+        long diferencaEntreDias = ChronoUnit.DAYS.between(compromissoRecorrente.getDataInicioRecorrencia(),compromissoRecorrente.getDataFimRecorrencia());
+        LocalDate dataDeInicio = compromissoRecorrente.getDataInicioRecorrencia();
+        for(long i = 0;i<= diferencaEntreDias;i++){
+            //confere se o dia esta dentro dos dias da semana q algo repete
+            if(compromissoRecorrente.getDiasDaSemana().contains(dataDeInicio.plusDays(i).getDayOfWeek())) {
+                compromissosService.criarCompromisso(mapperCompromissosRecorrentes.mapGerarCompromisso(compromissoRecorrente, dataDeInicio.plusDays(i)));
+            }
+        }
         return dtoCompromissosRecorrentes;
     }
 
