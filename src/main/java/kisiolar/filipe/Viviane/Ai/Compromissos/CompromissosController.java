@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
@@ -52,6 +53,13 @@ public class CompromissosController {
     public ResponseEntity<List<DTOSaidaCompromissos>> listarCompromissosDoDia(@PathVariable @DateTimeFormat(iso=DateTimeFormat.ISO.DATE)
                                                                              LocalDate dia){
         List<DTOSaidaCompromissos> lista = compromissosService.listarCompromissosDoDia(dia);
+
+        return ResponseEntity.ok(lista);
+    }
+
+    @GetMapping("listarcompromissosdasemana/{dia}")
+    public ResponseEntity<Map<DayOfWeek,List<DTOSaidaCompromissos>>> listarCompromissosDaSemana(@PathVariable LocalDate dia){
+        Map<DayOfWeek,List<DTOSaidaCompromissos>> lista = compromissosService.listarCompromissosDaSemana(dia);
 
         return ResponseEntity.ok(lista);
     }

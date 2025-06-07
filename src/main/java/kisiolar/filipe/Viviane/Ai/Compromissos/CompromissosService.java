@@ -6,9 +6,11 @@ import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.CompromissosRecorrente
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Service
 public class CompromissosService {
@@ -55,6 +57,39 @@ public class CompromissosService {
                 collect(Collectors.toList());
     }
 
+    //gera uma lista de compromissos da semana a partir do dia que a requisicao foi feita
+    @Transactional
+    public Map<DayOfWeek,List<DTOSaidaCompromissos>> listarCompromissosDaSemana(LocalDate diaAtual){
+
+        LocalDate diaFinal = diaAtual.plusDays(6);
+
+        List<CompromissosModel> compromissosDaSemana = compromissosRepository.findByDiaBetween(diaAtual,diaFinal);
+
+        //gera uma lista de dias na ordem do dia da semana atual ate o dia da semana final
+        List<DayOfWeek> ordemDosDias = IntStream.range(0, 7)
+                .mapToObj(i -> diaAtual.plusDays(i).getDayOfWeek())
+                .collect(Collectors.toList());
+
+        //inicializa um map que tem a ordem criada na lista ordemDosDias
+        Map<DayOfWeek ,List<DTOSaidaCompromissos>> diasOrganizados= new LinkedHashMap<>();
+        for (DayOfWeek dia: ordemDosDias){
+            diasOrganizados.put(dia, new ArrayList<>());
+        }
+        //altera os models para dtosaida e ja preenche o map com eles
+        for (CompromissosModel compromisso : compromissosDaSemana){
+            DayOfWeek dia = compromisso.getDia().getDayOfWeek();
+            if (diasOrganizados.containsKey(dia)){
+                diasOrganizados.get(dia).add(mapperCompromissos.map(compromisso));
+            }
+        }
+
+        //aqui organiza os compromissos pelos horarios
+        for (List<DTOSaidaCompromissos> lista : diasOrganizados.values()) {
+            lista.sort(Comparator.comparing(DTOSaidaCompromissos::getHoraInicial));
+        }
+        return diasOrganizados;
+    }
+
     public DTOSaidaCompromissos criarCompromisso(DTOCreateCompromissos dtoCreateCompromissos) {
         CompromissosModel compromissosModel = mapperCompromissos.map(dtoCreateCompromissos);
 
@@ -70,8 +105,6 @@ public class CompromissosService {
 
         return mapperCompromissos.map(compromissosModel);
     }
-
-
 
     public DTOSaidaCompromissos alterarCompromisso(long id,DTOUpdateCompromissos dtoUpdateCompromissos){
         CompromissosModel compromissosModel = compromissosRepository.findById(id).orElse(null);

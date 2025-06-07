@@ -9,4 +9,6 @@ public interface CompromissosRepository extends JpaRepository<CompromissosModel,
     List<CompromissosModel> findByDia(LocalDate dia);
 
     List<CompromissosModel> findByNome(String nome);
+
+    List<CompromissosModel> findByDiaBetween(LocalDate inicio, LocalDate fim);
 }
