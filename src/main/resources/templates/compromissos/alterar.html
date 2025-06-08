@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="/css/style.css">
+    <title>Alterar Compromisso</title>
+</head>
+<body>
+<h1>Alterar Compromisso</h1>
+<form method="post" th:action="@{'/ui/compromissos/alterarcompromisso/' + ${compromisso.id}}">
+    <input type="text" name="nome" th:value="${compromisso.nome}"/>
+    <button type="submit">Salvar</button>
+</form>
+<a href="/ui/compromissos">Voltar</a>
+</body>
+</html>

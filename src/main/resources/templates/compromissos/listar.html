@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="/css/style.css">
+    <title>Lista de Compromissos</title>
+</head>
+<body>
+<h1>Lista de Compromissos</h1>
+<ul>
+    <th:block th:each="c : \${compromissos}">
+        <li th:text="\${c.nome}"></li>
+    </th:block>
+</ul>
+<a href="/ui/compromissos">Voltar</a>
+</body>
+</html>
