@@ -1,16 +1,34 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
+    <title>Menu - Compromissos</title>
     <link rel="stylesheet" href="/css/style.css">
-    <title>Compromissos</title>
 </head>
 <body>
+
 <h1>Compromissos</h1>
+
 <ul>
-    <li><a href="/ui/compromissos/listarcompromissosdodia/{dia}">Listar compromissos do dia</a></li>
-    <li><a href="/ui/compromissos/listarcompromissosdasemana/{dia}">Listar compromissos da semana</a></li>
+    <li><a href="#" onclick="irParaDiaHoje()">Listar compromissos do dia</a></li>
+    <li><a href="#" onclick="irParaSemanaHoje()">Listar compromissos da semana</a></li>
     <li><a href="/ui/compromissos/criarcompromisso">Cadastrar compromisso</a></li>
-    <li><a href="/ui/menu">Voltar ao menu principal</a></li>
+    <li><a href="/ui/menu">Voltar ao Menu Principal</a></li>
 </ul>
+
+<script>
+    function irParaDiaHoje() {
+        const hoje = new Date().toISOString().split('T')[0];
+        window.location.href = `/ui/compromissos/listarcompromissosdodia/${hoje}`;
+    }
+
+    function irParaSemanaHoje() {
+        const hoje = new Date().toISOString().split('T')[0];
+        window.location.href = `/ui/compromissos/listarcompromissosdasemana/${hoje}`;
+    }
+</script>
+
 </body>
 </html>
+
+

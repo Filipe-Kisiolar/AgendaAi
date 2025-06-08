@@ -1,38 +1,59 @@
+/* Estilo geral */
 body {
-    font-family: "Segoe UI", sans-serif;
-    background-color: #f5f7fa;
-    padding: 20px;
+    font-family: Arial, sans-serif;
+    background-color: #f3f6f9;
+    margin: 0;
+    padding: 0;
+    text-align: center;
 }
 
 h1, h2 {
+    margin-top: 40px;
     color: #0d47a1;
 }
 
+/* Estilo de listas de menus */
+ul {
+    list-style-type: none;
+    padding: 0;
+    margin-top: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+li a {
+    display: block;
+    width: 280px;
+    padding: 12px 20px;
+    background-color: #ffffff;
+    color: #0d47a1;
+    text-decoration: none;
+    font-weight: bold;
+    border: 2px solid #e3f2fd;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+li a:hover {
+    background-color: #e3f2fd;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    transform: translateY(-2px);
+}
+
+/* Estilo dos formulários */
 form {
-    margin-bottom: 20px;
+    margin-top: 20px;
 }
 
-input[type="date"] {
-    padding: 6px 10px;
-    font-size: 14px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+label {
+    font-weight: bold;
+    margin-right: 10px;
 }
 
-button {
-    padding: 6px 12px;
-    font-size: 14px;
-    background-color: #2196f3;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-button:hover {
-    background-color: #1976d2;
-}
-
+/* Estilo da tabela da semana */
 .tabela-semana {
     width: 100%;
     border-collapse: collapse;
@@ -55,8 +76,8 @@ button:hover {
 }
 
 .tabela-semana thead th {
-    background-color: #e3f2fd;
-    color: #0d47a1;
+    background-color: #e3f2fd; /* azul claro */
+    color: #0d47a1;            /* azul escuro */
     font-weight: bold;
     text-transform: uppercase;
 }
@@ -69,25 +90,32 @@ button:hover {
     width: 70px;
 }
 
+/* Estilo para “dia livre” */
 .dia-livre {
     color: #888;
     font-style: italic;
 }
 
+/* Estilo dos horários */
 .hour-label {
     font-weight: bold;
-    color: #0d47a1;
+    color: #007bff;
     margin-top: 8px;
 }
 
-a {
-    display: inline-block;
-    margin-top: 20px;
-    text-decoration: none;
-    color: #0d47a1;
+/* Botões do formulário */
+button {
+    padding: 8px 16px;
+    border: none;
+    background-color: #0d47a1;
+    color: white;
+    border-radius: 6px;
     font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
 }
 
-a:hover {
-    text-decoration: underline;
+button:hover {
+    background-color: #1565c0;
 }
+
