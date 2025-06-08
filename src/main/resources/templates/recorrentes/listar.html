@@ -1,12 +1,44 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <link rel="stylesheet" href="/css/style.css">
+    <meta charset="UTF-8">
     <title>Lista de Compromissos Recorrentes</title>
+    <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
+
 <h1>Lista de Compromissos Recorrentes</h1>
-<p>Exibição dos compromissos recorrentes cadastrados.</p>
+
+<div th:if="${#lists.isEmpty(recorrentes)}">
+    <p>Não há compromissos recorrentes cadastrados.</p>
+</div>
+
+<div th:if="${!#lists.isEmpty(recorrentes)}">
+    <div th:each="r : ${recorrentes}" class="card-compromisso">
+        <div><strong th:text="${r.nome}">Nome</strong></div>
+        <div th:text="'Descrição: ' + ${r.descricao}">Descrição</div>
+        <div th:text="'Local: ' + ${r.local}">Local</div>
+        <div th:text="'Horário: ' + ${r.horaInicial} + ' - ' + ${r.horaFinal}">Horário</div>
+        <div th:text="'Dias da Semana: ' + ${#strings.listJoin(r.diasDaSemana, ', ')}">Dias</div>
+        <div th:text="'Início da Recorrência: ' + ${#temporals.format(r.dataInicioRecorrencia, 'dd/MM/yyyy')}">Início</div>
+        <div th:text="'Fim da Recorrência: ' + ${#temporals.format(r.dataFimRecorrencia, 'dd/MM/yyyy')}">Fim</div>
+
+        <div class="botoes-acoes">
+            <a th:href="@{'/ui/recorrentes/alterarcompromisso/' + ${r.id}}">
+                <button type="button" class="botao-azul">Alterar</button>
+            </a>
+            <a th:href="@{'/ui/recorrentes/deletarcompromisso/' + ${r.id}}"
+               onclick="return confirm('Deseja realmente excluir este compromisso recorrente?');">
+                <button type="button" class="botao-vermelho">Deletar</button>
+            </a>
+        </div>
+
+        <hr/>
+    </div>
+</div>
+
 <a href="/ui/recorrentes">Voltar</a>
+
 </body>
 </html>
+

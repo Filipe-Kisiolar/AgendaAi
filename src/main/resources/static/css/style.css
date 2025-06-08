@@ -183,3 +183,22 @@ a[href^="/ui/"] {
     box-shadow: none;
     border: none;
 }
+ul.recorrentes-lista li {
+    background-color: transparent;
+    border: none;
+    box-shadow: none;
+    padding: 10px;
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+}
+.card-compromisso {
+    background: transparent;
+    padding: 20px;
+    margin: 10px auto;
+    width: 90%;
+    max-width: 600px;
+    border-radius: 8px;
+    box-shadow: none;
+    text-align: left;
+}
