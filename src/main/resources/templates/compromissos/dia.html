@@ -4,41 +4,6 @@
     <meta charset="UTF-8">
     <title>Compromissos do Dia</title>
     <link rel="stylesheet" href="/css/style.css">
-    <style>
-        .tabela-dia {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 30px;
-            font-size: 14px;
-            table-layout: fixed;
-            background-color: white;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            border-radius: 6px;
-            overflow: hidden;
-        }
-
-        .tabela-dia th,
-        .tabela-dia td {
-            border: 1px solid #ddd;
-            text-align: center;
-            padding: 10px;
-            word-break: break-word;
-        }
-
-        .tabela-dia thead th {
-            background-color: #e3f2fd;
-            color: #0d47a1;
-            font-weight: bold;
-            text-transform: uppercase;
-        }
-
-        .sem-compromissos {
-            color: #777;
-            font-style: italic;
-            padding: 20px;
-            text-align: center;
-        }
-    </style>
 </head>
 <body>
 
@@ -68,6 +33,7 @@
             <th>Horário</th>
             <th>Nome</th>
             <th>Local</th>
+            <th>Ações</th>
         </tr>
         </thead>
         <tbody>
@@ -75,6 +41,17 @@
             <td th:text="${comp.horaInicial} + ' - ' + ${comp.horaFinal}">08:00 - 09:00</td>
             <td th:text="${comp.nome}">Compromisso</td>
             <td th:text="${comp.local}">Local</td>
+            <td>
+                <div class="botoes-acoes">
+                    <a th:href="@{'/ui/compromissos/alterarcompromisso/' + ${comp.id}}">
+                        <button type="button" class="botao-azul">Alterar</button>
+                    </a>
+                    <a th:href="@{'/ui/compromissos/deletarcompromisso/' + ${comp.id}}"
+                       onclick="return confirm('Deseja realmente excluir este compromisso?');">
+                        <button type="button" class="botao-vermelho">Deletar</button>
+                    </a>
+                </div>
+            </td>
         </tr>
         </tbody>
     </table>
@@ -88,3 +65,4 @@
 
 </body>
 </html>
+

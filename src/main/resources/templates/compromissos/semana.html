@@ -4,47 +4,6 @@
     <meta charset="UTF-8">
     <title>Compromissos da Semana</title>
     <link rel="stylesheet" href="/css/style.css">
-    <style>
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 30px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-            background-color: white;
-        }
-
-        th, td {
-            border: 1px solid #ccc;
-            text-align: left;
-            padding: 8px;
-            vertical-align: top;
-        }
-
-        th {
-            background-color: #007bff;
-            color: white;
-        }
-
-        .dia-livre {
-            color: #888;
-            font-style: italic;
-        }
-
-        .hour-label {
-            font-weight: bold;
-            color: #007bff;
-            margin-top: 8px;
-        }
-
-        .compromisso-nome {
-            font-weight: bold;
-        }
-
-        .compromisso-local {
-            color: #555;
-            font-size: 0.95em;
-        }
-    </style>
 </head>
 <body>
 
@@ -68,7 +27,7 @@
 <div th:if="${dias}">
     <h2 th:text="'Semana a partir de ' + ${diaInicial}"></h2>
 
-    <table>
+    <table class="tabela-semana">
         <thead>
         <tr>
             <th>Dia da Semana</th>
@@ -84,6 +43,17 @@
                     <div class="hour-label" th:text="${comp.horaInicial} + ' - ' + ${comp.horaFinal}"></div>
                     <div class="compromisso-nome" th:text="${comp.nome}"></div>
                     <div class="compromisso-local" th:text="'Local: ' + ${comp.local}"></div>
+
+                    <div class="botoes-acoes">
+                        <a th:href="@{'/ui/compromissos/alterarcompromisso/' + ${comp.id}}">
+                            <button type="button" class="botao-azul">Alterar</button>
+                        </a>
+                        <a th:href="@{'/ui/compromissos/deletarcompromisso/' + ${comp.id}}"
+                           onclick="return confirm('Deseja realmente excluir este compromisso?');">
+                            <button type="button" class="botao-vermelho">Deletar</button>
+                        </a>
+                    </div>
+
                     <br/>
                 </div>
             </td>
@@ -96,4 +66,5 @@
 
 </body>
 </html>
+
 
