@@ -27,9 +27,13 @@ public class CompromissosService {
     @Transactional
     public List<DTOSaidaCompromissos> listarCompromissos(){
         List<CompromissosModel> lista = compromissosRepository.findAll();
-        return lista.stream().
-                map(mapperCompromissos::map).
-                collect(Collectors.toList());
+        return lista.stream()
+                .sorted(Comparator
+                        .comparing(CompromissosModel::getDia)
+                        .thenComparing(CompromissosModel::getHoraInicial)
+                        )
+                .map(mapperCompromissos::map)
+                .collect(Collectors.toList());
 
     }
 

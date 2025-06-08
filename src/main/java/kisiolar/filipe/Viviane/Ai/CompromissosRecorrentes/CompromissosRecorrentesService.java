@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,6 +32,8 @@ public class CompromissosRecorrentesService{
         List<CompromissosRecorrentesModel> lista = compromissosRecorrentesRepository.findAll();
 
         return lista.stream().
+                sorted(Comparator
+                        .comparing(CompromissosRecorrentesModel::getDataInicioRecorrencia)).
                 map(mapperCompromissosRecorrentes ::map).
                 collect(Collectors.toList());
     }
