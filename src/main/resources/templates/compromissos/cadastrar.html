@@ -22,7 +22,7 @@
 
     <div>
         <label for="local">Local:</label>
-        <input type="text" id="local" name="local" placeholder="Local do compromisso" required />
+        <input type="text" id="local" name="local" placeholder="Local do compromisso"  />
     </div>
 
     <div>
@@ -42,13 +42,24 @@
 
     <div>
         <label for="compromissoRecorrenteId">ID do Recorrente (opcional):</label>
-        <input type="number" id="compromissoRecorrenteId" name="compromissoRecorrenteId" placeholder="ID do compromisso recorrente"/>
+        <input type="number" id="compromissoRecorrenteId" name="compromissoRecorrenteId"
+               placeholder="Deixe em branco se não for recorrente" min="0" />
+        <small style="color: #555;">Deixe em branco se não estiver vinculado a um compromisso recorrente.</small>
     </div>
 
     <button type="submit" class="botao-azul">Salvar</button>
 </form>
 
 <a href="/ui/compromissos">Voltar</a>
+
+<script>
+    document.querySelector("form").addEventListener("submit", function() {
+        const idInput = document.getElementById("compromissoRecorrenteId");
+        if (!idInput.value) {
+            idInput.value = 0;
+        }
+    });
+</script>
 
 </body>
 </html>

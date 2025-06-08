@@ -17,7 +17,7 @@
 
     <div>
         <label for="descricao">Descrição:</label>
-        <input type="text" id="descricao" name="descricao" th:value="${compromisso.descricao}">
+        <input type="text" id="descricao" name="descricao" th:value="${compromisso.descricao}" required>
     </div>
 
     <div>
@@ -27,17 +27,17 @@
 
     <div>
         <label for="dia">Dia:</label>
-        <input type="date" id="dia" name="dia" th:value="${compromisso.dia}">
+        <input type="date" id="dia" name="dia" th:value="${compromisso.dia}" required>
     </div>
 
     <div>
         <label for="horaInicial">Hora Inicial:</label>
-        <input type="time" id="horaInicial" name="horaInicial" th:value="${compromisso.horaInicial}">
+        <input type="time" id="horaInicial" name="horaInicial" th:value="${compromisso.horaInicial}" required>
     </div>
 
     <div>
         <label for="horaFinal">Hora Final:</label>
-        <input type="time" id="horaFinal" name="horaFinal" th:value="${compromisso.horaFinal}">
+        <input type="time" id="horaFinal" name="horaFinal" th:value="${compromisso.horaFinal}" required>
     </div>
 
     <button type="submit">Salvar Alterações</button>

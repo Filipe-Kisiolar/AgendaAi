@@ -23,7 +23,7 @@
 
     <div>
         <label for="local">Local:</label>
-        <input type="text" id="local" name="local" placeholder="Local" required />
+        <input type="text" id="local" name="local" placeholder="Local" />
     </div>
 
     <div>
@@ -64,7 +64,18 @@
 
 <a href="/ui/recorrentes">Voltar</a>
 
+<script>
+    document.querySelector("form").addEventListener("submit", function(event) {
+        const checkboxes = document.querySelectorAll('input[name="diasDaSemana"]:checked');
+        if (checkboxes.length === 0) {
+            alert("Selecione pelo menos um dia da semana.");
+            event.preventDefault();
+        }
+    });
+</script>
+
 </body>
 </html>
+
 
 
