@@ -1,6 +1,6 @@
 /* Estilo geral */
 body {
-    font-family: Arial, sans-serif;
+    font-family: "Segoe UI", Arial, sans-serif;
     background-color: #f3f6f9;
     margin: 0;
     padding: 0;
@@ -10,6 +10,24 @@ body {
 h1, h2 {
     margin-top: 40px;
     color: #0d47a1;
+}
+
+/* Estilo de formulários */
+form {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+label {
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+input[type="date"] {
+    padding: 6px 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
 }
 
 /* Estilo de listas de menus */
@@ -43,16 +61,6 @@ li a:hover {
     transform: translateY(-2px);
 }
 
-/* Estilo dos formulários */
-form {
-    margin-top: 20px;
-}
-
-label {
-    font-weight: bold;
-    margin-right: 10px;
-}
-
 /* Estilo da tabela da semana */
 .tabela-semana {
     width: 100%;
@@ -76,8 +84,8 @@ label {
 }
 
 .tabela-semana thead th {
-    background-color: #e3f2fd; /* azul claro */
-    color: #0d47a1;            /* azul escuro */
+    background-color: #e3f2fd;
+    color: #0d47a1;
     font-weight: bold;
     text-transform: uppercase;
 }
@@ -103,19 +111,75 @@ label {
     margin-top: 8px;
 }
 
-/* Botões do formulário */
-button {
-    padding: 8px 16px;
-    border: none;
-    background-color: #0d47a1;
+/* Estilo para links de voltar */
+a[href^="/ui/"] {
+    display: inline-block;
+    margin-top: 20px;
+    text-decoration: none;
+    color: #0d47a1;
+}
+
+/* Botões padrão */
+.botao-padrao {
+    padding: 10px 20px;
+    background-color: #1976d2;
     color: white;
+    border: none;
     border-radius: 6px;
     font-weight: bold;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.botao-padrao:hover {
+    background-color: #1565c0;
+    transform: scale(1.05);
+}
+
+/* Botão azul (Alterar) */
+.botao-azul {
+    padding: 8px 16px;
+    background-color: #1976d2;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    font-size: 13px;
     cursor: pointer;
     transition: background-color 0.2s ease;
 }
 
-button:hover {
+.botao-azul:hover {
     background-color: #1565c0;
 }
 
+/* Botão vermelho (Deletar) */
+.botao-vermelho {
+    padding: 8px 16px;
+    background-color: #e53935;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.botao-vermelho:hover {
+    background-color: #c62828;
+}
+
+/* Container para os botões (sem fundo branco) */
+.botoes-acoes {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 12px;
+    padding: 0;
+    background-color: transparent;
+    box-shadow: none;
+    border: none;
+}

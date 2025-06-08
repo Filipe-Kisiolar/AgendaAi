@@ -1,15 +1,51 @@
 <!DOCTYPE html>
-<html  xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <link rel="stylesheet" href="/css/style.css">
+    <meta charset="UTF-8">
     <title>Alterar Compromisso</title>
+    <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
+
 <h1>Alterar Compromisso</h1>
+
 <form method="post" th:action="@{'/ui/compromissos/alterarcompromisso/' + ${compromisso.id}}">
-    <input type="text" name="nome" th:value="${compromisso.nome}"/>
-    <button type="submit">Salvar</button>
+    <div>
+        <label for="nome">Nome:</label>
+        <input type="text" id="nome" name="nome" th:value="${compromisso.nome}" required>
+    </div>
+
+    <div>
+        <label for="descricao">Descrição:</label>
+        <input type="text" id="descricao" name="descricao" th:value="${compromisso.descricao}">
+    </div>
+
+    <div>
+        <label for="local">Local:</label>
+        <input type="text" id="local" name="local" th:value="${compromisso.local}">
+    </div>
+
+    <div>
+        <label for="dia">Dia:</label>
+        <input type="date" id="dia" name="dia" th:value="${compromisso.dia}">
+    </div>
+
+    <div>
+        <label for="horaInicial">Hora Inicial:</label>
+        <input type="time" id="horaInicial" name="horaInicial" th:value="${compromisso.horaInicial}">
+    </div>
+
+    <div>
+        <label for="horaFinal">Hora Final:</label>
+        <input type="time" id="horaFinal" name="horaFinal" th:value="${compromisso.horaFinal}">
+    </div>
+
+    <button type="submit">Salvar Alterações</button>
 </form>
+
+<br>
 <a href="/ui/compromissos">Voltar</a>
+
 </body>
 </html>
+
