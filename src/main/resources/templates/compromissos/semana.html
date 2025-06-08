@@ -1,12 +1,47 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <link rel="stylesheet" href="/css/style.css">
+    <meta charset="UTF-8">
     <title>Compromissos da Semana</title>
+    <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
+
 <h1>Compromissos da Semana</h1>
-<p>Listagem de compromissos da semana selecionada.</p>
-<a href="/ui/compromissos">Voltar</a>
+
+<!-- Formulário para escolher o dia -->
+<form action="#" onsubmit="event.preventDefault(); redirecionarParaSemana();">
+    <label for="data">Escolha o dia:</label>
+    <input type="date" id="data" name="data" required>
+    <button type="submit">Ver Semana</button>
+</form>
+
+<script>
+    function redirecionarParaSemana() {
+        const data = document.getElementById('data').value;
+        if (data) {
+            window.location.href = `/ui/compromissos/listarcompromissosdasemana/${data}`;
+        }
+    }
+</script>
+
+<hr/>
+
+<!-- Exibição da semana -->
+<div th:if="${dias}">
+    <h2 th:text="'Semana a partir de ' + ${diaInicial}"></h2>
+    <div th:each="entry : ${dias}">
+        <h3 th:text="${entry.key}">Dia da Semana</h3>
+        <ul>
+            <li th:each="compromisso : ${entry.value}"
+                th:text="${compromisso.horaInicial} + ' - ' + ${compromisso.horaFinal} + ' | ' + ${compromisso.descricao} + ' (' + ${compromisso.local} + ')'">
+                Compromisso
+            </li>
+        </ul>
+    </div>
+</div>
+
+<a href="/ui">Voltar ao Menu</a>
+
 </body>
 </html>

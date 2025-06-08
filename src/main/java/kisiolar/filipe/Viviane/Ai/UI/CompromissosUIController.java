@@ -57,7 +57,7 @@ public class CompromissosUIController {
     }
 
     @GetMapping("/listarcompromissosdasemana/{dia}")
-    public String listarCompromissosDaSemana(@PathVariable LocalDate dia, Model model) {
+    public String listarCompromissosDaSemana(@PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dia, Model model) {
         Map<DayOfWeek, List<DTOSaidaCompromissos>> lista = compromissosService.listarCompromissosDaSemana(dia);
         model.addAttribute("dias", lista);
         model.addAttribute("diaInicial", dia);
