@@ -49,6 +49,9 @@ public class CompromissosService {
         List<CompromissosModel> lista = compromissosRepository.findByNome(nome);
 
         return lista.stream().
+                sorted(Comparator.
+                        comparing(CompromissosModel::getDia).
+                        thenComparing(CompromissosModel::getHoraInicial)).
                 map(mapperCompromissos::map).
                 collect(Collectors.toList());
     }
@@ -57,6 +60,7 @@ public class CompromissosService {
     public List<DTOSaidaCompromissos> listarCompromissosDoDia(LocalDate dia){
         List<CompromissosModel> lista = compromissosRepository.findByDia(dia);
         return lista.stream().
+                sorted(Comparator.comparing(CompromissosModel::getHoraInicial)).
                 map(mapperCompromissos::map).
                 collect(Collectors.toList());
     }
