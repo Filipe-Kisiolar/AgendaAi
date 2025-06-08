@@ -1,16 +1,70 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <link rel="stylesheet" href="/css/style.css">
+    <meta charset="UTF-8">
     <title>Cadastrar Compromisso Recorrente</title>
+    <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
+
 <h1>Cadastrar Compromisso Recorrente</h1>
+
 <form method="post" action="/ui/recorrentes/criarcompromisso">
-    <!-- Campos do compromisso recorrente -->
-    <input type="text" name="descricao" placeholder="Descrição"/>
-    <button type="submit">Salvar</button>
+
+    <div>
+        <label for="nome">Nome:</label>
+        <input type="text" id="nome" name="nome" placeholder="Nome do compromisso" required />
+    </div>
+
+    <div>
+        <label for="descricao">Descrição:</label>
+        <input type="text" id="descricao" name="descricao" placeholder="Descrição" required />
+    </div>
+
+    <div>
+        <label for="local">Local:</label>
+        <input type="text" id="local" name="local" placeholder="Local" required />
+    </div>
+
+    <div>
+        <label for="horaInicial">Hora Inicial:</label>
+        <input type="time" id="horaInicial" name="horaInicial" required />
+    </div>
+
+    <div>
+        <label for="horaFinal">Hora Final:</label>
+        <input type="time" id="horaFinal" name="horaFinal" required />
+    </div>
+
+    <div>
+        <label>Dias da Semana:</label>
+        <div class="checkbox-group">
+            <label><input type="checkbox" name="diasDaSemana" value="MONDAY"> Segunda-feira</label>
+            <label><input type="checkbox" name="diasDaSemana" value="TUESDAY"> Terça-feira</label>
+            <label><input type="checkbox" name="diasDaSemana" value="WEDNESDAY"> Quarta-feira</label>
+            <label><input type="checkbox" name="diasDaSemana" value="THURSDAY"> Quinta-feira</label>
+            <label><input type="checkbox" name="diasDaSemana" value="FRIDAY"> Sexta-feira</label>
+            <label><input type="checkbox" name="diasDaSemana" value="SATURDAY"> Sábado</label>
+            <label><input type="checkbox" name="diasDaSemana" value="SUNDAY"> Domingo</label>
+        </div>
+    </div>
+
+    <div>
+        <label for="dataInicioRecorrencia">Início da Recorrência:</label>
+        <input type="date" id="dataInicioRecorrencia" name="dataInicioRecorrencia" required />
+    </div>
+
+    <div>
+        <label for="dataFimRecorrencia">Fim da Recorrência:</label>
+        <input type="date" id="dataFimRecorrencia" name="dataFimRecorrencia" required />
+    </div>
+
+    <button type="submit" class="botao-azul">Salvar</button>
 </form>
+
 <a href="/ui/recorrentes">Voltar</a>
+
 </body>
 </html>
+
+

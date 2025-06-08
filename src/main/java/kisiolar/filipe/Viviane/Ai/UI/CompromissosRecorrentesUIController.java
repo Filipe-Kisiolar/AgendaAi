@@ -59,7 +59,7 @@ public class CompromissosRecorrentesUIController {
     }
 
     @PostMapping("/criarcompromisso")
-    public String criarCompromisso(DTOCompromissosRecorrentes dto) {
+    public String criarCompromisso(@ModelAttribute DTOCompromissosRecorrentes dto) {
         compromissosRecorrentesService.criarCompromisso(dto);
         return "recorrentes/cadastroSucesso";
     }
