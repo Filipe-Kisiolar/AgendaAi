@@ -36,9 +36,23 @@
     </div>
 
     <div>
-        <label for="diasDaSemana">Dias da Semana:</label>
-        <input type="text" id="diasDaSemana" name="diasDaSemana"
-               th:value="${#strings.listJoin(compromisso.diasDaSemana, ', ')}" placeholder="Ex: MONDAY, WEDNESDAY"/>
+        <label>Dias da Semana:</label>
+        <div class="checkbox-group">
+            <label><input type="checkbox" name="diasDaSemana" value="MONDAY"
+                          th:checked="${#lists.contains(compromisso.diasDaSemana, T(java.time.DayOfWeek).MONDAY)}" /> Segunda</label>
+            <label><input type="checkbox" name="diasDaSemana" value="TUESDAY"
+                          th:checked="${#lists.contains(compromisso.diasDaSemana, T(java.time.DayOfWeek).TUESDAY)}" /> Terça</label>
+            <label><input type="checkbox" name="diasDaSemana" value="WEDNESDAY"
+                          th:checked="${#lists.contains(compromisso.diasDaSemana, T(java.time.DayOfWeek).WEDNESDAY)}" /> Quarta</label>
+            <label><input type="checkbox" name="diasDaSemana" value="THURSDAY"
+                          th:checked="${#lists.contains(compromisso.diasDaSemana, T(java.time.DayOfWeek).THURSDAY)}" /> Quinta</label>
+            <label><input type="checkbox" name="diasDaSemana" value="FRIDAY"
+                          th:checked="${#lists.contains(compromisso.diasDaSemana, T(java.time.DayOfWeek).FRIDAY)}" /> Sexta</label>
+            <label><input type="checkbox" name="diasDaSemana" value="SATURDAY"
+                          th:checked="${#lists.contains(compromisso.diasDaSemana, T(java.time.DayOfWeek).SATURDAY)}" /> Sábado</label>
+            <label><input type="checkbox" name="diasDaSemana" value="SUNDAY"
+                          th:checked="${#lists.contains(compromisso.diasDaSemana, T(java.time.DayOfWeek).SUNDAY)}" /> Domingo</label>
+        </div>
     </div>
 
     <div>
@@ -60,4 +74,3 @@
 
 </body>
 </html>
-

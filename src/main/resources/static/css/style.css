@@ -221,4 +221,6 @@ form input[type="number"] {
     font-size: 14px;
     padding-left: 10px;
 }
-
+.checkbox-group label {
+    font-size: 14px;
+}
