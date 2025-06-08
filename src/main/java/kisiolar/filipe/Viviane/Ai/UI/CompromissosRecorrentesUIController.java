@@ -37,8 +37,8 @@ public class CompromissosRecorrentesUIController {
         return "recorrentes/detalhe";
     }
 
-    @GetMapping("/buscarcompromissopornome/{nome}")
-    public String buscarCompromissoPornome(@PathVariable String nome, Model model) {
+    @GetMapping("/buscarcompromissopornome")
+    public String buscarCompromissoPornome(@RequestParam String nome, Model model) {
         DTOCompromissosRecorrentes dto = compromissosRecorrentesService.buscarCompromissoPorNome(nome);
         model.addAttribute("compromisso", dto);
         return "recorrentes/detalhe";

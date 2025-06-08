@@ -9,6 +9,12 @@
 
 <h1>Lista de Compromissos Recorrentes</h1>
 
+<!-- Campo de busca por nome -->
+<form action="/ui/recorrentes/buscarcompromissopornome" method="get" style="margin-bottom: 20px;">
+    <input type="text" name="nome" placeholder="Buscar por nome..." required>
+    <button type="submit" class="botao-azul">Buscar</button>
+</form>
+
 <div th:if="${#lists.isEmpty(recorrentes)}">
     <p>Não há compromissos recorrentes cadastrados.</p>
 </div>
@@ -41,4 +47,3 @@
 
 </body>
 </html>
-

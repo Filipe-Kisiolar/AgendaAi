@@ -9,6 +9,22 @@
 
 <h1>Lista de Compromissos</h1>
 
+<!-- Formulário de busca por nome -->
+<form id="formBusca" onsubmit="buscarPorNome(event)" style="margin-bottom: 20px;">
+    <input type="text" id="nomeBusca" placeholder="Digite o nome do compromisso" required />
+    <button type="submit" class="botao-azul">Buscar</button>
+</form>
+
+<script>
+    function buscarPorNome(event) {
+        event.preventDefault();
+        const nome = document.getElementById('nomeBusca').value.trim();
+        if (nome) {
+            window.location.href = `/ui/compromissos/listarcompromissopornome/${encodeURIComponent(nome)}`;
+        }
+    }
+</script>
+
 <div th:if="${#lists.isEmpty(compromissos)}">
     <p>Não há compromissos cadastrados.</p>
 </div>
