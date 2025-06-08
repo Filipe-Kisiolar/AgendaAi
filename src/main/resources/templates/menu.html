@@ -1,28 +1,37 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <link rel="stylesheet" href="/css/style.css">
+    <meta charset="UTF-8">
     <title>Menu Principal</title>
+    <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
+
 <h1>Menu Principal</h1>
 
 <ul>
-    <li><a href="/ui/compromissos/listarcompromissosdodia/{dia}">Listar compromissos do dia</a></li>
-    <li><a href="#" onclick="redirecionarSemanaHoje()">Listar compromissos da semana</a></li>
+    <li><a href="#" onclick="irParaDiaHoje()">Listar compromissos do dia</a></li>
+    <li><a href="#" onclick="irParaSemanaHoje()">Listar compromissos da semana</a></li>
     <li><a href="/ui/compromissos/criarcompromisso">Cadastrar compromisso</a></li>
     <li><a href="/ui/recorrentes/criarcompromisso">Cadastrar compromisso recorrente</a></li>
     <li><a href="/ui/compromissos">Gerenciar compromissos</a></li>
     <li><a href="/ui/recorrentes">Gerenciar compromissos recorrentes</a></li>
 </ul>
 
-<!-- Script deve vir depois da lista -->
 <script>
-    function redirecionarSemanaHoje() {
-        const hoje = new Date().toISOString().split('T')[0]; // formato YYYY-MM-DD
+    function irParaDiaHoje() {
+        const hoje = new Date().toISOString().split('T')[0];
+        window.location.href = `/ui/compromissos/listarcompromissosdodia/${hoje}`;
+    }
+
+    function irParaSemanaHoje() {
+        const hoje = new Date().toISOString().split('T')[0];
         window.location.href = `/ui/compromissos/listarcompromissosdasemana/${hoje}`;
     }
 </script>
+
 </body>
 </html>
+
+
 

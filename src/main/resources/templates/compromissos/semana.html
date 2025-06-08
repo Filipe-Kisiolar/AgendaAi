@@ -4,12 +4,52 @@
     <meta charset="UTF-8">
     <title>Compromissos da Semana</title>
     <link rel="stylesheet" href="/css/style.css">
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 30px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            background-color: white;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            text-align: left;
+            padding: 8px;
+            vertical-align: top;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .dia-livre {
+            color: #888;
+            font-style: italic;
+        }
+
+        .hour-label {
+            font-weight: bold;
+            color: #007bff;
+            margin-top: 8px;
+        }
+
+        .compromisso-nome {
+            font-weight: bold;
+        }
+
+        .compromisso-local {
+            color: #555;
+            font-size: 0.95em;
+        }
+    </style>
 </head>
 <body>
 
 <h1>Compromissos da Semana</h1>
 
-<!-- Formulário para escolher o dia -->
 <form action="#" onsubmit="event.preventDefault(); redirecionarParaSemana();">
     <label for="data">Escolha o dia:</label>
     <input type="date" id="data" name="data" required>
@@ -25,23 +65,35 @@
     }
 </script>
 
-<hr/>
-
-<!-- Exibição da semana -->
 <div th:if="${dias}">
     <h2 th:text="'Semana a partir de ' + ${diaInicial}"></h2>
-    <div th:each="entry : ${dias}">
-        <h3 th:text="${entry.key}">Dia da Semana</h3>
-        <ul>
-            <li th:each="compromisso : ${entry.value}"
-                th:text="${compromisso.horaInicial} + ' - ' + ${compromisso.horaFinal} + ' | ' + ${compromisso.descricao} + ' (' + ${compromisso.local} + ')'">
-                Compromisso
-            </li>
-        </ul>
-    </div>
+
+    <table>
+        <thead>
+        <tr>
+            <th>Dia da Semana</th>
+            <th>Compromissos</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="entry : ${dias}">
+            <td th:text="${entry.key}">Segunda</td>
+            <td>
+                <div th:if="${#lists.isEmpty(entry.value)}" class="dia-livre">Dia livre</div>
+                <div th:each="comp : ${entry.value}">
+                    <div class="hour-label" th:text="${comp.horaInicial} + ' - ' + ${comp.horaFinal}"></div>
+                    <div class="compromisso-nome" th:text="${comp.nome}"></div>
+                    <div class="compromisso-local" th:text="'Local: ' + ${comp.local}"></div>
+                    <br/>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
 </div>
 
-<a href="/ui">Voltar ao Menu</a>
+<a href="/ui/menu">Voltar ao Menu</a>
 
 </body>
 </html>
+
