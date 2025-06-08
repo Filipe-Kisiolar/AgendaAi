@@ -4,6 +4,41 @@
     <meta charset="UTF-8">
     <title>Compromissos do Dia</title>
     <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .bloco-horario {
+            background-color: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            padding: 15px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            text-align: left;
+        }
+
+        .horario-header {
+            font-weight: bold;
+            color: #0d47a1;
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+
+        .compromisso-nome {
+            font-weight: bold;
+            font-size: 15px;
+        }
+
+        .compromisso-local {
+            color: #555;
+            font-size: 0.95em;
+            margin-bottom: 8px;
+        }
+
+        .botoes-acoes {
+            display: flex;
+            gap: 10px;
+            margin-top: 5px;
+        }
+    </style>
 </head>
 <body>
 
@@ -27,37 +62,24 @@
 <div th:if="${compromissos}">
     <h2 th:text="'Compromissos para o dia: ' + ${dia}"></h2>
 
-    <table class="tabela-dia" th:if="${!#lists.isEmpty(compromissos)}">
-        <thead>
-        <tr>
-            <th>Horário</th>
-            <th>Nome</th>
-            <th>Local</th>
-            <th>Ações</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="comp : ${compromissos}">
-            <td th:text="${comp.horaInicial} + ' - ' + ${comp.horaFinal}">08:00 - 09:00</td>
-            <td th:text="${comp.nome}">Compromisso</td>
-            <td th:text="${comp.local}">Local</td>
-            <td>
-                <div class="botoes-acoes">
-                    <a th:href="@{'/ui/compromissos/alterarcompromisso/' + ${comp.id}}">
-                        <button type="button" class="botao-azul">Alterar</button>
-                    </a>
-                    <a th:href="@{'/ui/compromissos/deletarcompromisso/' + ${comp.id}}"
-                       onclick="return confirm('Deseja realmente excluir este compromisso?');">
-                        <button type="button" class="botao-vermelho">Deletar</button>
-                    </a>
-                </div>
-            </td>
-        </tr>
-        </tbody>
-    </table>
-
     <div th:if="${#lists.isEmpty(compromissos)}" class="sem-compromissos">
         Nenhum compromisso neste dia.
+    </div>
+
+    <div th:each="comp : ${compromissos}" class="bloco-horario">
+        <div class="horario-header" th:text="${comp.horaInicial} + ' - ' + ${comp.horaFinal}">08:00 - 09:00</div>
+        <div class="compromisso-nome" th:text="${comp.nome}">Compromisso</div>
+        <div class="compromisso-local" th:text="'Local: ' + ${comp.local}">Local</div>
+
+        <div class="botoes-acoes">
+            <a th:href="@{'/ui/compromissos/alterarcompromisso/' + ${comp.id}}">
+                <button type="button" class="botao-azul">Alterar</button>
+            </a>
+            <a th:href="@{'/ui/compromissos/deletarcompromisso/' + ${comp.id}}"
+               onclick="return confirm('Deseja realmente excluir este compromisso?');">
+                <button type="button" class="botao-vermelho">Deletar</button>
+            </a>
+        </div>
     </div>
 </div>
 
@@ -65,4 +87,5 @@
 
 </body>
 </html>
+
 
