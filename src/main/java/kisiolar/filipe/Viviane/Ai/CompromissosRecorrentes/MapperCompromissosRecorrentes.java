@@ -1,9 +1,10 @@
 package kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes;
 
 
-import kisiolar.filipe.Viviane.Ai.Compromissos.DTOCreateCompromissos;
-import kisiolar.filipe.Viviane.Ai.Compromissos.DTOUpdateCompromissos;
+import kisiolar.filipe.Viviane.Ai.Compromissos.DTOs.DTOCreateCompromissos;
 import kisiolar.filipe.Viviane.Ai.Compromissos.MapperCompromissos;
+import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.DTOCompromissosRecorrentes;
+import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.DTOUpdateCompromissosRecorrentes;
 import org.mapstruct.*;
 
 import java.time.LocalDate;

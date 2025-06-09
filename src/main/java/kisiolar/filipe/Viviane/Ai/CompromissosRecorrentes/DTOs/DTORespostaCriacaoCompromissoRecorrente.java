@@ -1,4 +1,4 @@
-package kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes;
+package kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs;
 
 import java.util.List;
 

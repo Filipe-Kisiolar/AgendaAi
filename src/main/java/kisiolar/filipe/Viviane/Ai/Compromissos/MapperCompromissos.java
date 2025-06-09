@@ -1,7 +1,9 @@
 package kisiolar.filipe.Viviane.Ai.Compromissos;
 
 
-import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.MapperCompromissosRecorrentes;
+import kisiolar.filipe.Viviane.Ai.Compromissos.DTOs.DTOCreateCompromissos;
+import kisiolar.filipe.Viviane.Ai.Compromissos.DTOs.DTOSaidaCompromissos;
+import kisiolar.filipe.Viviane.Ai.Compromissos.DTOs.DTOUpdateCompromissos;
 import org.mapstruct.*;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.ERROR)

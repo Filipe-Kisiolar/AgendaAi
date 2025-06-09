@@ -1,9 +1,9 @@
 package kisiolar.filipe.Viviane.Ai.UI;
 
 import kisiolar.filipe.Viviane.Ai.Compromissos.CompromissosService;
-import kisiolar.filipe.Viviane.Ai.Compromissos.DTOCreateCompromissos;
-import kisiolar.filipe.Viviane.Ai.Compromissos.DTOSaidaCompromissos;
-import kisiolar.filipe.Viviane.Ai.Compromissos.DTOUpdateCompromissos;
+import kisiolar.filipe.Viviane.Ai.Compromissos.DTOs.DTOCreateCompromissos;
+import kisiolar.filipe.Viviane.Ai.Compromissos.DTOs.DTOSaidaCompromissos;
+import kisiolar.filipe.Viviane.Ai.Compromissos.DTOs.DTOUpdateCompromissos;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;

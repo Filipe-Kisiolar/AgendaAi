@@ -1,6 +1,6 @@
-package kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes;
+package kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs;
 
-import kisiolar.filipe.Viviane.Ai.Compromissos.DTOSaidaCompromissos;
+import kisiolar.filipe.Viviane.Ai.Compromissos.DTOs.DTOSaidaCompromissos;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
