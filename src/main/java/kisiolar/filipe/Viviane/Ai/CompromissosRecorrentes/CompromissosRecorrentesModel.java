@@ -7,6 +7,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "compromissos_recorrentes")
@@ -145,5 +146,18 @@ public class CompromissosRecorrentesModel {
 
     public void setCompromissosGerados(List<CompromissosModel> compromissosGerados) {
         this.compromissosGerados = compromissosGerados;
+    }
+
+    @Override
+    public boolean equals(Object o){
+        if(this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CompromissosRecorrentesModel that = (CompromissosRecorrentesModel) o;
+        return id != null && id.equals(that.id);
+    }
+
+    @Override
+    public int hashCode(){
+        return Objects.hash(id);
     }
 }

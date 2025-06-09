@@ -5,6 +5,7 @@ import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.CompromissosRecorrente
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Objects;
 
 @Entity
 @Table(name = "compromissos")
@@ -113,5 +114,18 @@ public class CompromissosModel {
 
     public void setHoraFinal(LocalTime horaFinal) {
         this.horaFinal = horaFinal;
+    }
+
+    @Override
+    public boolean equals(Object o){
+        if(this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CompromissosModel that = (CompromissosModel) o;
+        return id != null && id.equals(that.id);
+    }
+
+    @Override
+    public int hashCode(){
+        return Objects.hash(id);
     }
 }
