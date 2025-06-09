@@ -3,7 +3,9 @@ package kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes;
 import jakarta.transaction.Transactional;
 import kisiolar.filipe.Viviane.Ai.Compromissos.CompromissosRepository;
 import kisiolar.filipe.Viviane.Ai.Compromissos.CompromissosService;
+import kisiolar.filipe.Viviane.Ai.Compromissos.DTOs.DTORespostaCriacaoCompromisso;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.DTOCompromissosRecorrentes;
+import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.DTORespostaCriacaoCompromissoRecorrente;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.DTOUpdateCompromissosRecorrentes;
 import kisiolar.filipe.Viviane.Ai.Exceptions.ResourceNotFindException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,7 +69,7 @@ public class CompromissosRecorrentesService{
     }
 
 
-    public DTOCompromissosRecorrentes criarCompromisso(DTOCompromissosRecorrentes dtoCompromissosRecorrentes){
+    public DTORespostaCriacaoCompromissoRecorrente criarCompromisso(DTOCompromissosRecorrentes dtoCompromissosRecorrentes){
 
         //salvar o compromisso e ja guarda-lo
         CompromissosRecorrentesModel compromissoRecorrente = compromissosRecorrentesRepository.save(mapperCompromissosRecorrentes.map(dtoCompromissosRecorrentes));
@@ -75,11 +77,13 @@ public class CompromissosRecorrentesService{
         //chama o metodo criado para gerar os compromissos atrelados
         criarCompromissosPorRecorrencia(compromissoRecorrente);
 
-        return dtoCompromissosRecorrentes;
+        List<DTOCompromissosRecorrentes> conflitos = verificarConflitos(compromissoRecorrente);
+
+        return new DTORespostaCriacaoCompromissoRecorrente(dtoCompromissosRecorrentes,conflitos);
     }
 
     @Transactional
-    public DTOCompromissosRecorrentes alterarCompromisso(long id, DTOUpdateCompromissosRecorrentes dtoUpdateCompromissosRecorrentes){
+    public DTORespostaCriacaoCompromissoRecorrente alterarCompromisso(long id, DTOUpdateCompromissosRecorrentes dtoUpdateCompromissosRecorrentes){
         CompromissosRecorrentesModel compromissosRecorrentesModel = compromissosRecorrentesRepository.findById(id).
                 orElseThrow(() -> new RuntimeException("compromisso recorrente não encontrado"));
 
@@ -96,8 +100,9 @@ public class CompromissosRecorrentesService{
         //cria os novos compromissos a partir do compromisso recorrente atualizado
         criarCompromissosPorRecorrencia(compromissoSalvo);
 
+        List<DTOCompromissosRecorrentes> conflitos = verificarConflitos(compromissoSalvo);
 
-        return mapperCompromissosRecorrentes.map(compromissosRecorrentesModel);
+        return new DTORespostaCriacaoCompromissoRecorrente(mapperCompromissosRecorrentes.map(compromissoSalvo),conflitos);
     }
 
     public void deletarCompromissoPorId(long id){
@@ -121,4 +126,24 @@ public class CompromissosRecorrentesService{
             }
           }
         }
+
+    //confere se ha compromisso recorrente que conflita com o que esta sendo criado ou alterado
+    public List<DTOCompromissosRecorrentes> verificarConflitos(CompromissosRecorrentesModel compromisso){
+        List<CompromissosRecorrentesModel> conflitos = compromissosRecorrentesRepository.buscarConflitosRecorrentes(
+                compromisso.getDataInicioRecorrencia(),
+                compromisso.getDataFimRecorrencia(),
+                compromisso.getDiasDaSemana(),
+                compromisso.getHoraInicial(),
+                compromisso.getHoraFinal()
+        );
+        Long ignorarId = compromisso.getId();
+        // remove o próprio compromisso da lista
+        if(ignorarId != null){
+            conflitos.remove(compromisso);
+        }
+
+        return conflitos.stream()
+                .map(mapperCompromissosRecorrentes ::map)
+                .collect(Collectors.toList());
+    }
 }

@@ -11,9 +11,9 @@ public class DTORespostaCriacaoCompromissoRecorrente {
     public DTORespostaCriacaoCompromissoRecorrente() {
     }
 
-    public DTORespostaCriacaoCompromissoRecorrente(DTOCompromissosRecorrentes dtoCompromissosRecorrentes, Boolean existeConflito, List<DTOCompromissosRecorrentes> compromissosConflitantes) {
+    public DTORespostaCriacaoCompromissoRecorrente(DTOCompromissosRecorrentes dtoCompromissosRecorrentes, List<DTOCompromissosRecorrentes> compromissosConflitantes) {
         this.dtoCompromissosRecorrentes = dtoCompromissosRecorrentes;
-        this.existeConflito = existeConflito;
+        this.existeConflito = !compromissosConflitantes.isEmpty();
         this.compromissosConflitantes = compromissosConflitantes;
     }
 

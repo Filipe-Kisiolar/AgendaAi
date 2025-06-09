@@ -2,6 +2,7 @@ package kisiolar.filipe.Viviane.Ai.Compromissos;
 
 import jakarta.transaction.Transactional;
 import kisiolar.filipe.Viviane.Ai.Compromissos.DTOs.DTOCreateCompromissos;
+import kisiolar.filipe.Viviane.Ai.Compromissos.DTOs.DTORespostaCriacaoCompromisso;
 import kisiolar.filipe.Viviane.Ai.Compromissos.DTOs.DTOSaidaCompromissos;
 import kisiolar.filipe.Viviane.Ai.Compromissos.DTOs.DTOUpdateCompromissos;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.CompromissosRecorrentesModel;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -103,7 +105,7 @@ public class CompromissosService {
         return diasOrganizados;
     }
 
-    public DTOSaidaCompromissos criarCompromisso(DTOCreateCompromissos dtoCreateCompromissos) {
+    public DTORespostaCriacaoCompromisso criarCompromisso(DTOCreateCompromissos dtoCreateCompromissos) {
         CompromissosModel compromissosModel = mapperCompromissos.map(dtoCreateCompromissos);
 
         if  (dtoCreateCompromissos.getCompromissoRecorrenteId() != 0) {
@@ -116,16 +118,20 @@ public class CompromissosService {
 
         compromissosRepository.save(compromissosModel);
 
-        return mapperCompromissos.map(compromissosModel);
+        List<DTOSaidaCompromissos> conflitos = verificarConflitos(compromissosModel);
+
+        return new DTORespostaCriacaoCompromisso(mapperCompromissos.map(compromissosModel),conflitos);
     }
 
-    public DTOSaidaCompromissos alterarCompromisso(long id, DTOUpdateCompromissos dtoUpdateCompromissos){
+    public DTORespostaCriacaoCompromisso alterarCompromisso(long id, DTOUpdateCompromissos dtoUpdateCompromissos){
         CompromissosModel compromissosModel = compromissosRepository.findById(id).
                 orElseThrow(() -> new RuntimeException("compromisso não encontrado"));
         mapperCompromissos.atualizacao(dtoUpdateCompromissos,compromissosModel);
         compromissosRepository.save(compromissosModel);
 
-        return mapperCompromissos.map(compromissosModel);
+        List<DTOSaidaCompromissos> conflitos = verificarConflitos(compromissosModel);
+
+        return new DTORespostaCriacaoCompromisso(mapperCompromissos.map(compromissosModel),conflitos);
     }
 
     public void deletarCompromissoPorId(long id){
@@ -134,4 +140,24 @@ public class CompromissosService {
         }
         compromissosRepository.deleteById(id);
     }
+
+    //lista conflitos de horario com o compromisso passado
+    public List<DTOSaidaCompromissos> verificarConflitos(CompromissosModel compromisso) {
+        List<CompromissosModel> conflitos = compromissosRepository.buscarConflitos(
+                compromisso.getDia(),
+                compromisso.getHoraInicial(),
+                compromisso.getHoraFinal()
+        );
+
+        Long ignorarId = compromisso.getId();
+        // remove o próprio compromisso da lista
+        if (ignorarId != null) {
+            conflitos.remove(compromisso);
+        }
+
+        return conflitos.stream()
+                .map(mapperCompromissos::map)
+                .toList();
+    }
+
 }
