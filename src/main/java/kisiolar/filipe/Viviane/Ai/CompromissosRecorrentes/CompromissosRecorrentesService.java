@@ -40,14 +40,16 @@ public class CompromissosRecorrentesService{
 
     @Transactional
     public DTOCompromissosRecorrentes buscarCompromissoPorId(long id){
-       CompromissosRecorrentesModel compromissosRecorrentesModel = compromissosRecorrentesRepository.findById(id).orElse(null);
+       CompromissosRecorrentesModel compromissosRecorrentesModel = compromissosRecorrentesRepository.findById(id).
+               orElseThrow(() -> new RuntimeException("compromisso recorrente não encontrado"));
 
        return mapperCompromissosRecorrentes.map(compromissosRecorrentesModel);
     }
 
     @Transactional
     public DTOCompromissosRecorrentes buscarCompromissoPorNome(String nome){
-        CompromissosRecorrentesModel compromissosRecorrentesModel = compromissosRecorrentesRepository.findByNome(nome).orElse(null);
+        CompromissosRecorrentesModel compromissosRecorrentesModel = compromissosRecorrentesRepository.findByNome(nome).
+                orElseThrow(() -> new RuntimeException("compromisso recorrente não encontrado"));
 
         return mapperCompromissosRecorrentes.map(compromissosRecorrentesModel);
     }
@@ -75,7 +77,8 @@ public class CompromissosRecorrentesService{
 
     @Transactional
     public DTOCompromissosRecorrentes alterarCompromisso(long id,DTOUpdateCompromissosRecorrentes dtoUpdateCompromissosRecorrentes){
-        CompromissosRecorrentesModel compromissosRecorrentesModel = compromissosRecorrentesRepository.findById(id).orElse(null);
+        CompromissosRecorrentesModel compromissosRecorrentesModel = compromissosRecorrentesRepository.findById(id).
+                orElseThrow(() -> new RuntimeException("compromisso recorrente não encontrado"));
 
         //apaga os compromissos anteriores
         if(!compromissosRecorrentesModel.getCompromissosGerados().isEmpty()){
@@ -101,7 +104,8 @@ public class CompromissosRecorrentesService{
 
     //cria automaticamente compromissos a partir de um compromisso recorrente
     public void criarCompromissosPorRecorrencia(CompromissosRecorrentesModel compromissosModel){
-        CompromissosRecorrentesModel compromissoRecorrente = compromissosRecorrentesRepository.findById(compromissosModel.getId()).orElse(null);
+        CompromissosRecorrentesModel compromissoRecorrente = compromissosRecorrentesRepository.findById(compromissosModel.getId()).
+                orElseThrow(() -> new RuntimeException("compromisso recorrente não encontrado"));
 
         long diferencaEntreDias = ChronoUnit.DAYS.between(compromissoRecorrente.getDataInicioRecorrencia(),compromissoRecorrente.getDataFimRecorrencia());
         LocalDate dataDeInicio = compromissoRecorrente.getDataInicioRecorrencia();

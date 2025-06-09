@@ -3,6 +3,7 @@ package kisiolar.filipe.Viviane.Ai.Compromissos;
 import jakarta.transaction.Transactional;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.CompromissosRecorrentesModel;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.CompromissosRecorrentesRepository;
+import kisiolar.filipe.Viviane.Ai.Exceptions.ResourceNotFindException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -39,7 +40,8 @@ public class CompromissosService {
 
     @Transactional
     public DTOSaidaCompromissos buscarCompromissoPorId(long id){
-        CompromissosModel compromissosModel = compromissosRepository.findById(id).orElse(null);
+        CompromissosModel compromissosModel = compromissosRepository.findById(id).
+                orElseThrow(() -> new ResourceNotFindException("compromisso não encontrado"));
 
         return mapperCompromissos.map(compromissosModel);
     }
@@ -104,7 +106,7 @@ public class CompromissosService {
         if  (dtoCreateCompromissos.getCompromissoRecorrenteId() != 0) {
             CompromissosRecorrentesModel compromissosRecorrentesModel = compromissosRecorrentesRepository
                     .findById(dtoCreateCompromissos.getCompromissoRecorrenteId())
-                    .orElseThrow(() -> new RuntimeException("Compromisso recorrente não encontrado"));
+                    .orElseThrow(() -> new ResourceNotFindException("Compromisso recorrente não encontrado"));
 
             compromissosModel.setCompromissoRecorrente(compromissosRecorrentesModel);
         }
@@ -115,7 +117,8 @@ public class CompromissosService {
     }
 
     public DTOSaidaCompromissos alterarCompromisso(long id,DTOUpdateCompromissos dtoUpdateCompromissos){
-        CompromissosModel compromissosModel = compromissosRepository.findById(id).orElse(null);
+        CompromissosModel compromissosModel = compromissosRepository.findById(id).
+                orElseThrow(() -> new RuntimeException("compromisso não encontrado"));
         mapperCompromissos.atualizacao(dtoUpdateCompromissos,compromissosModel);
         compromissosRepository.save(compromissosModel);
 
