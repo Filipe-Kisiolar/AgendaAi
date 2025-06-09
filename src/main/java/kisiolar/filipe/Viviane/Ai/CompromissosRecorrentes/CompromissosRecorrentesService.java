@@ -3,6 +3,7 @@ package kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes;
 import jakarta.transaction.Transactional;
 import kisiolar.filipe.Viviane.Ai.Compromissos.CompromissosRepository;
 import kisiolar.filipe.Viviane.Ai.Compromissos.CompromissosService;
+import kisiolar.filipe.Viviane.Ai.Exceptions.ResourceNotFindException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -98,7 +99,9 @@ public class CompromissosRecorrentesService{
     }
 
     public void deletarCompromissoPorId(long id){
-        //devo reaftorar depois para caso nao exista esse id
+        if(!compromissosRecorrentesRepository.existsById(id)) {
+            throw new ResourceNotFindException("Compromisso com ID:" +id +"não foi encontrado");
+        }
         compromissosRecorrentesRepository.deleteById(id);
     }
 

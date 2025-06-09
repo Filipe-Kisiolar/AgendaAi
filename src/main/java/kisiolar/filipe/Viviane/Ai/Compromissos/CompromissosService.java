@@ -126,7 +126,9 @@ public class CompromissosService {
     }
 
     public void deletarCompromissoPorId(long id){
-        //devo reaftorar depois para caso nao exista esse id
+        if(!compromissosRepository.existsById(id)){
+            throw new ResourceNotFindException("Compromisso com ID:" +id +"não foi encontrado");
+        }
         compromissosRepository.deleteById(id);
     }
 }
