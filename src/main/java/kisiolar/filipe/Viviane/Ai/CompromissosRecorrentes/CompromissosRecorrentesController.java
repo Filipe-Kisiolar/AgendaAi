@@ -1,6 +1,7 @@
 package kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes;
 
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.DTOCompromissosRecorrentes;
+import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.DTORespostaCriacaoCompromissoRecorrente;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.DTOUpdateCompromissosRecorrentes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -54,15 +55,15 @@ public class CompromissosRecorrentesController {
     }
 
     @PostMapping("/criarcompromisso")
-    public ResponseEntity<DTOCompromissosRecorrentes> criarCompromisso(@RequestBody DTOCompromissosRecorrentes dtoCompromissosRecorrentes){
-        compromissosRecorrentesService.criarCompromisso(dtoCompromissosRecorrentes);
+    public ResponseEntity<DTORespostaCriacaoCompromissoRecorrente> criarCompromisso(@RequestBody DTOCompromissosRecorrentes dtoCompromissosRecorrentes){
+        DTORespostaCriacaoCompromissoRecorrente compromissoCriado = compromissosRecorrentesService.criarCompromisso(dtoCompromissosRecorrentes);
 
-        return ResponseEntity.ok(dtoCompromissosRecorrentes);
+        return ResponseEntity.ok(compromissoCriado);
     }
 
     @PatchMapping("/alterarcompromisso/{id}")
-    public ResponseEntity<DTOCompromissosRecorrentes> alterarCompromisso(@PathVariable long id,@RequestBody DTOUpdateCompromissosRecorrentes updateCompromissosRecorrentes){
-        DTOCompromissosRecorrentes compromissoAlterado = compromissosRecorrentesService.alterarCompromisso(id,updateCompromissosRecorrentes);
+    public ResponseEntity<DTORespostaCriacaoCompromissoRecorrente> alterarCompromisso(@PathVariable long id,@RequestBody DTOUpdateCompromissosRecorrentes updateCompromissosRecorrentes){
+        DTORespostaCriacaoCompromissoRecorrente compromissoAlterado = compromissosRecorrentesService.alterarCompromisso(id,updateCompromissosRecorrentes);
 
         return ResponseEntity.ok(compromissoAlterado);
     }
