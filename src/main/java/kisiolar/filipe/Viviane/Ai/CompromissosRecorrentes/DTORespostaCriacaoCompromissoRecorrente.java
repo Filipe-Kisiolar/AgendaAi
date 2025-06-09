@@ -1,0 +1,43 @@
+package kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes;
+
+import java.util.List;
+
+public class DTORespostaCriacaoCompromissoRecorrente {
+
+    private DTOCompromissosRecorrentes dtoCompromissosRecorrentes;
+    private Boolean existeConflito;
+    private List<DTOCompromissosRecorrentes> compromissosConflitantes;
+
+    public DTORespostaCriacaoCompromissoRecorrente() {
+    }
+
+    public DTORespostaCriacaoCompromissoRecorrente(DTOCompromissosRecorrentes dtoCompromissosRecorrentes, Boolean existeConflito, List<DTOCompromissosRecorrentes> compromissosConflitantes) {
+        this.dtoCompromissosRecorrentes = dtoCompromissosRecorrentes;
+        this.existeConflito = existeConflito;
+        this.compromissosConflitantes = compromissosConflitantes;
+    }
+
+    public DTOCompromissosRecorrentes getDtoCompromissosRecorrentes() {
+        return dtoCompromissosRecorrentes;
+    }
+
+    public void setDtoCompromissosRecorrentes(DTOCompromissosRecorrentes dtoCompromissosRecorrentes) {
+        this.dtoCompromissosRecorrentes = dtoCompromissosRecorrentes;
+    }
+
+    public Boolean getExisteConflito() {
+        return existeConflito;
+    }
+
+    public void setExisteConflito(Boolean existeConflito) {
+        this.existeConflito = existeConflito;
+    }
+
+    public List<DTOCompromissosRecorrentes> getCompromissosConflitantes() {
+        return compromissosConflitantes;
+    }
+
+    public void setCompromissosConflitantes(List<DTOCompromissosRecorrentes> compromissosConflitantes) {
+        this.compromissosConflitantes = compromissosConflitantes;
+    }
+}
