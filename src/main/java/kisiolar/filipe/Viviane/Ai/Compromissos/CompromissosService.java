@@ -83,7 +83,7 @@ public class CompromissosService {
         //gera uma lista de dias na ordem do dia da semana atual ate o dia da semana final
         List<DayOfWeek> ordemDosDias = IntStream.range(0, 7)
                 .mapToObj(i -> diaAtual.plusDays(i).getDayOfWeek())
-                .collect(Collectors.toList());
+                .toList();
 
         //inicializa um map que tem a ordem criada na lista ordemDosDias
         Map<DayOfWeek ,List<DTOSaidaCompromissos>> diasOrganizados= new LinkedHashMap<>();
@@ -126,7 +126,9 @@ public class CompromissosService {
     public DTORespostaCriacaoCompromisso alterarCompromisso(long id, DTOUpdateCompromissos dtoUpdateCompromissos){
         CompromissosModel compromissosModel = compromissosRepository.findById(id).
                 orElseThrow(() -> new RuntimeException("compromisso não encontrado"));
+
         mapperCompromissos.atualizacao(dtoUpdateCompromissos,compromissosModel);
+
         compromissosRepository.save(compromissosModel);
 
         List<DTOSaidaCompromissos> conflitos = verificarConflitos(compromissosModel);
@@ -141,23 +143,31 @@ public class CompromissosService {
         compromissosRepository.deleteById(id);
     }
 
+    //verifica se ha conflito entre dois compromissos
+    public boolean conflitamEntreSi(CompromissosModel compromisso1,CompromissosModel compromisso2){
+        boolean temMesmoDia,horariosConflitam;
+
+
+         temMesmoDia = compromisso1.getDia().equals(compromisso2.getDia());
+
+         horariosConflitam = compromisso1.getHoraInicial().isBefore(compromisso2.getHoraFinal()) &&
+                 compromisso1.getHoraFinal().isAfter(compromisso2.getHoraInicial());
+
+         return temMesmoDia && horariosConflitam;
+    }
+
     //lista conflitos de horario com o compromisso passado
     public List<DTOSaidaCompromissos> verificarConflitos(CompromissosModel compromisso) {
-        List<CompromissosModel> conflitos = compromissosRepository.buscarConflitos(
-                compromisso.getDia(),
-                compromisso.getHoraInicial(),
-                compromisso.getHoraFinal()
-        );
+       List<CompromissosModel> listaTodosCompromissos = compromissosRepository.findAll();
 
-        Long ignorarId = compromisso.getId();
-        // remove o próprio compromisso da lista
-        if (ignorarId != null) {
-            conflitos.remove(compromisso);
-        }
+       List<CompromissosModel> listaConflitos = listaTodosCompromissos.stream()
+               .filter(c -> !c.getId().equals(compromisso.getId()))//ignora o proprio compromisso
+               .filter(c -> conflitamEntreSi(c,compromisso))
+               .toList();
 
-        return conflitos.stream()
-                .map(mapperCompromissos::map)
-                .toList();
+       return listaConflitos.stream()
+               .map(mapperCompromissos ::map)
+               .collect(Collectors.toList());
     }
 
 }

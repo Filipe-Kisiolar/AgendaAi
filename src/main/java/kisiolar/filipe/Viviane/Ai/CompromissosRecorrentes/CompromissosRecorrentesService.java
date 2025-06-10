@@ -3,7 +3,6 @@ package kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes;
 import jakarta.transaction.Transactional;
 import kisiolar.filipe.Viviane.Ai.Compromissos.CompromissosRepository;
 import kisiolar.filipe.Viviane.Ai.Compromissos.CompromissosService;
-import kisiolar.filipe.Viviane.Ai.Compromissos.DTOs.DTORespostaCriacaoCompromisso;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.DTOCompromissosRecorrentes;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.DTORespostaCriacaoCompromissoRecorrente;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.DTOUpdateCompromissosRecorrentes;
@@ -14,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -127,23 +127,32 @@ public class CompromissosRecorrentesService{
           }
         }
 
+    //verifica se ha conflito entre dois compromissos recorrentes
+    public boolean conflitamEntreSi(CompromissosRecorrentesModel compromisso1, CompromissosRecorrentesModel compromisso2){
+        boolean periodosConflitam,diaDaSemanaConflita,horariosConflitam;
+
+        periodosConflitam = compromisso1.getDataInicioRecorrencia().isBefore(compromisso2.getDataFimRecorrencia())
+                && compromisso1.getDataFimRecorrencia().isAfter(compromisso2.getDataInicioRecorrencia());
+
+        diaDaSemanaConflita = !Collections.disjoint(compromisso1.getDiasDaSemana(), compromisso2.getDiasDaSemana());
+
+        horariosConflitam = compromisso1.getHoraInicial().isBefore(compromisso2.getHoraFinal()) &&
+                compromisso1.getHoraFinal().isAfter(compromisso2.getHoraInicial());
+
+        return periodosConflitam && diaDaSemanaConflita && horariosConflitam;
+    }
+
     //confere se ha compromisso recorrente que conflita com o que esta sendo criado ou alterado
     public List<DTOCompromissosRecorrentes> verificarConflitos(CompromissosRecorrentesModel compromisso){
-        List<CompromissosRecorrentesModel> conflitos = compromissosRecorrentesRepository.buscarConflitosRecorrentes(
-                compromisso.getDataInicioRecorrencia(),
-                compromisso.getDataFimRecorrencia(),
-                compromisso.getDiasDaSemana(),
-                compromisso.getHoraInicial(),
-                compromisso.getHoraFinal()
-        );
-        Long ignorarId = compromisso.getId();
-        // remove o próprio compromisso da lista
-        if(ignorarId != null){
-            conflitos.remove(compromisso);
-        }
+        List<CompromissosRecorrentesModel> listaTodosCompromissos = compromissosRecorrentesRepository.findAll();
 
-        return conflitos.stream()
-                .map(mapperCompromissosRecorrentes ::map)
+        List<CompromissosRecorrentesModel> compromissosConflitantes = listaTodosCompromissos.stream()
+                .filter(c -> !c.getId().equals(compromisso.getId()))//tira o proprio compromisso
+                .filter(c -> conflitamEntreSi(c,compromisso))
+                .toList();
+
+        return compromissosConflitantes.stream()
+                .map(mapperCompromissosRecorrentes :: map)
                 .collect(Collectors.toList());
     }
 }
