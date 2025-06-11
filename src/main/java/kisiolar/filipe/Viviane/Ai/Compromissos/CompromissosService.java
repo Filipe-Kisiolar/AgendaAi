@@ -107,44 +107,7 @@ public class CompromissosService {
     public List<List<DTOSaidaCompromissos>> listarCompromissosConflitantes() {
         List<CompromissosModel> listaTodosCompromissos = compromissosRepository.findAll();
 
-        // Mapa de conflitos diretos entre compromissos
-        Map<CompromissosModel, Set<CompromissosModel>> conflitosEntreCompromissos = new HashMap<>();
-
-        for (CompromissosModel compromisso : listaTodosCompromissos) {
-            List<CompromissosModel> listaConflitosIndividualizada= verificarConflitosNaLista(compromisso, listaTodosCompromissos);
-            if(!listaConflitosIndividualizada.isEmpty()) {
-                conflitosEntreCompromissos.put(compromisso, new HashSet<>(listaConflitosIndividualizada));
-            }
-        }
-
-        Set<CompromissosModel> jaVisitados = new HashSet<>();
-        List<List<DTOSaidaCompromissos>> gruposDeConflito = new ArrayList<>();
-
-        for (CompromissosModel compromisso : conflitosEntreCompromissos.keySet()) {
-            if (!jaVisitados.contains(compromisso)) {
-                Set<CompromissosModel> grupo = new HashSet<>();
-                Queue<CompromissosModel> fila = new LinkedList<>();
-                fila.add(compromisso);
-
-                while (!fila.isEmpty()) {
-                    CompromissosModel atual = fila.poll();
-                    if (jaVisitados.add(atual)) {
-                        grupo.add(atual);
-                        fila.addAll(conflitosEntreCompromissos.getOrDefault(atual, Set.of()));
-                    }
-                }
-
-                List<DTOSaidaCompromissos> grupoDTO = grupo.stream()
-                        .map(mapperCompromissos::map)
-                        .collect(Collectors.toList());
-                gruposDeConflito.add(grupoDTO);
-            }
-        }
-
-        gruposDeConflito.sort(Comparator.comparing((List<DTOSaidaCompromissos> grupo) -> grupo.getFirst().getDia())
-                .thenComparing(grupo -> grupo.getFirst().getHoraInicial())
-                .thenComparing(grupo -> grupo.getFirst().getHoraFinal()));
-
+        List<List<DTOSaidaCompromissos>> gruposDeConflito = compromissosConflitantesLista(listaTodosCompromissos);
         return gruposDeConflito;
 
     }
@@ -223,4 +186,46 @@ public class CompromissosService {
        return verificarConflitosNaLista(compromisso,listaTodosCompromissos);
     }
 
+    //retorna grupos de compromissos que conflitam a partir de uma lista
+    public List<List<DTOSaidaCompromissos>> compromissosConflitantesLista(List<CompromissosModel> lista){
+        // Mapa de conflitos diretos entre compromissos
+        Map<CompromissosModel, Set<CompromissosModel>> conflitosEntreCompromissos = new HashMap<>();
+
+        for (CompromissosModel compromisso : lista) {
+            List<CompromissosModel> listaConflitosIndividualizada= verificarConflitosNaLista(compromisso, lista);
+            if(!listaConflitosIndividualizada.isEmpty()) {
+                conflitosEntreCompromissos.put(compromisso, new HashSet<>(listaConflitosIndividualizada));
+            }
+        }
+
+        Set<CompromissosModel> jaVisitados = new HashSet<>();
+        List<List<DTOSaidaCompromissos>> gruposDeConflito = new ArrayList<>();
+
+        for (CompromissosModel compromisso : conflitosEntreCompromissos.keySet()) {
+            if (!jaVisitados.contains(compromisso)) {
+                Set<CompromissosModel> grupo = new HashSet<>();
+                Queue<CompromissosModel> fila = new LinkedList<>();
+                fila.add(compromisso);
+
+                while (!fila.isEmpty()) {
+                    CompromissosModel atual = fila.poll();
+                    if (jaVisitados.add(atual)) {
+                        grupo.add(atual);
+                        fila.addAll(conflitosEntreCompromissos.getOrDefault(atual, Set.of()));
+                    }
+                }
+
+                List<DTOSaidaCompromissos> grupoDTO = grupo.stream()
+                        .map(mapperCompromissos::map)
+                        .collect(Collectors.toList());
+                gruposDeConflito.add(grupoDTO);
+            }
+        }
+
+        gruposDeConflito.sort(Comparator.comparing((List<DTOSaidaCompromissos> grupo) -> grupo.getFirst().getDia())
+                .thenComparing(grupo -> grupo.getFirst().getHoraInicial())
+                .thenComparing(grupo -> grupo.getFirst().getHoraFinal()));
+
+        return gruposDeConflito;
+    }
 }

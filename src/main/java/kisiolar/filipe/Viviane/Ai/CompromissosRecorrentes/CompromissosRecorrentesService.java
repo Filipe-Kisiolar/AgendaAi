@@ -68,41 +68,7 @@ public class CompromissosRecorrentesService{
 
     public List<List<DTOCompromissosRecorrentes>> listarCompromissosConflitantes(){
         List<CompromissosRecorrentesModel> listaTodosCompromissos = compromissosRecorrentesRepository.findAll();
-        Map<CompromissosRecorrentesModel,Set<CompromissosRecorrentesModel>> conflitosEntreCompromissos = new HashMap<>();
-
-        for(CompromissosRecorrentesModel compromissos : listaTodosCompromissos) {
-            List<CompromissosRecorrentesModel> listaIndividualConflitos = verificarConflitosNaLista(compromissos, listaTodosCompromissos);
-            if(!listaIndividualConflitos.isEmpty()) {
-                conflitosEntreCompromissos.put(compromissos, new HashSet<>(listaIndividualConflitos));
-            }
-        }
-            Set<CompromissosRecorrentesModel> jaVisitados = new HashSet<>();
-            List<List<DTOCompromissosRecorrentes>> gruposDeConflito = new ArrayList<>();
-
-            for(CompromissosRecorrentesModel compromisso : conflitosEntreCompromissos.keySet()){
-                if(!jaVisitados.contains(compromisso)) {
-                    Set<CompromissosRecorrentesModel> grupo = new HashSet<>();
-                    Queue<CompromissosRecorrentesModel> fila = new LinkedList<>();
-                    fila.add(compromisso);
-
-                    while (!fila.isEmpty()) {
-                        CompromissosRecorrentesModel atual = fila.poll();
-                        if (jaVisitados.add(atual)) {
-                            grupo.add(atual);
-                            fila.addAll(conflitosEntreCompromissos.getOrDefault(atual, Set.of()));
-                        }
-                    }
-
-                    List<DTOCompromissosRecorrentes> grupoDTO = grupo.stream()
-                            .map(mapperCompromissosRecorrentes::map)
-                            .collect(Collectors.toList());
-                    gruposDeConflito.add(grupoDTO);
-                }
-            }
-        gruposDeConflito.sort(Comparator.comparing((List<DTOCompromissosRecorrentes> grupo) -> grupo.getFirst().getDataInicioRecorrencia())
-                .thenComparing(grupo -> grupo.getFirst().getHoraInicial())
-                .thenComparing(grupo -> grupo.getFirst().getHoraFinal()));
-
+        List<List<DTOCompromissosRecorrentes>> gruposDeConflito = compromissosConflitantesLista(listaTodosCompromissos);
         return gruposDeConflito;
     }
 
@@ -201,5 +167,45 @@ public class CompromissosRecorrentesService{
         List<CompromissosRecorrentesModel> listaTodosCompromissos = compromissosRecorrentesRepository.findAll();
 
         return  verificarConflitosNaLista(compromisso,listaTodosCompromissos);
+    }
+
+    //retorna grupos de compromissos que conflitam a partir de uma lista
+    public List<List<DTOCompromissosRecorrentes>> compromissosConflitantesLista(List<CompromissosRecorrentesModel> lista){
+        Map<CompromissosRecorrentesModel,Set<CompromissosRecorrentesModel>> conflitosEntreCompromissos = new HashMap<>();
+
+        for(CompromissosRecorrentesModel compromissos : lista) {
+            List<CompromissosRecorrentesModel> listaIndividualConflitos = verificarConflitosNaLista(compromissos, lista);
+            if(!listaIndividualConflitos.isEmpty()) {
+                conflitosEntreCompromissos.put(compromissos, new HashSet<>(listaIndividualConflitos));
+            }
+        }
+        Set<CompromissosRecorrentesModel> jaVisitados = new HashSet<>();
+        List<List<DTOCompromissosRecorrentes>> gruposDeConflito = new ArrayList<>();
+
+        for(CompromissosRecorrentesModel compromisso : conflitosEntreCompromissos.keySet()){
+            if(!jaVisitados.contains(compromisso)) {
+                Set<CompromissosRecorrentesModel> grupo = new HashSet<>();
+                Queue<CompromissosRecorrentesModel> fila = new LinkedList<>();
+                fila.add(compromisso);
+
+                while (!fila.isEmpty()) {
+                    CompromissosRecorrentesModel atual = fila.poll();
+                    if (jaVisitados.add(atual)) {
+                        grupo.add(atual);
+                        fila.addAll(conflitosEntreCompromissos.getOrDefault(atual, Set.of()));
+                    }
+                }
+
+                List<DTOCompromissosRecorrentes> grupoDTO = grupo.stream()
+                        .map(mapperCompromissosRecorrentes::map)
+                        .collect(Collectors.toList());
+                gruposDeConflito.add(grupoDTO);
+            }
+        }
+        gruposDeConflito.sort(Comparator.comparing((List<DTOCompromissosRecorrentes> grupo) -> grupo.getFirst().getDataInicioRecorrencia())
+                .thenComparing(grupo -> grupo.getFirst().getHoraInicial())
+                .thenComparing(grupo -> grupo.getFirst().getHoraFinal()));
+
+        return gruposDeConflito;
     }
 }
