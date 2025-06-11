@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -105,6 +104,52 @@ public class CompromissosService {
         return diasOrganizados;
     }
 
+    public List<List<DTOSaidaCompromissos>> listarCompromissosConflitantes() {
+        List<CompromissosModel> listaTodosCompromissos = compromissosRepository.findAll();
+
+        // Mapa de conflitos diretos entre compromissos
+        Map<CompromissosModel, Set<CompromissosModel>> conflitosEntreCompromissos = new HashMap<>();
+
+        for (CompromissosModel compromisso : listaTodosCompromissos) {
+            List<CompromissosModel> listaConflitosIndividualizada= verificarConflitosNaLista(compromisso, listaTodosCompromissos);
+            if(!listaConflitosIndividualizada.isEmpty()) {
+                conflitosEntreCompromissos.put(compromisso, new HashSet<>(listaConflitosIndividualizada));
+            }
+        }
+
+        Set<CompromissosModel> jaVisitados = new HashSet<>();
+        List<List<DTOSaidaCompromissos>> gruposDeConflito = new ArrayList<>();
+
+        for (CompromissosModel compromisso : conflitosEntreCompromissos.keySet()) {
+            if (!jaVisitados.contains(compromisso)) {
+                Set<CompromissosModel> grupo = new HashSet<>();
+                Queue<CompromissosModel> fila = new LinkedList<>();
+                fila.add(compromisso);
+
+                while (!fila.isEmpty()) {
+                    CompromissosModel atual = fila.poll();
+                    if (jaVisitados.add(atual)) {
+                        grupo.add(atual);
+                        fila.addAll(conflitosEntreCompromissos.getOrDefault(atual, Set.of()));
+                    }
+                }
+
+                List<DTOSaidaCompromissos> grupoDTO = grupo.stream()
+                        .map(mapperCompromissos::map)
+                        .collect(Collectors.toList());
+                gruposDeConflito.add(grupoDTO);
+            }
+        }
+
+        gruposDeConflito.sort(Comparator.comparing((List<DTOSaidaCompromissos> grupo) -> grupo.getFirst().getDia())
+                .thenComparing(grupo -> grupo.getFirst().getHoraInicial())
+                .thenComparing(grupo -> grupo.getFirst().getHoraFinal()));
+
+        return gruposDeConflito;
+
+    }
+
+
     public DTORespostaCriacaoCompromisso criarCompromisso(DTOCreateCompromissos dtoCreateCompromissos) {
         CompromissosModel compromissosModel = mapperCompromissos.map(dtoCreateCompromissos);
 
@@ -118,7 +163,9 @@ public class CompromissosService {
 
         compromissosRepository.save(compromissosModel);
 
-        List<DTOSaidaCompromissos> conflitos = verificarConflitos(compromissosModel);
+        List<DTOSaidaCompromissos> conflitos = verificarConflitos(compromissosModel).stream()
+                .map(mapperCompromissos::map)
+                .collect(Collectors.toList());
 
         return new DTORespostaCriacaoCompromisso(mapperCompromissos.map(compromissosModel),conflitos);
     }
@@ -131,7 +178,9 @@ public class CompromissosService {
 
         compromissosRepository.save(compromissosModel);
 
-        List<DTOSaidaCompromissos> conflitos = verificarConflitos(compromissosModel);
+        List<DTOSaidaCompromissos> conflitos = verificarConflitos(compromissosModel).stream()
+                .map(mapperCompromissos::map)
+                .collect(Collectors.toList());
 
         return new DTORespostaCriacaoCompromisso(mapperCompromissos.map(compromissosModel),conflitos);
     }
@@ -156,18 +205,22 @@ public class CompromissosService {
          return temMesmoDia && horariosConflitam;
     }
 
+    //confere se ha compromisso recorrente em uma lista que conflita com o que esta sendo passado
+    public List<CompromissosModel> verificarConflitosNaLista(CompromissosModel compromisso,List<CompromissosModel> lista){
+
+        List<CompromissosModel> listaConflitos = lista.stream()
+                .filter(c -> !c.getId().equals(compromisso.getId()))//ignora o proprio compromisso
+                .filter(c -> conflitamEntreSi(c,compromisso))
+                .toList();
+
+        return listaConflitos;
+    }
+
     //lista conflitos de horario com o compromisso passado
-    public List<DTOSaidaCompromissos> verificarConflitos(CompromissosModel compromisso) {
+    public List<CompromissosModel> verificarConflitos(CompromissosModel compromisso) {
        List<CompromissosModel> listaTodosCompromissos = compromissosRepository.findAll();
 
-       List<CompromissosModel> listaConflitos = listaTodosCompromissos.stream()
-               .filter(c -> !c.getId().equals(compromisso.getId()))//ignora o proprio compromisso
-               .filter(c -> conflitamEntreSi(c,compromisso))
-               .toList();
-
-       return listaConflitos.stream()
-               .map(mapperCompromissos ::map)
-               .collect(Collectors.toList());
+       return verificarConflitosNaLista(compromisso,listaTodosCompromissos);
     }
 
 }

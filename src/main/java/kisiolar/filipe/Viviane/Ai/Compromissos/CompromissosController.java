@@ -67,6 +67,13 @@ public class CompromissosController {
         return ResponseEntity.ok(lista);
     }
 
+    @GetMapping("/listarconflitos")
+    public ResponseEntity<List<List<DTOSaidaCompromissos>>> listarCompromissosConflitantes(){
+        List<List<DTOSaidaCompromissos>> lista = compromissosService.listarCompromissosConflitantes();
+
+        return ResponseEntity.ok(lista);
+    }
+
     @PostMapping("/criarcompromisso")
     public ResponseEntity<DTORespostaCriacaoCompromisso> criarCompromisso(@RequestBody DTOCreateCompromissos dtoCompromissos){
         DTORespostaCriacaoCompromisso compromissos = compromissosService.criarCompromisso(dtoCompromissos);
