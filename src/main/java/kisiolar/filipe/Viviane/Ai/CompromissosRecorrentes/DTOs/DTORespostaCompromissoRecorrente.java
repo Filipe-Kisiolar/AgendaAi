@@ -2,16 +2,20 @@ package kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs;
 
 import java.util.List;
 
-public class DTORespostaCriacaoCompromissoRecorrente {
+public class DTORespostaCompromissoRecorrente {
 
     private DTOCompromissosRecorrentes dtoCompromissosRecorrentes;
     private Boolean existeConflito;
     private List<DTOCompromissosRecorrentes> compromissosConflitantes;
 
-    public DTORespostaCriacaoCompromissoRecorrente() {
+    public DTORespostaCompromissoRecorrente() {
     }
 
-    public DTORespostaCriacaoCompromissoRecorrente(DTOCompromissosRecorrentes dtoCompromissosRecorrentes, List<DTOCompromissosRecorrentes> compromissosConflitantes) {
+    public DTORespostaCompromissoRecorrente(DTOCompromissosRecorrentes dtoCompromissosRecorrentes) {
+        this.dtoCompromissosRecorrentes = dtoCompromissosRecorrentes;
+    }
+
+    public DTORespostaCompromissoRecorrente(DTOCompromissosRecorrentes dtoCompromissosRecorrentes, List<DTOCompromissosRecorrentes> compromissosConflitantes) {
         this.dtoCompromissosRecorrentes = dtoCompromissosRecorrentes;
         this.existeConflito = !compromissosConflitantes.isEmpty();
         this.compromissosConflitantes = compromissosConflitantes;
