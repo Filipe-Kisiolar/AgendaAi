@@ -1,10 +1,7 @@
 package kisiolar.filipe.Viviane.Ai.Compromissos;
 
 import jakarta.transaction.Transactional;
-import kisiolar.filipe.Viviane.Ai.Compromissos.DTOs.DTOCreateCompromissos;
-import kisiolar.filipe.Viviane.Ai.Compromissos.DTOs.DTORespostaCriacaoCompromisso;
-import kisiolar.filipe.Viviane.Ai.Compromissos.DTOs.DTOSaidaCompromissos;
-import kisiolar.filipe.Viviane.Ai.Compromissos.DTOs.DTOUpdateCompromissos;
+import kisiolar.filipe.Viviane.Ai.Compromissos.DTOs.*;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.CompromissosRecorrentesModel;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.CompromissosRecorrentesRepository;
 import kisiolar.filipe.Viviane.Ai.Exceptions.ResourceNotFindException;
@@ -30,78 +27,126 @@ public class CompromissosService {
     private MapperCompromissos mapperCompromissos;
 
     @Transactional
-    public List<DTOSaidaCompromissos> listarCompromissos(){
+    public DTORespostaListasCompromissos listarCompromissos(){
         List<CompromissosModel> lista = compromissosRepository.findAll();
-        return lista.stream()
-                .sorted(Comparator
-                        .comparing(CompromissosModel::getDia)
-                        .thenComparing(CompromissosModel::getHoraInicial)
+        List<DTOSaidaCompromissos> listaDto =lista.stream()
+                        .sorted(Comparator
+                            .comparing(CompromissosModel::getDia)
+                            .thenComparing(CompromissosModel::getHoraInicial)
                         )
-                .map(mapperCompromissos::map)
-                .collect(Collectors.toList());
+                        .map(mapperCompromissos::map)
+                        .toList();
 
+        return new DTORespostaListasCompromissos(listaDto);
     }
 
     @Transactional
-    public DTOSaidaCompromissos buscarCompromissoPorId(long id){
+    public DTORespostaCompromisso buscarCompromissoPorId(long id){
         CompromissosModel compromissosModel = compromissosRepository.findById(id).
                 orElseThrow(() -> new ResourceNotFindException("compromisso não encontrado"));
 
-        return mapperCompromissos.map(compromissosModel);
+        DTOSaidaCompromissos dtoSaidaCompromissos = mapperCompromissos.map(compromissosModel);
+
+        List<DTOSaidaCompromissos> conflitos = verificarConflitos(compromissosModel).stream()
+                .map(mapperCompromissos::map)
+                .toList();
+
+        if(conflitos.isEmpty()){
+            return new DTORespostaCompromisso(dtoSaidaCompromissos);
+        }else {
+            return new DTORespostaCompromisso(dtoSaidaCompromissos,conflitos);
+        }
     }
 
     @Transactional
-    public List<DTOSaidaCompromissos> listarCompromissosPorNome(String nome){
+    public DTORespostaListasCompromissos listarCompromissosPorNome(String nome){
         List<CompromissosModel> lista = compromissosRepository.findByNome(nome);
 
-        return lista.stream().
-                sorted(Comparator.
-                        comparing(CompromissosModel::getDia).
-                        thenComparing(CompromissosModel::getHoraInicial)).
-                map(mapperCompromissos::map).
-                collect(Collectors.toList());
+        List<DTOSaidaCompromissos> listaDto =lista.stream()
+                .sorted(Comparator
+                        .comparing(CompromissosModel::getDia)
+                        .thenComparing(CompromissosModel::getHoraInicial)
+                )
+                .map(mapperCompromissos::map)
+                .toList();
+
+        List<List<DTOSaidaCompromissos>> conflitos = compromissosConflitantesLista(lista);
+
+        if(conflitos.isEmpty()){
+            return new DTORespostaListasCompromissos(listaDto);
+        }else {
+            return new DTORespostaListasCompromissos(listaDto,conflitos);
+        }
     }
 
     @Transactional
-    public List<DTOSaidaCompromissos> listarCompromissosDoDia(LocalDate dia){
+    public DTORespostaListasCompromissos listarCompromissosDoDia(LocalDate dia){
         List<CompromissosModel> lista = compromissosRepository.findByDia(dia);
-        return lista.stream().
-                sorted(Comparator.comparing(CompromissosModel::getHoraInicial)).
-                map(mapperCompromissos::map).
-                collect(Collectors.toList());
+        List<DTOSaidaCompromissos> listaDto =lista.stream()
+                .sorted(Comparator
+                        .comparing(CompromissosModel::getDia)
+                        .thenComparing(CompromissosModel::getHoraInicial)
+                )
+                .map(mapperCompromissos::map)
+                .toList();
+
+        List<List<DTOSaidaCompromissos>> conflitos = compromissosConflitantesLista(lista);
+
+        if(conflitos.isEmpty()){
+            return new DTORespostaListasCompromissos(listaDto);
+        }else {
+            return new DTORespostaListasCompromissos(listaDto,conflitos);
+        }
     }
 
     //gera uma lista de compromissos da semana a partir do dia que a requisicao foi feita
     @Transactional
-    public Map<DayOfWeek,List<DTOSaidaCompromissos>> listarCompromissosDaSemana(LocalDate diaAtual){
-
+    public Map<DayOfWeek, DTORespostaListasCompromissos> listarCompromissosDaSemana(LocalDate diaAtual) {
         LocalDate diaFinal = diaAtual.plusDays(6);
 
-        List<CompromissosModel> compromissosDaSemana = compromissosRepository.findByDiaBetween(diaAtual,diaFinal);
+        List<CompromissosModel> compromissosDaSemana = compromissosRepository.findByDiaBetween(diaAtual, diaFinal);
 
-        //gera uma lista de dias na ordem do dia da semana atual ate o dia da semana final
+        //Define a ordem dos dias da semana a partir da data atual
         List<DayOfWeek> ordemDosDias = IntStream.range(0, 7)
                 .mapToObj(i -> diaAtual.plusDays(i).getDayOfWeek())
                 .toList();
 
-        //inicializa um map que tem a ordem criada na lista ordemDosDias
-        Map<DayOfWeek ,List<DTOSaidaCompromissos>> diasOrganizados= new LinkedHashMap<>();
-        for (DayOfWeek dia: ordemDosDias){
-            diasOrganizados.put(dia, new ArrayList<>());
-        }
-        //altera os models para dtosaida e ja preenche o map com eles
-        for (CompromissosModel compromisso : compromissosDaSemana){
-            DayOfWeek dia = compromisso.getDia().getDayOfWeek();
-            if (diasOrganizados.containsKey(dia)){
-                diasOrganizados.get(dia).add(mapperCompromissos.map(compromisso));
-            }
+        //Inicializa o map com todos os dias da semana vazios, mantendo a ordem
+        Map<DayOfWeek, List<CompromissosModel>> compromissosPorDia = new LinkedHashMap<>();
+        for (DayOfWeek dia : ordemDosDias) {
+            compromissosPorDia.put(dia, new ArrayList<>());
         }
 
-        //aqui organiza os compromissos pelos horarios
-        for (List<DTOSaidaCompromissos> lista : diasOrganizados.values()) {
-            lista.sort(Comparator.comparing(DTOSaidaCompromissos::getHoraInicial));
+        //Preenche o map com os compromissos encontrados
+        for (CompromissosModel compromisso : compromissosDaSemana) {
+            DayOfWeek dia = compromisso.getDia().getDayOfWeek();
+            compromissosPorDia.get(dia).add(compromisso);
         }
-        return diasOrganizados;
+
+        //Ordena os compromissos de cada dia por hora
+        compromissosPorDia.values().forEach(lista ->
+                lista.sort(Comparator.comparing(CompromissosModel::getHoraInicial)));
+
+        //Monta o map de resposta com os conflitos
+        Map<DayOfWeek, DTORespostaListasCompromissos> respostaPorDia = new LinkedHashMap<>();
+
+        for (DayOfWeek dia : ordemDosDias) {
+            List<CompromissosModel> listaCompromissos = compromissosPorDia.get(dia);
+
+            List<DTOSaidaCompromissos> listaDto = listaCompromissos.stream()
+                    .map(mapperCompromissos::map)
+                    .toList();
+
+            List<List<DTOSaidaCompromissos>> conflitos = compromissosConflitantesLista(listaCompromissos);
+
+            DTORespostaListasCompromissos resposta = new DTORespostaListasCompromissos();
+            resposta.setListaCompromissos(listaDto);
+            resposta.setCompromissosConflitantes(conflitos);
+
+            respostaPorDia.put(dia, resposta);
+        }
+
+        return respostaPorDia;
     }
 
     public List<List<DTOSaidaCompromissos>> listarCompromissosConflitantes() {
@@ -113,7 +158,7 @@ public class CompromissosService {
     }
 
 
-    public DTORespostaCriacaoCompromisso criarCompromisso(DTOCreateCompromissos dtoCreateCompromissos) {
+    public DTORespostaCompromisso criarCompromisso(DTOCreateCompromissos dtoCreateCompromissos) {
         CompromissosModel compromissosModel = mapperCompromissos.map(dtoCreateCompromissos);
 
         if  (dtoCreateCompromissos.getCompromissoRecorrenteId() != 0) {
@@ -130,10 +175,10 @@ public class CompromissosService {
                 .map(mapperCompromissos::map)
                 .collect(Collectors.toList());
 
-        return new DTORespostaCriacaoCompromisso(mapperCompromissos.map(compromissosModel),conflitos);
+        return new DTORespostaCompromisso(mapperCompromissos.map(compromissosModel),conflitos);
     }
 
-    public DTORespostaCriacaoCompromisso alterarCompromisso(long id, DTOUpdateCompromissos dtoUpdateCompromissos){
+    public DTORespostaCompromisso alterarCompromisso(long id, DTOUpdateCompromissos dtoUpdateCompromissos){
         CompromissosModel compromissosModel = compromissosRepository.findById(id).
                 orElseThrow(() -> new RuntimeException("compromisso não encontrado"));
 
@@ -145,7 +190,7 @@ public class CompromissosService {
                 .map(mapperCompromissos::map)
                 .collect(Collectors.toList());
 
-        return new DTORespostaCriacaoCompromisso(mapperCompromissos.map(compromissosModel),conflitos);
+        return new DTORespostaCompromisso(mapperCompromissos.map(compromissosModel),conflitos);
     }
 
     public void deletarCompromissoPorId(long id){

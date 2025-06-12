@@ -2,7 +2,7 @@ package kisiolar.filipe.Viviane.Ai.Compromissos;
 
 
 import kisiolar.filipe.Viviane.Ai.Compromissos.DTOs.DTOCreateCompromissos;
-import kisiolar.filipe.Viviane.Ai.Compromissos.DTOs.DTORespostaCriacaoCompromisso;
+import kisiolar.filipe.Viviane.Ai.Compromissos.DTOs.DTORespostaCompromisso;
 import kisiolar.filipe.Viviane.Ai.Compromissos.DTOs.DTOSaidaCompromissos;
 import kisiolar.filipe.Viviane.Ai.Compromissos.DTOs.DTOUpdateCompromissos;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,15 +75,15 @@ public class CompromissosController {
     }
 
     @PostMapping("/criarcompromisso")
-    public ResponseEntity<DTORespostaCriacaoCompromisso> criarCompromisso(@RequestBody DTOCreateCompromissos dtoCompromissos){
-        DTORespostaCriacaoCompromisso compromissos = compromissosService.criarCompromisso(dtoCompromissos);
+    public ResponseEntity<DTORespostaCompromisso> criarCompromisso(@RequestBody DTOCreateCompromissos dtoCompromissos){
+        DTORespostaCompromisso compromissos = compromissosService.criarCompromisso(dtoCompromissos);
 
         return ResponseEntity.ok(compromissos);
     }
 
     @PatchMapping("/alterarcompromisso/{id}")
-    public ResponseEntity<DTORespostaCriacaoCompromisso> alterarCompromisso(@PathVariable long id,@RequestBody DTOUpdateCompromissos update){
-        DTORespostaCriacaoCompromisso compromissoAlterado = compromissosService.alterarCompromisso(id,update);
+    public ResponseEntity<DTORespostaCompromisso> alterarCompromisso(@PathVariable long id, @RequestBody DTOUpdateCompromissos update){
+        DTORespostaCompromisso compromissoAlterado = compromissosService.alterarCompromisso(id,update);
 
         return ResponseEntity.ok(compromissoAlterado);
     }

@@ -4,7 +4,8 @@ import jakarta.transaction.Transactional;
 import kisiolar.filipe.Viviane.Ai.Compromissos.CompromissosRepository;
 import kisiolar.filipe.Viviane.Ai.Compromissos.CompromissosService;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.DTOCompromissosRecorrentes;
-import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.DTORespostaCriacaoCompromissoRecorrente;
+import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.DTORespostaCompromissoRecorrente;
+import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.DTORespostasListasCompromissoRecorrentes;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.DTOUpdateCompromissosRecorrentes;
 import kisiolar.filipe.Viviane.Ai.Exceptions.ResourceNotFindException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,39 +32,72 @@ public class CompromissosRecorrentesService{
     private MapperCompromissosRecorrentes mapperCompromissosRecorrentes;
 
     @Transactional
-    public List<DTOCompromissosRecorrentes> listarCompromissos(){
+    //TODO: refatora para ter outra lista completa mapeada pelos dias da semana
+    public DTORespostasListasCompromissoRecorrentes listarCompromissos(){
         List<CompromissosRecorrentesModel> lista = compromissosRecorrentesRepository.findAll();
 
-        return lista.stream().
+        List<DTOCompromissosRecorrentes> listaDto =lista.stream().
                 sorted(Comparator
                         .comparing(CompromissosRecorrentesModel::getDataInicioRecorrencia)).
                 map(mapperCompromissosRecorrentes ::map).
                 collect(Collectors.toList());
+
+        return new DTORespostasListasCompromissoRecorrentes(listaDto);
     }
 
     @Transactional
-    public DTOCompromissosRecorrentes buscarCompromissoPorId(long id){
+    public DTORespostaCompromissoRecorrente buscarCompromissoPorId(long id){
        CompromissosRecorrentesModel compromissosRecorrentesModel = compromissosRecorrentesRepository.findById(id).
                orElseThrow(() -> new RuntimeException("compromisso recorrente não encontrado"));
 
-       return mapperCompromissosRecorrentes.map(compromissosRecorrentesModel);
+       DTOCompromissosRecorrentes dtoCompromissosRecorrentes = mapperCompromissosRecorrentes.map(compromissosRecorrentesModel);
+
+       List<DTOCompromissosRecorrentes> conflitos = verificarConflitos(compromissosRecorrentesModel).stream()
+               .map(mapperCompromissosRecorrentes::map)
+               .toList();
+
+       if (conflitos.isEmpty()){
+           return new DTORespostaCompromissoRecorrente(dtoCompromissosRecorrentes);
+       }else{
+           return new DTORespostaCompromissoRecorrente(dtoCompromissosRecorrentes,conflitos);
+       }
     }
 
     @Transactional
-    public DTOCompromissosRecorrentes buscarCompromissoPorNome(String nome){
+    public DTORespostaCompromissoRecorrente buscarCompromissoPorNome(String nome){
         CompromissosRecorrentesModel compromissosRecorrentesModel = compromissosRecorrentesRepository.findByNome(nome).
                 orElseThrow(() -> new RuntimeException("compromisso recorrente não encontrado"));
 
-        return mapperCompromissosRecorrentes.map(compromissosRecorrentesModel);
+        DTOCompromissosRecorrentes dtoCompromissosRecorrentes = mapperCompromissosRecorrentes.map(compromissosRecorrentesModel);
+
+        List<DTOCompromissosRecorrentes> conflitos = verificarConflitos(compromissosRecorrentesModel).stream()
+                .map(mapperCompromissosRecorrentes::map)
+                .toList();
+
+        if (conflitos.isEmpty()){
+            return new DTORespostaCompromissoRecorrente(dtoCompromissosRecorrentes);
+        }else{
+            return new DTORespostaCompromissoRecorrente(dtoCompromissosRecorrentes,conflitos);
+        }
     }
 
     @Transactional
-    public List<DTOCompromissosRecorrentes> buscarCompromissoPorDiaDaSemana(DayOfWeek dia){
+    public DTORespostasListasCompromissoRecorrentes buscarCompromissoPorDiaDaSemana(DayOfWeek dia){
         List<CompromissosRecorrentesModel> lista = compromissosRecorrentesRepository.findByDiasDaSemana(dia);
 
-        return  lista.stream().
+        List<DTOCompromissosRecorrentes> listaDto =lista.stream().
+                sorted(Comparator
+                        .comparing(CompromissosRecorrentesModel::getDataInicioRecorrencia)).
                 map(mapperCompromissosRecorrentes ::map).
                 collect(Collectors.toList());
+
+        List<List<DTOCompromissosRecorrentes>> conflitos = compromissosConflitantesLista(lista);
+
+        if(conflitos.isEmpty()){
+            return new DTORespostasListasCompromissoRecorrentes(listaDto);
+        }else {
+            return new DTORespostasListasCompromissoRecorrentes(listaDto,conflitos);
+        }
     }
 
     public List<List<DTOCompromissosRecorrentes>> listarCompromissosConflitantes(){
@@ -72,7 +106,7 @@ public class CompromissosRecorrentesService{
         return gruposDeConflito;
     }
 
-    public DTORespostaCriacaoCompromissoRecorrente criarCompromisso(DTOCompromissosRecorrentes dtoCompromissosRecorrentes){
+    public DTORespostaCompromissoRecorrente criarCompromisso(DTOCompromissosRecorrentes dtoCompromissosRecorrentes){
 
         //salvar o compromisso e ja guarda-lo
         CompromissosRecorrentesModel compromissoRecorrente = compromissosRecorrentesRepository.save(mapperCompromissosRecorrentes.map(dtoCompromissosRecorrentes));
@@ -84,11 +118,11 @@ public class CompromissosRecorrentesService{
                 .map(mapperCompromissosRecorrentes :: map)
                 .collect(Collectors.toList());
 
-        return new DTORespostaCriacaoCompromissoRecorrente(dtoCompromissosRecorrentes,conflitos);
+        return new DTORespostaCompromissoRecorrente(dtoCompromissosRecorrentes,conflitos);
     }
 
     @Transactional
-    public DTORespostaCriacaoCompromissoRecorrente alterarCompromisso(long id, DTOUpdateCompromissosRecorrentes dtoUpdateCompromissosRecorrentes){
+    public DTORespostaCompromissoRecorrente alterarCompromisso(long id, DTOUpdateCompromissosRecorrentes dtoUpdateCompromissosRecorrentes){
         CompromissosRecorrentesModel compromissosRecorrentesModel = compromissosRecorrentesRepository.findById(id).
                 orElseThrow(() -> new RuntimeException("compromisso recorrente não encontrado"));
 
@@ -109,7 +143,7 @@ public class CompromissosRecorrentesService{
                 .map(mapperCompromissosRecorrentes :: map)
                 .collect(Collectors.toList());
 
-        return new DTORespostaCriacaoCompromissoRecorrente(mapperCompromissosRecorrentes.map(compromissoSalvo),conflitos);
+        return new DTORespostaCompromissoRecorrente(mapperCompromissosRecorrentes.map(compromissoSalvo),conflitos);
     }
 
     public void deletarCompromissoPorId(long id){
@@ -120,6 +154,7 @@ public class CompromissosRecorrentesService{
     }
 
     //cria automaticamente compromissos a partir de um compromisso recorrente
+    //TODO:refatora esse metodo para retornar os compromissos conflitantes criados
     public void criarCompromissosPorRecorrencia(CompromissosRecorrentesModel compromissosModel){
         CompromissosRecorrentesModel compromissoRecorrente = compromissosRecorrentesRepository.findById(compromissosModel.getId()).
                 orElseThrow(() -> new RuntimeException("compromisso recorrente não encontrado"));
