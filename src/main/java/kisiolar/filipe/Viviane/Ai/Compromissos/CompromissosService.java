@@ -175,7 +175,11 @@ public class CompromissosService {
                 .map(mapperCompromissos::map)
                 .collect(Collectors.toList());
 
-        return new DTORespostaCompromisso(mapperCompromissos.map(compromissosModel),conflitos);
+        if(conflitos.isEmpty()){
+            return new DTORespostaCompromisso(mapperCompromissos.map(compromissosModel));
+        }else{
+            return new DTORespostaCompromisso(mapperCompromissos.map(compromissosModel),conflitos);
+        }
     }
 
     public DTORespostaCompromisso alterarCompromisso(long id, DTOUpdateCompromissos dtoUpdateCompromissos){
@@ -190,7 +194,11 @@ public class CompromissosService {
                 .map(mapperCompromissos::map)
                 .collect(Collectors.toList());
 
-        return new DTORespostaCompromisso(mapperCompromissos.map(compromissosModel),conflitos);
+        if(conflitos.isEmpty()){
+            return new DTORespostaCompromisso(mapperCompromissos.map(compromissosModel));
+        }else{
+            return new DTORespostaCompromisso(mapperCompromissos.map(compromissosModel),conflitos);
+        }
     }
 
     public void deletarCompromissoPorId(long id){
