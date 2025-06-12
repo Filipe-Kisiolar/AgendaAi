@@ -3,6 +3,7 @@ package kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes;
 import jakarta.transaction.Transactional;
 import kisiolar.filipe.Viviane.Ai.Compromissos.CompromissosRepository;
 import kisiolar.filipe.Viviane.Ai.Compromissos.CompromissosService;
+import kisiolar.filipe.Viviane.Ai.Compromissos.DTOs.DTORespostaCompromisso;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.DTOCompromissosRecorrentes;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.DTORespostaCompromissoRecorrente;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.DTORespostasListasCompromissoRecorrentes;
@@ -59,7 +60,7 @@ public class CompromissosRecorrentesService{
        if (conflitos.isEmpty()){
            return new DTORespostaCompromissoRecorrente(dtoCompromissosRecorrentes);
        }else{
-           return new DTORespostaCompromissoRecorrente(dtoCompromissosRecorrentes,conflitos);
+           return DTORespostaCompromissoRecorrente.comConflitosRecorrentes(dtoCompromissosRecorrentes,conflitos);
        }
     }
 
@@ -77,7 +78,7 @@ public class CompromissosRecorrentesService{
         if (conflitos.isEmpty()){
             return new DTORespostaCompromissoRecorrente(dtoCompromissosRecorrentes);
         }else{
-            return new DTORespostaCompromissoRecorrente(dtoCompromissosRecorrentes,conflitos);
+            return DTORespostaCompromissoRecorrente.comConflitosRecorrentes(dtoCompromissosRecorrentes,conflitos);
         }
     }
 
@@ -111,14 +112,22 @@ public class CompromissosRecorrentesService{
         //salvar o compromisso e ja guarda-lo
         CompromissosRecorrentesModel compromissoRecorrente = compromissosRecorrentesRepository.save(mapperCompromissosRecorrentes.map(dtoCompromissosRecorrentes));
 
-        //chama o metodo criado para gerar os compromissos atrelados
-        criarCompromissosPorRecorrencia(compromissoRecorrente);
+        //chama o metodo criado para gerar os compromissos atrelados e guarda conflitos(se houver)
+        List<DTORespostaCompromisso> compromissosGeradosComConflito = criarCompromissosPorRecorrencia(compromissoRecorrente);
 
         List<DTOCompromissosRecorrentes> conflitos = verificarConflitos(compromissoRecorrente).stream()
                 .map(mapperCompromissosRecorrentes :: map)
                 .collect(Collectors.toList());
 
-        return new DTORespostaCompromissoRecorrente(dtoCompromissosRecorrentes,conflitos);
+        if(conflitos.isEmpty() && compromissosGeradosComConflito.isEmpty()){
+            return new DTORespostaCompromissoRecorrente(dtoCompromissosRecorrentes);
+        } else if (conflitos.isEmpty()) {
+            return DTORespostaCompromissoRecorrente.comConflitosGerados(dtoCompromissosRecorrentes,compromissosGeradosComConflito);
+        } else if (compromissosGeradosComConflito.isEmpty()) {
+            return DTORespostaCompromissoRecorrente.comConflitosRecorrentes(dtoCompromissosRecorrentes,conflitos);
+        } else {
+            return new DTORespostaCompromissoRecorrente(dtoCompromissosRecorrentes,conflitos,compromissosGeradosComConflito);
+        }
     }
 
     @Transactional
@@ -136,14 +145,24 @@ public class CompromissosRecorrentesService{
         //salva as alteracoes do compromisso recorrente e o guarda em uma variavel
         CompromissosRecorrentesModel compromissoSalvo = compromissosRecorrentesRepository.save(compromissosRecorrentesModel);
 
-        //cria os novos compromissos a partir do compromisso recorrente atualizado
-        criarCompromissosPorRecorrencia(compromissoSalvo);
+        DTOCompromissosRecorrentes compromissoSalvoDto = mapperCompromissosRecorrentes.map(compromissoSalvo);
+
+        //chama o metodo criado para gerar os compromissos atrelados e guarda conflitos(se houver)
+        List<DTORespostaCompromisso> compromissosGeradosComConflito = criarCompromissosPorRecorrencia(compromissoSalvo);
 
         List<DTOCompromissosRecorrentes> conflitos = verificarConflitos(compromissoSalvo).stream()
                 .map(mapperCompromissosRecorrentes :: map)
                 .collect(Collectors.toList());
 
-        return new DTORespostaCompromissoRecorrente(mapperCompromissosRecorrentes.map(compromissoSalvo),conflitos);
+        if(conflitos.isEmpty() && compromissosGeradosComConflito.isEmpty()){
+            return new DTORespostaCompromissoRecorrente(compromissoSalvoDto);
+        } else if (conflitos.isEmpty()) {
+            return DTORespostaCompromissoRecorrente.comConflitosGerados(compromissoSalvoDto,compromissosGeradosComConflito);
+        } else if (compromissosGeradosComConflito.isEmpty()) {
+            return DTORespostaCompromissoRecorrente.comConflitosRecorrentes(compromissoSalvoDto,conflitos);
+        } else {
+            return new DTORespostaCompromissoRecorrente(compromissoSalvoDto,conflitos,compromissosGeradosComConflito);
+        }
     }
 
     public void deletarCompromissoPorId(long id){
@@ -154,19 +173,27 @@ public class CompromissosRecorrentesService{
     }
 
     //cria automaticamente compromissos a partir de um compromisso recorrente
-    //TODO:refatora esse metodo para retornar os compromissos conflitantes criados
-    public void criarCompromissosPorRecorrencia(CompromissosRecorrentesModel compromissosModel){
+    public List<DTORespostaCompromisso> criarCompromissosPorRecorrencia(CompromissosRecorrentesModel compromissosModel){
         CompromissosRecorrentesModel compromissoRecorrente = compromissosRecorrentesRepository.findById(compromissosModel.getId()).
                 orElseThrow(() -> new RuntimeException("compromisso recorrente não encontrado"));
 
         long diferencaEntreDias = ChronoUnit.DAYS.between(compromissoRecorrente.getDataInicioRecorrencia(),compromissoRecorrente.getDataFimRecorrencia());
         LocalDate dataDeInicio = compromissoRecorrente.getDataInicioRecorrencia();
+
+        //lista para pegar os compromissos com conflitos gerados
+        List<DTORespostaCompromisso> compromissosComConflito = new ArrayList<>();
+
             for(long i = 0;i<= diferencaEntreDias;i++){
-            //confere se o dia esta dentro dos dias da semana q algo repete
+            //confere se o dia esta dentro dos dias da semana q compromisso recorrente repete
             if(compromissoRecorrente.getDiasDaSemana().contains(dataDeInicio.plusDays(i).getDayOfWeek())) {
-                compromissosService.criarCompromisso(mapperCompromissosRecorrentes.mapGerarCompromisso(compromissoRecorrente, dataDeInicio.plusDays(i)));
+                DTORespostaCompromisso compromissoCriado = compromissosService.criarCompromisso(mapperCompromissosRecorrentes
+                        .mapGerarCompromisso(compromissoRecorrente, dataDeInicio.plusDays(i)));
+                if(compromissoCriado.getExisteConflito()){
+                    compromissosComConflito.add(compromissoCriado);
+                }
             }
           }
+            return compromissosComConflito;
         }
 
     //verifica se ha conflito entre dois compromissos recorrentes
