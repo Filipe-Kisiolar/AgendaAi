@@ -1,11 +1,14 @@
 package kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import java.util.List;
 
 public class DTORespostasListasCompromissoRecorrentes {
 
     List<DTOCompromissosRecorrentes> listaCompromissosRecorrentes;
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     List<List<DTOCompromissosRecorrentes>> compromissosConflitantes;
 
     public DTORespostasListasCompromissoRecorrentes() {
