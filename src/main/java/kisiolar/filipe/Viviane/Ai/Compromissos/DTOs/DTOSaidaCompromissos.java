@@ -1,4 +1,4 @@
-package kisiolar.filipe.Viviane.Ai.Compromissos;
+package kisiolar.filipe.Viviane.Ai.Compromissos.DTOs;
 
 import java.time.LocalDate;
 import java.time.LocalTime;

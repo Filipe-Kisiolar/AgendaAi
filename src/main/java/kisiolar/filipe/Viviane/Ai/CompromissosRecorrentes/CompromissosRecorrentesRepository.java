@@ -10,4 +10,5 @@ public interface CompromissosRecorrentesRepository extends JpaRepository<Comprom
     Optional<CompromissosRecorrentesModel> findByNome(String nome);
 
     List<CompromissosRecorrentesModel> findByDiasDaSemana(DayOfWeek diaDaSemana);
+
 }

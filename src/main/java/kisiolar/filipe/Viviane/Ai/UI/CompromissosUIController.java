@@ -1,9 +1,7 @@
 package kisiolar.filipe.Viviane.Ai.UI;
 
 import kisiolar.filipe.Viviane.Ai.Compromissos.CompromissosService;
-import kisiolar.filipe.Viviane.Ai.Compromissos.DTOCreateCompromissos;
-import kisiolar.filipe.Viviane.Ai.Compromissos.DTOSaidaCompromissos;
-import kisiolar.filipe.Viviane.Ai.Compromissos.DTOUpdateCompromissos;
+import kisiolar.filipe.Viviane.Ai.Compromissos.DTOs.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
@@ -29,28 +27,28 @@ public class CompromissosUIController {
 
     @GetMapping("/listarcompromissos")
     public String listarCompromissos(Model model) {
-        List<DTOSaidaCompromissos> lista = compromissosService.listarCompromissos();
+        DTORespostaListasCompromissos lista = compromissosService.listarCompromissos();
         model.addAttribute("compromissos", lista);
         return "compromissos/listar";
     }
 
     @GetMapping("/buscarcompromissoporid/{id}")
     public String buscarCompromissoPorId(@PathVariable long id, Model model) {
-        DTOSaidaCompromissos compromisso = compromissosService.buscarCompromissoPorId(id);
+        DTORespostaCompromisso compromisso = compromissosService.buscarCompromissoPorId(id);
         model.addAttribute("compromisso", compromisso);
         return "compromissos/detalhe";
     }
 
     @GetMapping("/listarcompromissopornome/{nome}")
     public String buscarCompromissoPorNome(@PathVariable String nome, Model model) {
-        List<DTOSaidaCompromissos> lista = compromissosService.listarCompromissosPorNome(nome);
+        DTORespostaListasCompromissos lista = compromissosService.listarCompromissosPorNome(nome);
         model.addAttribute("compromissos", lista);
         return "compromissos/listar";
     }
 
     @GetMapping("/listarcompromissosdodia/{dia}")
     public String listarCompromissosDoDia(@PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dia, Model model) {
-        List<DTOSaidaCompromissos> lista = compromissosService.listarCompromissosDoDia(dia);
+        DTORespostaListasCompromissos lista = compromissosService.listarCompromissosDoDia(dia);
         model.addAttribute("compromissos", lista);
         model.addAttribute("dia", dia);
         return "compromissos/dia";
@@ -58,7 +56,7 @@ public class CompromissosUIController {
 
     @GetMapping("/listarcompromissosdasemana/{dia}")
     public String listarCompromissosDaSemana(@PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dia, Model model) {
-        Map<DayOfWeek, List<DTOSaidaCompromissos>> lista = compromissosService.listarCompromissosDaSemana(dia);
+        Map<DayOfWeek, DTORespostaListasCompromissos> lista = compromissosService.listarCompromissosDaSemana(dia);
         model.addAttribute("dias", lista);
         model.addAttribute("diaInicial", dia);
         return "compromissos/semana";
@@ -78,7 +76,7 @@ public class CompromissosUIController {
 
     @GetMapping("/alterarcompromisso/{id}")
     public String formAlterar(@PathVariable long id, Model model) {
-        DTOSaidaCompromissos compromisso = compromissosService.buscarCompromissoPorId(id);
+        DTORespostaCompromisso compromisso = compromissosService.buscarCompromissoPorId(id);
         model.addAttribute("compromisso", compromisso);
         model.addAttribute("update", new DTOUpdateCompromissos());
         return "compromissos/alterar";

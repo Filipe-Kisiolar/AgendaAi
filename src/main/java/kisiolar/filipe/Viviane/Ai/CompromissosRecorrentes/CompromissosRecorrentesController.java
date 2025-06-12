@@ -1,9 +1,12 @@
 package kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes;
 
+import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.DTOCompromissosRecorrentes;
+import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.DTORespostaCompromissoRecorrente;
+import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.DTORespostasListasCompromissoRecorrentes;
+import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.DTOUpdateCompromissosRecorrentes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.DayOfWeek;
@@ -20,8 +23,8 @@ public class CompromissosRecorrentesController {
 
     @GetMapping("/listarcompromissos")
     public ResponseEntity<?> listarCompromissos(){
-        List<DTOCompromissosRecorrentes> listarcompromissos = compromissosRecorrentesService.listarCompromissos();
-        if (listarcompromissos.isEmpty()){
+        DTORespostasListasCompromissoRecorrentes listarcompromissos = compromissosRecorrentesService.listarCompromissos();
+        if (listarcompromissos.getListaCompromissosRecorrentes().isEmpty()){
             Map<String,Object> resposta = new HashMap<>();
             resposta.put("mensagem","ainda nao a compromissos recorrentes para criar um copromisso recorrente entre no link:");
             resposta.put("link","/compromissosrecorrentes/criarcompromisso ");
@@ -32,36 +35,42 @@ public class CompromissosRecorrentesController {
     }
 
     @GetMapping("/buscarcompromissoporid/{id}")
-    public ResponseEntity<DTOCompromissosRecorrentes> buscarCompromissoPorId(@PathVariable long id){
-        DTOCompromissosRecorrentes dtoCompromissosRecorrentes = compromissosRecorrentesService.buscarCompromissoPorId(id);
+    public ResponseEntity<DTORespostaCompromissoRecorrente> buscarCompromissoPorId(@PathVariable long id){
+        DTORespostaCompromissoRecorrente dtoCompromissosRecorrentes = compromissosRecorrentesService.buscarCompromissoPorId(id);
 
         return ResponseEntity.ok(dtoCompromissosRecorrentes);
     }
 
     @GetMapping("/buscarcompromissopornome/{nome}")
-    public ResponseEntity<DTOCompromissosRecorrentes> buscarCompromissoPornome(@PathVariable String nome){
-        DTOCompromissosRecorrentes dtoCompromissosRecorrentes = compromissosRecorrentesService.buscarCompromissoPorNome(nome);
+    public ResponseEntity<DTORespostaCompromissoRecorrente> buscarCompromissoPornome(@PathVariable String nome){
+        DTORespostaCompromissoRecorrente dtoCompromissosRecorrentes = compromissosRecorrentesService.buscarCompromissoPorNome(nome);
 
         return ResponseEntity.ok(dtoCompromissosRecorrentes);
     }
 
     @GetMapping("/listarcompromissosdiadasemana/{diadasemana}")
-    public ResponseEntity<List<DTOCompromissosRecorrentes>> listarCompromissosPorDiaDaSemana(@PathVariable DayOfWeek diadasemana){
-        List<DTOCompromissosRecorrentes> lista = compromissosRecorrentesService.buscarCompromissoPorDiaDaSemana(diadasemana);
+    public ResponseEntity<DTORespostasListasCompromissoRecorrentes> listarCompromissosPorDiaDaSemana(@PathVariable DayOfWeek diadasemana){
+        DTORespostasListasCompromissoRecorrentes lista = compromissosRecorrentesService.buscarCompromissoPorDiaDaSemana(diadasemana);
 
         return ResponseEntity.ok(lista);
     }
 
-    @PostMapping("/criarcompromisso")
-    public ResponseEntity<DTOCompromissosRecorrentes> criarCompromisso(@RequestBody DTOCompromissosRecorrentes dtoCompromissosRecorrentes){
-        compromissosRecorrentesService.criarCompromisso(dtoCompromissosRecorrentes);
+    @GetMapping("/listarconflitos")
+    public ResponseEntity<List<List<DTOCompromissosRecorrentes>>> listarCompromissosConflitantes(){
+        List<List<DTOCompromissosRecorrentes>> lista = compromissosRecorrentesService.listarCompromissosConflitantes();
+        return ResponseEntity.ok(lista);
+    }
 
-        return ResponseEntity.ok(dtoCompromissosRecorrentes);
+    @PostMapping("/criarcompromisso")
+    public ResponseEntity<DTORespostaCompromissoRecorrente> criarCompromisso(@RequestBody DTOCompromissosRecorrentes dtoCompromissosRecorrentes){
+        DTORespostaCompromissoRecorrente compromissoCriado = compromissosRecorrentesService.criarCompromisso(dtoCompromissosRecorrentes);
+
+        return ResponseEntity.ok(compromissoCriado);
     }
 
     @PatchMapping("/alterarcompromisso/{id}")
-    public ResponseEntity<DTOCompromissosRecorrentes> alterarCompromisso(@PathVariable long id,@RequestBody DTOUpdateCompromissosRecorrentes updateCompromissosRecorrentes){
-        DTOCompromissosRecorrentes compromissoAlterado = compromissosRecorrentesService.alterarCompromisso(id,updateCompromissosRecorrentes);
+    public ResponseEntity<DTORespostaCompromissoRecorrente> alterarCompromisso(@PathVariable long id, @RequestBody DTOUpdateCompromissosRecorrentes updateCompromissosRecorrentes){
+        DTORespostaCompromissoRecorrente compromissoAlterado = compromissosRecorrentesService.alterarCompromisso(id,updateCompromissosRecorrentes);
 
         return ResponseEntity.ok(compromissoAlterado);
     }
