@@ -2,6 +2,8 @@ package kisiolar.filipe.Viviane.Ai.UI;
 
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.CompromissosRecorrentesService;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.DTOCompromissosRecorrentes;
+import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.DTORespostaCompromissoRecorrente;
+import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.DTORespostasListasCompromissoRecorrentes;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.DTOUpdateCompromissosRecorrentes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -25,28 +27,28 @@ public class CompromissosRecorrentesUIController {
 
     @GetMapping("/listarcompromissos")
     public String listarCompromissos(Model model) {
-        List<DTOCompromissosRecorrentes> lista = compromissosRecorrentesService.listarCompromissos();
+        DTORespostasListasCompromissoRecorrentes lista = compromissosRecorrentesService.listarCompromissos();
         model.addAttribute("recorrentes", lista);
         return "recorrentes/listar";
     }
 
     @GetMapping("/buscarcompromissoporid/{id}")
     public String buscarCompromissoPorId(@PathVariable long id, Model model) {
-        DTOCompromissosRecorrentes dto = compromissosRecorrentesService.buscarCompromissoPorId(id);
+        DTORespostaCompromissoRecorrente dto = compromissosRecorrentesService.buscarCompromissoPorId(id);
         model.addAttribute("compromisso", dto);
         return "recorrentes/detalhe";
     }
 
     @GetMapping("/buscarcompromissopornome")
     public String buscarCompromissoPornome(@RequestParam String nome, Model model) {
-        DTOCompromissosRecorrentes dto = compromissosRecorrentesService.buscarCompromissoPorNome(nome);
+        DTORespostaCompromissoRecorrente dto = compromissosRecorrentesService.buscarCompromissoPorNome(nome);
         model.addAttribute("compromisso", dto);
         return "recorrentes/detalhe";
     }
 
     @GetMapping("/listarcompromissosdiadasemana/{dia}")
     public String listarCompromissosPorDiaDaSemana(@PathVariable DayOfWeek dia, Model model) {
-        List<DTOCompromissosRecorrentes> lista = compromissosRecorrentesService.buscarCompromissoPorDiaDaSemana(dia);
+        DTORespostasListasCompromissoRecorrentes lista = compromissosRecorrentesService.buscarCompromissoPorDiaDaSemana(dia);
         model.addAttribute("recorrentes", lista);
         model.addAttribute("dia", dia);
         return "recorrentes/listar";
@@ -66,7 +68,7 @@ public class CompromissosRecorrentesUIController {
 
     @GetMapping("/alterarcompromisso/{id}")
     public String formAlterar(@PathVariable long id, Model model) {
-        DTOCompromissosRecorrentes compromisso = compromissosRecorrentesService.buscarCompromissoPorId(id);
+        DTORespostaCompromissoRecorrente compromisso = compromissosRecorrentesService.buscarCompromissoPorId(id);
         model.addAttribute("compromisso", compromisso);
         model.addAttribute("update", new DTOUpdateCompromissosRecorrentes());
         return "recorrentes/alterar";
