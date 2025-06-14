@@ -172,6 +172,11 @@ public class CompromissosRecorrentesService{
         compromissosRecorrentesRepository.deleteById(id);
     }
 
+    @Transactional
+    public void deletarCompromissosAntigos(){
+        compromissosRecorrentesRepository.deletarRecorrentesFinalizadosHaMaisDe30Dias();
+    }
+
     //cria automaticamente compromissos a partir de um compromisso recorrente
     public List<DTORespostaCompromisso> criarCompromissosPorRecorrencia(CompromissosRecorrentesModel compromissosModel){
         CompromissosRecorrentesModel compromissoRecorrente = compromissosRecorrentesRepository.findById(compromissosModel.getId()).

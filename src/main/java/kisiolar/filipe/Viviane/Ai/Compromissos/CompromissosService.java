@@ -208,6 +208,11 @@ public class CompromissosService {
         compromissosRepository.deleteById(id);
     }
 
+    @Transactional
+    public void deletarCompromissosAntigos(){
+        compromissosRepository.deletarCompromissosAntigos();
+    }
+
     //verifica se ha conflito entre dois compromissos
     public boolean conflitamEntreSi(CompromissosModel compromisso1,CompromissosModel compromisso2){
         boolean temMesmoDia,horariosConflitam;
