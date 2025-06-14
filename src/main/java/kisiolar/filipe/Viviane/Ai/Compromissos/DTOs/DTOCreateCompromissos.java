@@ -1,7 +1,6 @@
 package kisiolar.filipe.Viviane.Ai.Compromissos.DTOs;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 
 public class DTOCreateCompromissos {
 
@@ -13,25 +12,22 @@ public class DTOCreateCompromissos {
 
     private String local;
 
-    private LocalDate dia;
+    private LocalDateTime inicio;
 
-    private LocalTime horaInicial;
-
-    private LocalTime horaFinal;
+    private LocalDateTime fim;
 
     private Long compromissoRecorrenteId;
 
     public DTOCreateCompromissos() {
     }
 
-    public DTOCreateCompromissos(Long id, String nome, String descricao, String local, LocalDate dia, LocalTime horaInicial, LocalTime horaFinal, long compromissoRecorrenteId) {
+    public DTOCreateCompromissos(Long id, String nome, String descricao, String local, LocalDateTime inicio, LocalDateTime fim, Long compromissoRecorrenteId) {
         this.id = id;
         this.nome = nome;
         this.descricao = descricao;
         this.local = local;
-        this.dia = dia;
-        this.horaInicial = horaInicial;
-        this.horaFinal = horaFinal;
+        this.inicio = inicio;
+        this.fim = fim;
         this.compromissoRecorrenteId = compromissoRecorrenteId;
     }
 
@@ -67,28 +63,20 @@ public class DTOCreateCompromissos {
         this.local = local;
     }
 
-    public LocalDate getDia() {
-        return dia;
+    public LocalDateTime getInicio() {
+        return inicio;
     }
 
-    public void setDia(LocalDate dia) {
-        this.dia = dia;
+    public void setInicio(LocalDateTime inicio) {
+        this.inicio = inicio;
     }
 
-    public LocalTime getHoraInicial() {
-        return horaInicial;
+    public LocalDateTime getFim() {
+        return fim;
     }
 
-    public void setHoraInicial(LocalTime horaInicial) {
-        this.horaInicial = horaInicial;
-    }
-
-    public LocalTime getHoraFinal() {
-        return horaFinal;
-    }
-
-    public void setHoraFinal(LocalTime horaFinal) {
-        this.horaFinal = horaFinal;
+    public void setFim(LocalDateTime fim) {
+        this.fim = fim;
     }
 
     public long getCompromissoRecorrenteId() {
