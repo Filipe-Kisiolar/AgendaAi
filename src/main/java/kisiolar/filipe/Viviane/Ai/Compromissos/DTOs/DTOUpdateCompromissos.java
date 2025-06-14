@@ -1,6 +1,7 @@
 package kisiolar.filipe.Viviane.Ai.Compromissos.DTOs;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 public class DTOUpdateCompromissos {
@@ -11,23 +12,19 @@ public class DTOUpdateCompromissos {
 
     private String local;
 
-    private LocalDate dia;
+    private LocalDateTime inicio;
 
-    private LocalTime horaInicial;
-
-    private LocalTime horaFinal;
+    private LocalDateTime fim;
 
     public DTOUpdateCompromissos() {
     }
 
-    public DTOUpdateCompromissos(String nome, String descricao, String local, LocalDate dia, LocalTime horaInicial, LocalTime horaFinal) {
+    public DTOUpdateCompromissos(String nome, String descricao, String local, LocalDateTime inicio, LocalDateTime fim) {
         this.nome = nome;
         this.descricao = descricao;
         this.local = local;
-        this.dia = dia;
-        this.horaInicial = horaInicial;
-        this.horaFinal = horaFinal;
-
+        this.inicio = inicio;
+        this.fim = fim;
     }
 
     public String getNome() {
@@ -54,28 +51,20 @@ public class DTOUpdateCompromissos {
         this.local = local;
     }
 
-    public LocalDate getDia() {
-        return dia;
+    public LocalDateTime getInicio() {
+        return inicio;
     }
 
-    public void setDia(LocalDate dia) {
-        this.dia = dia;
+    public void setInicio(LocalDateTime inicio) {
+        this.inicio = inicio;
     }
 
-    public LocalTime getHoraInicial() {
-        return horaInicial;
+    public LocalDateTime getFim() {
+        return fim;
     }
 
-    public void setHoraInicial(LocalTime horaInicial) {
-        this.horaInicial = horaInicial;
-    }
-
-    public LocalTime getHoraFinal() {
-        return horaFinal;
-    }
-
-    public void setHoraFinal(LocalTime horaFinal) {
-        this.horaFinal = horaFinal;
+    public void setFim(LocalDateTime fim) {
+        this.fim = fim;
     }
 }
 

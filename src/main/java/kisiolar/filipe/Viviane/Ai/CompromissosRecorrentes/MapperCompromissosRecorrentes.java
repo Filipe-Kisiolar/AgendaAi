@@ -8,6 +8,7 @@ import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.DTOUpdateCompromi
 import org.mapstruct.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Mapper(componentModel = "spring",
         uses = MapperCompromissos.class,
@@ -20,9 +21,11 @@ public interface MapperCompromissosRecorrentes {
 
     //map para gerar um compromisso a partir de um compromisso recorrente
     @Mapping(target = "id",ignore = true)
-    @Mapping(target = "dia",source = "dataGerada")
+    @Mapping(target = "inicio",source = "inicioGerado")
+    @Mapping(target = "fim",source = "fimGerado")
     @Mapping(target = "compromissoRecorrenteId", source = "compromissosRecorrentesModel.id")
-    DTOCreateCompromissos mapGerarCompromisso(CompromissosRecorrentesModel compromissosRecorrentesModel, LocalDate dataGerada);
+    DTOCreateCompromissos mapGerarCompromisso(CompromissosRecorrentesModel compromissosRecorrentesModel, LocalDateTime inicioGerado
+                                                ,LocalDateTime fimGerado);
 
 
     @Mapping(target = "id", ignore = true)

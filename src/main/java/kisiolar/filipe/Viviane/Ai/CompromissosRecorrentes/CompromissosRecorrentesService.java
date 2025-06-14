@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -174,7 +176,8 @@ public class CompromissosRecorrentesService{
 
     @Transactional
     public void deletarCompromissosAntigos(){
-        compromissosRecorrentesRepository.deletarRecorrentesFinalizadosHaMaisDe30Dias();
+        LocalDate aPartirDe = LocalDate.now().minusMonths(1);
+        compromissosRecorrentesRepository.deletarCompromissosAntigos(aPartirDe);
     }
 
     //cria automaticamente compromissos a partir de um compromisso recorrente
@@ -183,20 +186,36 @@ public class CompromissosRecorrentesService{
                 orElseThrow(() -> new RuntimeException("compromisso recorrente não encontrado"));
 
         long diferencaEntreDias = ChronoUnit.DAYS.between(compromissoRecorrente.getDataInicioRecorrencia(),compromissoRecorrente.getDataFimRecorrencia());
-        LocalDate dataDeInicio = compromissoRecorrente.getDataInicioRecorrencia();
+
+        LocalDate diaInicioRecorrencia = compromissoRecorrente.getDataInicioRecorrencia();
+
+        LocalTime horaInicio = compromissoRecorrente.getHoraInicial();
+        LocalTime horaFim = compromissoRecorrente.getHoraFinal();
 
         //lista para pegar os compromissos com conflitos gerados
         List<DTORespostaCompromisso> compromissosComConflito = new ArrayList<>();
 
             for(long i = 0;i<= diferencaEntreDias;i++){
-            //confere se o dia esta dentro dos dias da semana q compromisso recorrente repete
-            if(compromissoRecorrente.getDiasDaSemana().contains(dataDeInicio.plusDays(i).getDayOfWeek())) {
-                DTORespostaCompromisso compromissoCriado = compromissosService.criarCompromisso(mapperCompromissosRecorrentes
-                        .mapGerarCompromisso(compromissoRecorrente, dataDeInicio.plusDays(i)));
-                if(compromissoCriado.getExisteConflito()){
-                    compromissosComConflito.add(compromissoCriado);
+                LocalDate dataAtual = diaInicioRecorrencia.plusDays(i);
+                DayOfWeek diaDaSemana = dataAtual.getDayOfWeek();
+
+                if (compromissoRecorrente.getDiasDaSemana().contains(diaDaSemana)) {
+
+                    LocalDateTime inicioGerado = dataAtual.atTime(horaInicio);
+                    LocalDateTime fimGerado;
+
+                    if(horaFim.isBefore(horaInicio)){
+                        fimGerado = dataAtual.plusDays(1).atTime(horaFim);
+                    }else {
+                        fimGerado = dataAtual.atTime(horaFim);
+                    }
+
+                    DTORespostaCompromisso compromissoCriado = compromissosService.criarCompromisso(mapperCompromissosRecorrentes
+                            .mapGerarCompromisso(compromissoRecorrente,inicioGerado,fimGerado));
+                    if(compromissoCriado.getExisteConflito()){
+                        compromissosComConflito.add(compromissoCriado);
+                    }
                 }
-            }
           }
             return compromissosComConflito;
         }
