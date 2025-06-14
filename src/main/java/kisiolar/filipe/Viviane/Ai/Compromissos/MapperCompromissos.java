@@ -10,7 +10,7 @@ import org.mapstruct.*;
 public interface MapperCompromissos {
      @Mapping(target = "id",ignore = true)
      @Mapping(target = "compromissoRecorrente", ignore = true)
-     CompromissosModel map(DTOCreateCompromissos dtoCompromissos);
+     CompromissosModel map(DTOCreateCompromissos dto);
 
      DTOSaidaCompromissos map(CompromissosModel compromissosModel);
 

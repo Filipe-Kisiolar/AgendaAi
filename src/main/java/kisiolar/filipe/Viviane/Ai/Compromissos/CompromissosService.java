@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -29,13 +30,9 @@ public class CompromissosService {
     @Transactional
     public DTORespostaListasCompromissos listarCompromissos(){
         List<CompromissosModel> lista = compromissosRepository.findAll();
-        List<DTOSaidaCompromissos> listaDto =lista.stream()
-                        .sorted(Comparator
-                            .comparing(CompromissosModel::getDia)
-                            .thenComparing(CompromissosModel::getHoraInicial)
-                        )
-                        .map(mapperCompromissos::map)
-                        .toList();
+        List<DTOSaidaCompromissos> listaDto =ordenarListaPorHorario(lista).stream()
+                .map(mapperCompromissos::map)
+                .toList();
 
         return new DTORespostaListasCompromissos(listaDto);
     }
@@ -62,15 +59,11 @@ public class CompromissosService {
     public DTORespostaListasCompromissos listarCompromissosPorNome(String nome){
         List<CompromissosModel> lista = compromissosRepository.findByNome(nome);
 
-        List<DTOSaidaCompromissos> listaDto =lista.stream()
-                .sorted(Comparator
-                        .comparing(CompromissosModel::getDia)
-                        .thenComparing(CompromissosModel::getHoraInicial)
-                )
+        List<DTOSaidaCompromissos> listaDto =ordenarListaPorHorario(lista).stream()
                 .map(mapperCompromissos::map)
                 .toList();
 
-        List<List<DTOSaidaCompromissos>> conflitos = compromissosConflitantesLista(lista);
+        List<List<DTOSaidaCompromissos>> conflitos = compromissosConflitantesDaLista(lista);
 
         if(conflitos.isEmpty()){
             return new DTORespostaListasCompromissos(listaDto);
@@ -81,16 +74,14 @@ public class CompromissosService {
 
     @Transactional
     public DTORespostaListasCompromissos listarCompromissosDoDia(LocalDate dia){
-        List<CompromissosModel> lista = compromissosRepository.findByDia(dia);
-        List<DTOSaidaCompromissos> listaDto =lista.stream()
-                .sorted(Comparator
-                        .comparing(CompromissosModel::getDia)
-                        .thenComparing(CompromissosModel::getHoraInicial)
-                )
+        LocalDateTime comecoDoDia = dia.atStartOfDay();
+        LocalDateTime finalDoDia = dia.plusDays(1).atStartOfDay();
+        List<CompromissosModel> lista = compromissosRepository.findCompromissoByInicioBetwenn(comecoDoDia,finalDoDia);
+        List<DTOSaidaCompromissos> listaDto =ordenarListaPorHorario(lista).stream()
                 .map(mapperCompromissos::map)
                 .toList();
 
-        List<List<DTOSaidaCompromissos>> conflitos = compromissosConflitantesLista(lista);
+        List<List<DTOSaidaCompromissos>> conflitos = compromissosConflitantesDaLista(lista);
 
         if(conflitos.isEmpty()){
             return new DTORespostaListasCompromissos(listaDto);
@@ -102,9 +93,11 @@ public class CompromissosService {
     //gera uma lista de compromissos da semana a partir do dia que a requisicao foi feita
     @Transactional
     public Map<DayOfWeek, DTORespostaListasCompromissos> listarCompromissosDaSemana(LocalDate diaAtual) {
-        LocalDate diaFinal = diaAtual.plusDays(6);
+        LocalDateTime primeiroDiaDaSemana = diaAtual.atStartOfDay();
+        LocalDateTime ultimoDiaDaSemana = diaAtual.plusWeeks(1).atStartOfDay();
 
-        List<CompromissosModel> compromissosDaSemana = compromissosRepository.findByDiaBetween(diaAtual, diaFinal);
+        List<CompromissosModel> compromissosDaSemana = compromissosRepository
+                .findCompromissoByInicioBetwenn(primeiroDiaDaSemana,ultimoDiaDaSemana);
 
         //Define a ordem dos dias da semana a partir da data atual
         List<DayOfWeek> ordemDosDias = IntStream.range(0, 7)
@@ -119,13 +112,13 @@ public class CompromissosService {
 
         //Preenche o map com os compromissos encontrados
         for (CompromissosModel compromisso : compromissosDaSemana) {
-            DayOfWeek dia = compromisso.getDia().getDayOfWeek();
+            DayOfWeek dia = compromisso.getInicio().getDayOfWeek();
             compromissosPorDia.get(dia).add(compromisso);
         }
 
         //Ordena os compromissos de cada dia por hora
         compromissosPorDia.values().forEach(lista ->
-                lista.sort(Comparator.comparing(CompromissosModel::getHoraInicial)));
+                lista.sort(Comparator.comparing(CompromissosModel::getInicio)));
 
         //Monta o map de resposta com os conflitos
         Map<DayOfWeek, DTORespostaListasCompromissos> respostaPorDia = new LinkedHashMap<>();
@@ -137,7 +130,7 @@ public class CompromissosService {
                     .map(mapperCompromissos::map)
                     .toList();
 
-            List<List<DTOSaidaCompromissos>> conflitos = compromissosConflitantesLista(listaCompromissos);
+            List<List<DTOSaidaCompromissos>> conflitos = compromissosConflitantesDaLista(listaCompromissos);
 
             DTORespostaListasCompromissos resposta = new DTORespostaListasCompromissos();
             resposta.setListaCompromissos(listaDto);
@@ -152,7 +145,7 @@ public class CompromissosService {
     public List<List<DTOSaidaCompromissos>> listarCompromissosConflitantes() {
         List<CompromissosModel> listaTodosCompromissos = compromissosRepository.findAll();
 
-        List<List<DTOSaidaCompromissos>> gruposDeConflito = compromissosConflitantesLista(listaTodosCompromissos);
+        List<List<DTOSaidaCompromissos>> gruposDeConflito = compromissosConflitantesDaLista(listaTodosCompromissos);
         return gruposDeConflito;
 
     }
@@ -214,17 +207,22 @@ public class CompromissosService {
         compromissosRepository.deletarCompromissosAntigos(aPartirDe);
     }
 
+    public List<CompromissosModel> ordenarListaPorHorario(List<CompromissosModel> lista){
+        return lista.stream().sorted(Comparator
+                        .comparing(CompromissosModel::getInicio)
+                        .thenComparing(CompromissosModel::getFim)
+                        )
+                        .toList();
+    }
+
     //verifica se ha conflito entre dois compromissos
     public boolean conflitamEntreSi(CompromissosModel compromisso1,CompromissosModel compromisso2){
         boolean temMesmoDia,horariosConflitam;
 
+        boolean conflitam = compromisso1.getInicio().isBefore(compromisso2.getFim()) &&
+                compromisso1.getFim().isAfter(compromisso2.getInicio());
 
-         temMesmoDia = compromisso1.getDia().equals(compromisso2.getDia());
-
-         horariosConflitam = compromisso1.getHoraInicial().isBefore(compromisso2.getHoraFinal()) &&
-                 compromisso1.getHoraFinal().isAfter(compromisso2.getHoraInicial());
-
-         return temMesmoDia && horariosConflitam;
+         return conflitam;
     }
 
     //confere se ha compromisso recorrente em uma lista que conflita com o que esta sendo passado
@@ -246,7 +244,7 @@ public class CompromissosService {
     }
 
     //retorna grupos de compromissos que conflitam a partir de uma lista
-    public List<List<DTOSaidaCompromissos>> compromissosConflitantesLista(List<CompromissosModel> lista){
+    public List<List<DTOSaidaCompromissos>> compromissosConflitantesDaLista(List<CompromissosModel> lista){
         // Mapa de conflitos diretos entre compromissos
         Map<CompromissosModel, Set<CompromissosModel>> conflitosEntreCompromissos = new HashMap<>();
 
@@ -281,9 +279,10 @@ public class CompromissosService {
             }
         }
 
-        gruposDeConflito.sort(Comparator.comparing((List<DTOSaidaCompromissos> grupo) -> grupo.getFirst().getDia())
-                .thenComparing(grupo -> grupo.getFirst().getHoraInicial())
-                .thenComparing(grupo -> grupo.getFirst().getHoraFinal()));
+        gruposDeConflito.sort(
+                Comparator.comparing((List<DTOSaidaCompromissos> grupo) -> grupo.getFirst().getInicio())
+                        .thenComparing(grupo -> grupo.getFirst().getFim())
+        );
 
         return gruposDeConflito;
     }
