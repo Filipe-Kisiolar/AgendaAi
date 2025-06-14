@@ -18,8 +18,8 @@ public interface CompromissosRepository extends JpaRepository<CompromissosModel,
 
 
     @Modifying
-    @Query("DELETE FROM CompromissosModel c WHERE c.dia < :limite")
-    void deletarCompromissosAntigos(@Param("limite") LocalDate limite);
+    @Query("DELETE FROM CompromissosModel c WHERE c.inicio < :limite")
+    void deletarCompromissosAntigos(@Param("limite") LocalDateTime limite);
 
 
 }

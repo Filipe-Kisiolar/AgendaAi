@@ -2,10 +2,7 @@ package kisiolar.filipe.Viviane.Ai.Compromissos;
 
 import jakarta.persistence.*;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.CompromissosRecorrentesModel;
-
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.Objects;
 
 @Entity

@@ -203,7 +203,7 @@ public class CompromissosService {
 
     @Transactional
     public void deletarCompromissosAntigos(){
-        LocalDate aPartirDe = LocalDate.now().minusMonths(1);
+        LocalDateTime aPartirDe = LocalDateTime.now().minusMonths(1);
         compromissosRepository.deletarCompromissosAntigos(aPartirDe);
     }
 
