@@ -210,7 +210,8 @@ public class CompromissosService {
 
     @Transactional
     public void deletarCompromissosAntigos(){
-        compromissosRepository.deletarCompromissosAntigos();
+        LocalDate aPartirDe = LocalDate.now().minusMonths(1);
+        compromissosRepository.deletarCompromissosAntigos(aPartirDe);
     }
 
     //verifica se ha conflito entre dois compromissos

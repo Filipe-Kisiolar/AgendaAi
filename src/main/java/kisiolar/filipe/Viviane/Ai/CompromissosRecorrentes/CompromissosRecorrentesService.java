@@ -174,7 +174,8 @@ public class CompromissosRecorrentesService{
 
     @Transactional
     public void deletarCompromissosAntigos(){
-        compromissosRecorrentesRepository.deletarRecorrentesFinalizadosHaMaisDe30Dias();
+        LocalDate aPartirDe = LocalDate.now().minusMonths(1);
+        compromissosRecorrentesRepository.deletarCompromissosAntigos(aPartirDe);
     }
 
     //cria automaticamente compromissos a partir de um compromisso recorrente
