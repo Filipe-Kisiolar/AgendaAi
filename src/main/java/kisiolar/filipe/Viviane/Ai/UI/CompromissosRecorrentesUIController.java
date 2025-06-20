@@ -1,17 +1,16 @@
 package kisiolar.filipe.Viviane.Ai.UI;
 
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.CompromissosRecorrentesService;
-import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.DTOCompromissosRecorrentes;
-import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.DTORespostaCompromissoRecorrente;
-import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.DTORespostasListasCompromissoRecorrentes;
-import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.DTOUpdateCompromissosRecorrentes;
+import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.CompromissosRecorrentes.DTOCreateCompromissosRecorrentes;
+import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.CompromissosRecorrentes.DTORespostaCompromissoRecorrente;
+import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.CompromissosRecorrentes.DTORespostasListasCompromissoRecorrentes;
+import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.CompromissosRecorrentes.DTOUpdateCompromissosRecorrentes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.DayOfWeek;
-import java.util.List;
 
 @Controller
 @RequestMapping("/ui/recorrentes")
@@ -46,23 +45,15 @@ public class CompromissosRecorrentesUIController {
         return "recorrentes/detalhe";
     }
 
-    @GetMapping("/listarcompromissosdiadasemana/{dia}")
-    public String listarCompromissosPorDiaDaSemana(@PathVariable DayOfWeek dia, Model model) {
-        DTORespostasListasCompromissoRecorrentes lista = compromissosRecorrentesService.buscarCompromissoPorDiaDaSemana(dia);
-        model.addAttribute("recorrentes", lista);
-        model.addAttribute("dia", dia);
-        return "recorrentes/listar";
-    }
-
     @GetMapping("/criarcompromisso")
     public String formCriar(Model model) {
-        model.addAttribute("compromisso", new DTOCompromissosRecorrentes());
+        model.addAttribute("compromisso", new DTOCreateCompromissosRecorrentes());
         return "recorrentes/cadastrar";
     }
 
     @PostMapping("/criarcompromisso")
-    public String criarCompromisso(@ModelAttribute DTOCompromissosRecorrentes dto) {
-        compromissosRecorrentesService.criarCompromisso(dto);
+    public String criarCompromisso(@ModelAttribute DTOCreateCompromissosRecorrentes dto) {
+        compromissosRecorrentesService.criarCompromissoRecorrente(dto);
         return "recorrentes/cadastroSucesso";
     }
 
@@ -76,7 +67,7 @@ public class CompromissosRecorrentesUIController {
 
     @PostMapping("/alterarcompromisso/{id}")
     public String alterarCompromisso(@PathVariable long id, DTOUpdateCompromissosRecorrentes update) {
-        compromissosRecorrentesService.alterarCompromisso(id, update);
+        compromissosRecorrentesService.alterarCompromissoRecorrente(id, update);
         return "recorrentes/alterado";
     }
 
