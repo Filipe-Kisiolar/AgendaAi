@@ -1,6 +1,9 @@
 package kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.Enums;
 
 public enum ModoDeRecorrenciaEnum {
-    INTERVALADO,
-    POSICAO_FIXA_NO_MES
+    FREQUENCIA_DIARIA,
+    FREQUENCIA_SEMANAL,
+    PADRAO_RELATIVO_MENSAL,
+    DIA_ESPECIFICO_MENSAL,
+    DATA_ESPECIFICA_ANUAL
 }
