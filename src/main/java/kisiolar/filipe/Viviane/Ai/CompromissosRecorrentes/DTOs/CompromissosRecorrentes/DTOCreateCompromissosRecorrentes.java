@@ -1,10 +1,11 @@
-package kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs;
+package kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.CompromissosRecorrentes;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Size;
+import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.HorariosPorDia.DTOCreateHorariosPorDia;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.Enums.ModoDeRecorrenciaEnum;
-import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.Enums.OrdenamentoDoDiaEnum;
-import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.Enums.TipoDeFrequenciaFixaEnum;
+import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.Enums.OrdenamentoDaSemanaNoMesEnum;
+
 import java.time.LocalDate;
 import java.util.List;
 
@@ -19,7 +20,7 @@ public class DTOCreateCompromissosRecorrentes {
 
         @Size(min = 1, message = "É necessário ao menos um horário.")
         @Valid
-        private List<DTOHorariosPorDia> horariosPorDias;
+        private List<DTOCreateHorariosPorDia> horariosPorDia;
 
         private LocalDate dataInicioRecorrencia;
 
@@ -27,29 +28,26 @@ public class DTOCreateCompromissosRecorrentes {
 
         private Integer intervalo;
 
-        private TipoDeFrequenciaFixaEnum tipoDeFrequenciaFixa;
-
         private ModoDeRecorrenciaEnum modoDeRecorrencia;
 
-        private OrdenamentoDoDiaEnum ordenamentoDoDia;
+        private OrdenamentoDaSemanaNoMesEnum ordenamentoDaSemanaNoMes;
 
         private boolean apenasDiasUteis;
 
         public DTOCreateCompromissosRecorrentes() {
         }
 
-        public DTOCreateCompromissosRecorrentes(Long id, String nome, String descricao, String local, List<DTOHorariosPorDia> horariosPorDias, LocalDate dataInicioRecorrencia, LocalDate dataFimRecorrencia, Integer intervalo, TipoDeFrequenciaFixaEnum tipoDeFrequenciaFixa, ModoDeRecorrenciaEnum modoDeRecorrencia, OrdenamentoDoDiaEnum ordenamentoDoDia, boolean apenasDiasUteis) {
+        public DTOCreateCompromissosRecorrentes(Long id, String nome, String descricao, String local, List<DTOCreateHorariosPorDia> horariosPorDia, LocalDate dataInicioRecorrencia, LocalDate dataFimRecorrencia, Integer intervalo, ModoDeRecorrenciaEnum modoDeRecorrencia, OrdenamentoDaSemanaNoMesEnum ordenamentoDaSemanaNoMes, boolean apenasDiasUteis) {
                 this.id = id;
                 this.nome = nome;
                 this.descricao = descricao;
                 this.local = local;
-                this.horariosPorDias = horariosPorDias;
+                this.horariosPorDia = horariosPorDia;
                 this.dataInicioRecorrencia = dataInicioRecorrencia;
                 this.dataFimRecorrencia = dataFimRecorrencia;
                 this.intervalo = intervalo;
-                this.tipoDeFrequenciaFixa = tipoDeFrequenciaFixa;
                 this.modoDeRecorrencia = modoDeRecorrencia;
-                this.ordenamentoDoDia = ordenamentoDoDia;
+                this.ordenamentoDaSemanaNoMes = ordenamentoDaSemanaNoMes;
                 this.apenasDiasUteis = apenasDiasUteis;
         }
 
@@ -85,12 +83,12 @@ public class DTOCreateCompromissosRecorrentes {
                 this.local = local;
         }
 
-        public List<DTOHorariosPorDia> getHorariosPorDias() {
-                return horariosPorDias;
+        public List<DTOCreateHorariosPorDia> getHorariosPorDia() {
+                return horariosPorDia;
         }
 
-        public void setHorariosPorDias(List<DTOHorariosPorDia> horariosPorDias) {
-                this.horariosPorDias = horariosPorDias;
+        public void setHorariosPorDia(List<DTOCreateHorariosPorDia> horariosPorDia) {
+                this.horariosPorDia = horariosPorDia;
         }
 
         public LocalDate getDataInicioRecorrencia() {
@@ -117,14 +115,6 @@ public class DTOCreateCompromissosRecorrentes {
                 this.intervalo = intervalo;
         }
 
-        public TipoDeFrequenciaFixaEnum getTipoDeFrequenciaFixa() {
-                return tipoDeFrequenciaFixa;
-        }
-
-        public void setTipoDeFrequenciaFixa(TipoDeFrequenciaFixaEnum tipoDeFrequenciaFixa) {
-                this.tipoDeFrequenciaFixa = tipoDeFrequenciaFixa;
-        }
-
         public ModoDeRecorrenciaEnum getModoDeRecorrencia() {
                 return modoDeRecorrencia;
         }
@@ -133,12 +123,12 @@ public class DTOCreateCompromissosRecorrentes {
                 this.modoDeRecorrencia = modoDeRecorrencia;
         }
 
-        public OrdenamentoDoDiaEnum getOrdenamentoDoDia() {
-                return ordenamentoDoDia;
+        public OrdenamentoDaSemanaNoMesEnum getOrdenamentoDaSemanaNoMes() {
+                return ordenamentoDaSemanaNoMes;
         }
 
-        public void setOrdenamentoDoDia(OrdenamentoDoDiaEnum ordenamentoDoDia) {
-                this.ordenamentoDoDia = ordenamentoDoDia;
+        public void setOrdenamentoDaSemanaNoMes(OrdenamentoDaSemanaNoMesEnum ordenamentoDaSemanaNoMes) {
+                this.ordenamentoDaSemanaNoMes = ordenamentoDaSemanaNoMes;
         }
 
         public boolean isApenasDiasUteis() {

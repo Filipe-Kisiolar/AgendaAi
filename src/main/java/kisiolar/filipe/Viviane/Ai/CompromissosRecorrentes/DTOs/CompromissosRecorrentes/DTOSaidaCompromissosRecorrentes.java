@@ -1,11 +1,16 @@
 package kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.CompromissosRecorrentes;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import kisiolar.filipe.Viviane.Ai.Compromissos.DTOs.DTOSaidaCompromissos;
+import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.HorariosPorDia.DTOSaidaHorariosPorDia;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.Enums.ModoDeRecorrenciaEnum;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.Enums.OrdenamentoDaSemanaNoMesEnum;
 
 import java.time.LocalDate;
+import java.util.List;
 
-public class DTOUpdateCompromissosRecorrentes {
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class DTOSaidaCompromissosRecorrentes {
 
     private Long id;
 
@@ -14,6 +19,8 @@ public class DTOUpdateCompromissosRecorrentes {
     private String descricao;
 
     private String local;
+
+    private List<DTOSaidaHorariosPorDia> horariosPorDia;
 
     private LocalDate dataInicioRecorrencia;
 
@@ -27,20 +34,24 @@ public class DTOUpdateCompromissosRecorrentes {
 
     private boolean apenasDiasUteis;
 
-    public DTOUpdateCompromissosRecorrentes() {
+    private List<DTOSaidaCompromissos> compromissosGerados;
+
+    public DTOSaidaCompromissosRecorrentes() {
     }
 
-    public DTOUpdateCompromissosRecorrentes(Long id, String nome, String descricao, String local, LocalDate dataInicioRecorrencia, LocalDate dataFimRecorrencia, Integer intervalo, ModoDeRecorrenciaEnum modoDeRecorrencia, OrdenamentoDaSemanaNoMesEnum ordenamentoDaSemanaNoMes, boolean apenasDiasUteis) {
+    public DTOSaidaCompromissosRecorrentes(Long id, String nome, String descricao, String local, List<DTOSaidaHorariosPorDia> horariosPorDia, LocalDate dataInicioRecorrencia, LocalDate dataFimRecorrencia, Integer intervalo, ModoDeRecorrenciaEnum modoDeRecorrencia, OrdenamentoDaSemanaNoMesEnum ordenamentoDaSemanaNoMes, boolean apenasDiasUteis, List<DTOSaidaCompromissos> compromissosGerados) {
         this.id = id;
         this.nome = nome;
         this.descricao = descricao;
         this.local = local;
+        this.horariosPorDia = horariosPorDia;
         this.dataInicioRecorrencia = dataInicioRecorrencia;
         this.dataFimRecorrencia = dataFimRecorrencia;
         this.intervalo = intervalo;
         this.modoDeRecorrencia = modoDeRecorrencia;
         this.ordenamentoDaSemanaNoMes = ordenamentoDaSemanaNoMes;
         this.apenasDiasUteis = apenasDiasUteis;
+        this.compromissosGerados = compromissosGerados;
     }
 
     public Long getId() {
@@ -73,6 +84,14 @@ public class DTOUpdateCompromissosRecorrentes {
 
     public void setLocal(String local) {
         this.local = local;
+    }
+
+    public List<DTOSaidaHorariosPorDia> getHorariosPorDia() {
+        return horariosPorDia;
+    }
+
+    public void setHorariosPorDia(List<DTOSaidaHorariosPorDia> horariosPorDia) {
+        this.horariosPorDia = horariosPorDia;
     }
 
     public LocalDate getDataInicioRecorrencia() {
@@ -121,5 +140,13 @@ public class DTOUpdateCompromissosRecorrentes {
 
     public void setApenasDiasUteis(boolean apenasDiasUteis) {
         this.apenasDiasUteis = apenasDiasUteis;
+    }
+
+    public List<DTOSaidaCompromissos> getCompromissosGerados() {
+        return compromissosGerados;
+    }
+
+    public void setCompromissosGerados(List<DTOSaidaCompromissos> compromissosGerados) {
+        this.compromissosGerados = compromissosGerados;
     }
 }
