@@ -104,13 +104,13 @@ public class CompromissosService {
                 .mapToObj(i -> diaAtual.plusDays(i).getDayOfWeek())
                 .toList();
 
-        //Inicializa o map com todos os dias da semana vazios, mantendo a ordem
+        //Inicializa o mapToDto com todos os dias da semana vazios, mantendo a ordem
         Map<DayOfWeek, List<CompromissosModel>> compromissosPorDia = new LinkedHashMap<>();
         for (DayOfWeek dia : ordemDosDias) {
             compromissosPorDia.put(dia, new ArrayList<>());
         }
 
-        //Preenche o map com os compromissos encontrados
+        //Preenche o mapToDto com os compromissos encontrados
         for (CompromissosModel compromisso : compromissosDaSemana) {
             DayOfWeek dia = compromisso.getInicio().getDayOfWeek();
             compromissosPorDia.get(dia).add(compromisso);
@@ -120,7 +120,7 @@ public class CompromissosService {
         compromissosPorDia.values().forEach(lista ->
                 lista.sort(Comparator.comparing(CompromissosModel::getInicio)));
 
-        //Monta o map de resposta com os conflitos
+        //Monta o mapToDto de resposta com os conflitos
         Map<DayOfWeek, DTORespostaListasCompromissos> respostaPorDia = new LinkedHashMap<>();
 
         for (DayOfWeek dia : ordemDosDias) {
