@@ -13,10 +13,13 @@ import kisiolar.filipe.Viviane.Ai.Exceptions.ResourceNotFindException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.MonthDay;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class HorariosPorDiaService {
@@ -117,43 +120,28 @@ public class HorariosPorDiaService {
         return horariosConflitam;
     }
 
-    public boolean verificarConflitoEntreHorariosUsamDiasDaSemana(HorariosPorDiaModel horariosPorDia_1, HorariosPorDiaModel horariosPorDia_2){
-        final int PASSADESEMANA = 7;
+    public boolean verificarConflitoEntreHorariosUsamDiasDaSemana(
+            HorariosPorDiaModel horario_1, HorariosPorDiaModel horario_2) {
 
-        int distanciaAteDiaDaSemanaInicioHorario =
-                LocalDate.now().getDayOfWeek().getValue() - horariosPorDia_1.getDiaDaSemanaInicio().getValue();
+        Set<DayOfWeek> dias1 = getDiasDaSemanaEntre(horario_1.getDiaDaSemanaInicio(), horario_1.getDiaDaSemanaFim());
+        Set<DayOfWeek> dias2 = getDiasDaSemanaEntre(horario_2.getDiaDaSemanaInicio(), horario_2.getDiaDaSemanaFim());
 
-        int diferencaInicio_Fim_Compromisso = horariosPorDia_1.getDiaDaSemanaFim().getValue() - horariosPorDia_1.getDiaDaSemanaInicio().getValue();
+        boolean intersecaoDias = dias1.stream().anyMatch(dias2::contains);
 
-        if (diferencaInicio_Fim_Compromisso < 0) {
-            diferencaInicio_Fim_Compromisso += PASSADESEMANA;
-        }
+        boolean horariosConflitam = verificarConflitoEntreHorariosDiarios(horario_1, horario_2);
 
-        LocalDate diaInicioParaAnalise_Horario_1 = LocalDate.now().plusDays(distanciaAteDiaDaSemanaInicioHorario);
-
-        LocalDate diaFimParaAnalise_Horario_1 = diaInicioParaAnalise_Horario_1.plusDays(diferencaInicio_Fim_Compromisso);
-
-        distanciaAteDiaDaSemanaInicioHorario =
-                LocalDate.now().getDayOfWeek().getValue() - horariosPorDia_2.getDiaDaSemanaInicio().getValue();
-
-        diferencaInicio_Fim_Compromisso = horariosPorDia_2.getDiaDaSemanaFim().getValue() - horariosPorDia_2.getDiaDaSemanaInicio().getValue();
-
-        if (diferencaInicio_Fim_Compromisso < 0) {
-            diferencaInicio_Fim_Compromisso += PASSADESEMANA;
-        }
-
-        LocalDate diaInicioParaAnalise_Horario_2 = LocalDate.now().plusDays(distanciaAteDiaDaSemanaInicioHorario);
-
-        LocalDate diaFimParaAnalise_Horario_2 = diaInicioParaAnalise_Horario_2.plusDays(diferencaInicio_Fim_Compromisso);
-
-        boolean diasDaSemanaConflitam = diaInicioParaAnalise_Horario_1.isBefore(diaFimParaAnalise_Horario_2)
-                &&diaFimParaAnalise_Horario_1.isAfter(diaInicioParaAnalise_Horario_2);
-
-        boolean horariosConflitam= verificarConflitoEntreHorariosDiarios(horariosPorDia_1,horariosPorDia_2);
-
-        return diasDaSemanaConflitam && horariosConflitam;
+        return intersecaoDias && horariosConflitam;
     }
 
+    private Set<DayOfWeek> getDiasDaSemanaEntre(DayOfWeek inicio, DayOfWeek fim) {
+        Set<DayOfWeek> dias = new HashSet<>();
+        DayOfWeek atual = inicio;
+        do {
+            dias.add(atual);
+            atual = atual.plus(1);
+        } while (atual != fim.plus(1));
+        return dias;
+    }
     public boolean verificarConflitoEntreHorariosDiaEspecificoMensal(HorariosPorDiaModel horariosPorDia_1, HorariosPorDiaModel horariosPorDia_2){
         LocalDateTime inicioHorario_1 = LocalDateTime.of(
                 LocalDate.now().getYear(),
@@ -238,7 +226,7 @@ public class HorariosPorDiaService {
                     HorariosPorDiaModel horarioAnalisado = listaHorariosPorDia.get(i);
 
                     haConflito = verificarConflitoEntreHorariosUsamDiasDaSemana(horariosPorDia,horarioAnalisado);
-
+                    System.out.println("ha conflito dias da semana:" + haConflito);
                     i++;
                 }
             }
