@@ -2,7 +2,7 @@ package kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.CompromissosReco
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Size;
-import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.HorariosPorDia.DTOCreateHorariosPorDia;
+import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.HorariosPorDia.DTOCreateHorariosPorDiaBase;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.Enums.ModoDeRecorrenciaEnum;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.Enums.OrdenamentoDaSemanaNoMesEnum;
 
@@ -20,7 +20,7 @@ public class DTOCreateCompromissosRecorrentes {
 
         @Size(min = 1, message = "É necessário ao menos um horário.")
         @Valid
-        private List<DTOCreateHorariosPorDia> horariosPorDia;
+        private List<DTOCreateHorariosPorDiaBase> horariosPorDia;
 
         private LocalDate dataInicioRecorrencia;
 
@@ -37,7 +37,7 @@ public class DTOCreateCompromissosRecorrentes {
         public DTOCreateCompromissosRecorrentes() {
         }
 
-        public DTOCreateCompromissosRecorrentes(Long id, String nome, String descricao, String local, List<DTOCreateHorariosPorDia> horariosPorDia, LocalDate dataInicioRecorrencia, LocalDate dataFimRecorrencia, Integer intervalo, ModoDeRecorrenciaEnum modoDeRecorrencia, OrdenamentoDaSemanaNoMesEnum ordenamentoDaSemanaNoMes, boolean apenasDiasUteis) {
+        public DTOCreateCompromissosRecorrentes(Long id, String nome, String descricao, String local, List<DTOCreateHorariosPorDiaBase> horariosPorDia, LocalDate dataInicioRecorrencia, LocalDate dataFimRecorrencia, Integer intervalo, ModoDeRecorrenciaEnum modoDeRecorrencia, OrdenamentoDaSemanaNoMesEnum ordenamentoDaSemanaNoMes, boolean apenasDiasUteis) {
                 this.id = id;
                 this.nome = nome;
                 this.descricao = descricao;
@@ -83,11 +83,11 @@ public class DTOCreateCompromissosRecorrentes {
                 this.local = local;
         }
 
-        public List<DTOCreateHorariosPorDia> getHorariosPorDia() {
+        public @Size(min = 1, message = "É necessário ao menos um horário.") @Valid List<DTOCreateHorariosPorDiaBase> getHorariosPorDia() {
                 return horariosPorDia;
         }
 
-        public void setHorariosPorDia(List<DTOCreateHorariosPorDia> horariosPorDia) {
+        public void setHorariosPorDia(@Size(min = 1, message = "É necessário ao menos um horário.") @Valid List<DTOCreateHorariosPorDiaBase> horariosPorDia) {
                 this.horariosPorDia = horariosPorDia;
         }
 

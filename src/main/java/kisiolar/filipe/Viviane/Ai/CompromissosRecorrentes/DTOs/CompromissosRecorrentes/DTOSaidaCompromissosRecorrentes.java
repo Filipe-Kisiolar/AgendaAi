@@ -2,7 +2,7 @@ package kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.CompromissosReco
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import kisiolar.filipe.Viviane.Ai.Compromissos.DTOs.DTOSaidaCompromissos;
-import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.HorariosPorDia.DTOSaidaHorariosPorDia;
+import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.HorariosPorDia.DTOSaidaHorariosPorDiaBase;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.Enums.ModoDeRecorrenciaEnum;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.Enums.OrdenamentoDaSemanaNoMesEnum;
 
@@ -20,7 +20,7 @@ public class DTOSaidaCompromissosRecorrentes {
 
     private String local;
 
-    private List<DTOSaidaHorariosPorDia> horariosPorDia;
+    private List<DTOSaidaHorariosPorDiaBase> horariosPorDia;
 
     private LocalDate dataInicioRecorrencia;
 
@@ -39,7 +39,7 @@ public class DTOSaidaCompromissosRecorrentes {
     public DTOSaidaCompromissosRecorrentes() {
     }
 
-    public DTOSaidaCompromissosRecorrentes(Long id, String nome, String descricao, String local, List<DTOSaidaHorariosPorDia> horariosPorDia, LocalDate dataInicioRecorrencia, LocalDate dataFimRecorrencia, Integer intervalo, ModoDeRecorrenciaEnum modoDeRecorrencia, OrdenamentoDaSemanaNoMesEnum ordenamentoDaSemanaNoMes, boolean apenasDiasUteis, List<DTOSaidaCompromissos> compromissosGerados) {
+    public DTOSaidaCompromissosRecorrentes(Long id, String nome, String descricao, String local, List<DTOSaidaHorariosPorDiaBase> horariosPorDia, LocalDate dataInicioRecorrencia, LocalDate dataFimRecorrencia, Integer intervalo, ModoDeRecorrenciaEnum modoDeRecorrencia, OrdenamentoDaSemanaNoMesEnum ordenamentoDaSemanaNoMes, boolean apenasDiasUteis, List<DTOSaidaCompromissos> compromissosGerados) {
         this.id = id;
         this.nome = nome;
         this.descricao = descricao;
@@ -86,11 +86,11 @@ public class DTOSaidaCompromissosRecorrentes {
         this.local = local;
     }
 
-    public List<DTOSaidaHorariosPorDia> getHorariosPorDia() {
+    public List<DTOSaidaHorariosPorDiaBase> getHorariosPorDia() {
         return horariosPorDia;
     }
 
-    public void setHorariosPorDia(List<DTOSaidaHorariosPorDia> horariosPorDia) {
+    public void setHorariosPorDia(List<DTOSaidaHorariosPorDiaBase> horariosPorDia) {
         this.horariosPorDia = horariosPorDia;
     }
 
