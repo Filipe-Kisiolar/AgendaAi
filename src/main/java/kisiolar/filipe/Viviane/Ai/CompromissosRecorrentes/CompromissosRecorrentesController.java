@@ -2,10 +2,10 @@ package kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes;
 
 import kisiolar.filipe.Viviane.Ai.Compromissos.DTOs.DTOSaidaCompromissos;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.CompromissosRecorrentes.*;
-import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.HorariosPorDia.DTOCreateHorariosPorDia;
-import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.HorariosPorDia.DTOSaidaHorariosPorDia;
-import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.HorariosPorDia.DTOUpdateHorariosPorDia;
-import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.HorariosPorDia.HorariosPorDiaService;
+import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.HorariosPorDia.DTOCreateHorariosPorDiaBase;
+import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.HorariosPorDia.DTOSaidaHorariosPorDiaBase;
+import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.HorariosPorDia.DTOUpdateHorariosPorDiaBase;
+import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.HorariosPorDia.ServicesHorariosPorDia.HorariosPorDiaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -73,27 +73,27 @@ public class CompromissosRecorrentesController {
     }
 
     @PatchMapping("/adicionarhorarionocompromisso/{id}")
-    public ResponseEntity<DTOSaidaHorariosPorDia> adicionarHorario(@PathVariable Long compromissoRecorrenteId,
-                                                                   @RequestBody DTOCreateHorariosPorDia horariosPorDia){
-        DTOSaidaHorariosPorDia saidaHorariosPorDia = horariosPorDiaService.adicionarHorario(compromissoRecorrenteId,horariosPorDia);
+    public ResponseEntity<DTOSaidaHorariosPorDiaBase> adicionarHorario(@PathVariable Long compromissoRecorrenteId,
+                                                                   @RequestBody DTOCreateHorariosPorDiaBase horariosPorDia){
+        DTOSaidaHorariosPorDiaBase saidaHorariosPorDia = horariosPorDiaService.adicionarHorario(compromissoRecorrenteId,horariosPorDia);
 
         return ResponseEntity.ok(saidaHorariosPorDia);
     }
 
     @PatchMapping("/alterarhorariodocompromisso/{compromissoid}/{idhorario}")
-    public ResponseEntity<DTOSaidaHorariosPorDia> alterarHorario(
+    public ResponseEntity<DTOSaidaHorariosPorDiaBase> alterarHorario(
             @PathVariable("compromissoid") Long compromissoRecorrenteId,
             @PathVariable("idhorario") Long horarioId,
-            @RequestBody DTOUpdateHorariosPorDia updateHorariosPorDia) {
+            @RequestBody DTOUpdateHorariosPorDiaBase updateHorariosPorDia) {
 
-        DTOSaidaHorariosPorDia saidaHorariosPorDia = horariosPorDiaService.alterarHorario(compromissoRecorrenteId, horarioId, updateHorariosPorDia);
+        DTOSaidaHorariosPorDiaBase saidaHorariosPorDia = horariosPorDiaService.alterarHorario(compromissoRecorrenteId, horarioId, updateHorariosPorDia);
         return ResponseEntity.ok(saidaHorariosPorDia);
     }
 
     @DeleteMapping("/deletarhorariodocompromisso/{id")
-    public ResponseEntity<List<DTOSaidaCompromissos>> deletarHorario(@PathVariable Long compromissoRecorrenteId,
+    public ResponseEntity<Long> deletarHorario(@PathVariable Long compromissoRecorrenteId,
                                                @PathVariable Long horarioId){
-        List<DTOSaidaCompromissos> compromissosDeletados = horariosPorDiaService.deletarHorarioPorId(compromissoRecorrenteId,horarioId);
+        long compromissosDeletados = horariosPorDiaService.deletarHorarioPorId(compromissoRecorrenteId,horarioId);
 
         return ResponseEntity.ok(compromissosDeletados);
     }
