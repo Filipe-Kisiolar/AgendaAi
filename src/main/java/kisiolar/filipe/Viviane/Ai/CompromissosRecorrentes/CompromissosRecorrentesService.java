@@ -7,8 +7,9 @@ import kisiolar.filipe.Viviane.Ai.Compromissos.DTOs.DTORespostaCompromisso;
 import kisiolar.filipe.Viviane.Ai.Compromissos.MapperCompromissos;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.CompromissosRecorrentes.*;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.Enums.ModoDeRecorrenciaEnum;
-import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.HorariosPorDia.HorariosPorDiaModels.HorariosPorDiaModel;
+import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.HorariosPorDia.HorariosPorDiaModels.*;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.HorariosPorDia.ServicesHorariosPorDia.HorariosPorDiaService;
+import kisiolar.filipe.Viviane.Ai.Exceptions.BadRequestException;
 import kisiolar.filipe.Viviane.Ai.Exceptions.ResourceNotFindException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,8 +18,7 @@ import java.time.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.Enums.ModoDeRecorrenciaEnum.FREQUENCIA_SEMANAL;
-import static kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.Enums.ModoDeRecorrenciaEnum.PADRAO_RELATIVO_MENSAL;
+import static kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.Enums.ModoDeRecorrenciaEnum.*;
 
 @Service
 public class CompromissosRecorrentesService{
@@ -94,10 +94,46 @@ public class CompromissosRecorrentesService{
         return gruposDeConflito;
     }
 
+    private boolean verificarConformidadeModoDeRecorrencia_Horario(
+            ModoDeRecorrenciaEnum modoDeRecorrencia,HorariosPorDiaModel horario){
+
+        return switch (horario){
+            case HorariosFrequenciaDiaria diaria when modoDeRecorrencia == FREQUENCIA_DIARIA-> {
+                yield true;
+            }
+            case HorariosFrequenciaSemanal semanal when modoDeRecorrencia == FREQUENCIA_SEMANAL -> {
+                yield true;
+            }
+            case HorariosPadraoRelativoMensal relativoMensal when modoDeRecorrencia == PADRAO_RELATIVO_MENSAL-> {
+                yield true;
+            }
+            case HorariosDiaEspecificoMensal mensal when modoDeRecorrencia == DIA_ESPECIFICO_MENSAL-> {
+                yield true;
+
+            }
+            case HorariosDataEspecificaAnual anual when modoDeRecorrencia == DATA_ESPECIFICA_ANUAL -> {
+                yield true;
+            }
+            default -> {
+                yield false;
+            }
+        };
+    }
+
     public DTORespostaCompromissoRecorrente criarCompromissoRecorrente(DTOCreateCompromissosRecorrentes dtoCreateCompromissosRecorrentes){
-        //todo fazer verificacao dos horarios,fazer um estream com verificacao baseada no modo de recorrencia setado
-        //salvar o compromisso e ja guarda-lo
-        CompromissosRecorrentesModel compromissoRecorrente = compromissosRecorrentesRepository.save(mapperCompromissosRecorrentes.mapToModel(dtoCreateCompromissosRecorrentes));
+
+        CompromissosRecorrentesModel compromissoRecorrente = mapperCompromissosRecorrentes.mapToModel(dtoCreateCompromissosRecorrentes);
+
+        //verificar se ha inconformidade nos tipos de horarios com modo de recorrencia
+        ModoDeRecorrenciaEnum modoDeRecorrencia = compromissoRecorrente.getModoDeRecorrencia();
+        boolean inconformidade = compromissoRecorrente.getHorariosPorDias().stream()
+                .anyMatch(horario -> !verificarConformidadeModoDeRecorrencia_Horario(modoDeRecorrencia, horario));
+
+        if(inconformidade){
+            throw new BadRequestException("Combinação inválida de tipo e modo de recorrência");
+        }
+
+        compromissosRecorrentesRepository.save(compromissoRecorrente);
 
         //chama o metodo criado para gerar os compromissos atrelados e guarda conflitos(se houver)
         List<DTORespostaCompromisso> compromissosGeradosComConflito = criarCompromissosPorRecorrencia(compromissoRecorrente);
