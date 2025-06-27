@@ -1,253 +1,256 @@
-package kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.HorariosPorDia;
+package kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.HorariosPorDia.ServicesHorariosPorDia;
 
 import jakarta.transaction.Transactional;
-import kisiolar.filipe.Viviane.Ai.Compromissos.DTOs.DTOSaidaCompromissos;
+import kisiolar.filipe.Viviane.Ai.Compromissos.CompromissosService;
+import kisiolar.filipe.Viviane.Ai.Compromissos.DTOs.DTORespostaCompromisso;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.CompromissosRecorrentesModel;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.CompromissosRecorrentesRepository;
-import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.CompromissosRecorrentesService;
-import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.HorariosPorDia.MappersHorariosPorDia.MapperHorariosPorDia;
+import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.HorariosPorDia.DTOCreateHorariosPorDiaBase;
+import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.HorariosPorDia.DTOSaidaHorariosPorDiaBase;
+import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.HorariosPorDia.DTOUpdateHorariosPorDiaBase;
+import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.HorariosPorDia.DataEspecificaAnual.DTOCreateHorariosDataEspecificaAnual;
+import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.HorariosPorDia.DataEspecificaAnual.DTOUpdateHorariosDataEspecificaAnual;
+import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.HorariosPorDia.DiaEspecificoMensal.DTOCreateHorariosDiaEspecificoMensal;
+import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.HorariosPorDia.DiaEspecificoMensal.DTOUpdateHorariosDiaEspecificoMensal;
+import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.HorariosPorDia.FrequenciaDiaria.DTOCreateHorariosFrequenciaDiaria;
+import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.HorariosPorDia.FrequenciaDiaria.DTOUpdateHorariosFrequenciaDiaria;
+import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.HorariosPorDia.FrequenciaSemanal.DTOCreateHorariosFrequenciaSemanal;
+import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.HorariosPorDia.FrequenciaSemanal.DTOUpdateHorariosFrequenciaSemanal;
+import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.HorariosPorDia.PadraoRelativoMensal.DTOCreateHorariosPadraoRelativoMensal;
+import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.HorariosPorDia.PadraoRelativoMensal.DTOUpdateHorariosPadraoRelativoMensal;
+import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.Enums.ModoDeRecorrenciaEnum;
+import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.HorariosPorDia.*;
+import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.HorariosPorDia.MappersHorariosPorDia.*;
+import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.MapperCompromissosRecorrentes;
 import kisiolar.filipe.Viviane.Ai.Exceptions.BadRequestException;
 import kisiolar.filipe.Viviane.Ai.Exceptions.ResourceNotFindException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.MonthDay;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+
+import static kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.Enums.ModoDeRecorrenciaEnum.*;
 
 @Service
-public class HorariosPorDiaService {
+public class HorariosPorDiaService extends HorariosServiceBase {
 
-    @Autowired
-    HorariosPorDiaRepository horariosPorDiaRepository;
+    private final HorariosFrequenciaDiariaService horariosFrequenciaDiariaService;
 
-    @Autowired
-    CompromissosRecorrentesRepository compromissosRecorrentesRepository;
+    private final HorariosFrequenciaSemanalService horariosFrequenciaSemanalService;
 
-    @Autowired
-    MapperHorariosPorDia mapperHorariosPorDia;
+    private final HorariosPadraoRelativoMensalService horariosPadraoRelativoMensalService;
 
-    private CompromissosRecorrentesService compromissosRecorrentesService;
+    private final HorariosDiaEspecificoMensalService horariosDiaEspecificoMensalService;
 
-    public void setCompromissosRecorrentesService(CompromissosRecorrentesService service) {
-        this.compromissosRecorrentesService = service;
+    private final HorariosDataEspecificaAnualService horariosDataEspecificaAnualService;
+
+
+    public HorariosPorDiaService(CompromissosRecorrentesRepository compromissosRecorrentesRepository, MapperCompromissosRecorrentes mapperCompromissosRecorrentes, CompromissosService compromissosService, HorariosFrequenciaDiariaService horariosFrequenciaDiariaService, HorariosFrequenciaSemanalService horariosFrequenciaSemanalService, HorariosPadraoRelativoMensalService horariosPadraoRelativoMensalService, HorariosDiaEspecificoMensalService horariosDiaEspecificoMensalService, HorariosDataEspecificaAnualService horariosDataEspecificaAnualService) {
+        super(compromissosRecorrentesRepository, mapperCompromissosRecorrentes, compromissosService);
+        this.horariosFrequenciaDiariaService = horariosFrequenciaDiariaService;
+        this.horariosFrequenciaSemanalService = horariosFrequenciaSemanalService;
+        this.horariosPadraoRelativoMensalService = horariosPadraoRelativoMensalService;
+        this.horariosDiaEspecificoMensalService = horariosDiaEspecificoMensalService;
+        this.horariosDataEspecificaAnualService = horariosDataEspecificaAnualService;
     }
 
     @Transactional
-    public DTOSaidaHorariosPorDia adicionarHorario(Long compromissoRecorrenteId, DTOCreateHorariosPorDia dtoCreateHorariosPorDia){
-        HorariosPorDiaModel horariosCriado = mapperHorariosPorDia.mapToModel(dtoCreateHorariosPorDia);
+    public DTOSaidaHorariosPorDiaBase adicionarHorario(Long compromissoRecorrenteId, DTOCreateHorariosPorDiaBase dtoCreateHorariosPorDia) {
+        CompromissosRecorrentesModel compromissoRecorrente = compromissosRecorrentesRepository.findById(compromissoRecorrenteId)
+                .orElseThrow(() -> new ResourceNotFindException("Compromisso recorrente não encontrado"));
+
+        return switch (compromissoRecorrente.getModoDeRecorrencia()) {
+            case FREQUENCIA_DIARIA -> {
+                if (!(dtoCreateHorariosPorDia instanceof DTOCreateHorariosFrequenciaDiaria dtoCreateHorario)) {
+                    throw new BadRequestException("DTO incompatível para FREQUENCIA_DIARIA");
+                }
+                yield horariosFrequenciaDiariaService.adicionarHorario(compromissoRecorrente, dtoCreateHorario);
+            }
+            case FREQUENCIA_SEMANAL -> {
+                if (!(dtoCreateHorariosPorDia instanceof DTOCreateHorariosFrequenciaSemanal dtoCreateHorario)) {
+                    throw new BadRequestException("DTO incompatível para FREQUENCIA_SEMANAL");
+                }
+                yield horariosFrequenciaSemanalService.adicionarHorario(compromissoRecorrente, dtoCreateHorario);
+            }
+            case PADRAO_RELATIVO_MENSAL -> {
+                if (!(dtoCreateHorariosPorDia instanceof DTOCreateHorariosPadraoRelativoMensal dtoCreateHorario)) {
+                    throw new BadRequestException("DTO incompatível para PADRAO_RELATIVO_MENSAL");
+                }
+                yield horariosPadraoRelativoMensalService.adicionarHorario(compromissoRecorrente, dtoCreateHorario);
+            }
+            case DIA_ESPECIFICO_MENSAL -> {
+                if (!(dtoCreateHorariosPorDia instanceof DTOCreateHorariosDiaEspecificoMensal dtoCreateHorario)) {
+                    throw new BadRequestException("DTO incompatível para DIA_ESPECIFICO_MENSAL");
+                }
+                yield horariosDiaEspecificoMensalService.adicionarHorario(compromissoRecorrente, dtoCreateHorario);
+            }
+            case DATA_ESPECIFICA_ANUAL -> {
+                if (!(dtoCreateHorariosPorDia instanceof DTOCreateHorariosDataEspecificaAnual dtoCreateHorario)) {
+                    throw new BadRequestException("DTO incompatível para DATA_ESPECIFICA_ANUAL");
+                }
+                yield horariosDataEspecificaAnualService.adicionarHorario(compromissoRecorrente, dtoCreateHorario);
+            }
+            default -> throw new IllegalArgumentException("Modo de recorrência inválido: " + compromissoRecorrente.getModoDeRecorrencia());
+        };
+    }
+
+    @Transactional
+    public DTOSaidaHorariosPorDiaBase alterarHorario(Long compromissoRecorrenteId, Long horarioId, DTOUpdateHorariosPorDiaBase dtoUpdateHorariosPorDia) {
 
         CompromissosRecorrentesModel compromissoRecorrente = compromissosRecorrentesRepository.findById(compromissoRecorrenteId)
                 .orElseThrow(() -> new ResourceNotFindException("Compromisso recorrente não encontrado"));
 
-        horariosCriado.setCompromissoRecorrente(compromissoRecorrente);
-
-        boolean haConflitos = verificarConflitosComHorarioNaLista(compromissoRecorrente,horariosCriado,compromissoRecorrente.getHorariosPorDias());
-
-        if(haConflitos){
-            throw new BadRequestException("Esse horário conflita com outros já criados no mesmo Compromisso Recorrente");
-        }
-
-        horariosPorDiaRepository.save(horariosCriado);
-
-        compromissosRecorrentesService.criarCompromissosDiretamentePorHorariosPorDia(horariosCriado);
-
-        return mapperHorariosPorDia.mapToDto(horariosCriado);
+        return switch (compromissoRecorrente.getModoDeRecorrencia()) {
+            case FREQUENCIA_DIARIA -> {
+                if (!(dtoUpdateHorariosPorDia instanceof DTOUpdateHorariosFrequenciaDiaria dtoUpdateHorario)) {
+                    throw new BadRequestException("DTO incompatível para FREQUENCIA_DIARIA");
+                }
+                yield horariosFrequenciaDiariaService.alterarHorario(compromissoRecorrente, horarioId, dtoUpdateHorario);
+            }
+            case FREQUENCIA_SEMANAL -> {
+                if (!(dtoUpdateHorariosPorDia instanceof DTOUpdateHorariosFrequenciaSemanal dtoUpdateHorario)) {
+                    throw new BadRequestException("DTO incompatível para FREQUENCIA_SEMANAL");
+                }
+                yield horariosFrequenciaSemanalService.alterarHorario(compromissoRecorrente, horarioId, dtoUpdateHorario);
+            }
+            case PADRAO_RELATIVO_MENSAL -> {
+                if (!(dtoUpdateHorariosPorDia instanceof DTOUpdateHorariosPadraoRelativoMensal dtoUpdateHorario)) {
+                    throw new BadRequestException("DTO incompatível para PADRAO_RELATIVO_MENSAL");
+                }
+                yield horariosPadraoRelativoMensalService.alterarHorario(compromissoRecorrente, horarioId, dtoUpdateHorario);
+            }
+            case DIA_ESPECIFICO_MENSAL -> {
+                if (!(dtoUpdateHorariosPorDia instanceof DTOUpdateHorariosDiaEspecificoMensal dtoUpdateHorario)) {
+                    throw new BadRequestException("DTO incompatível para DIA_ESPECIFICO_MENSAL");
+                }
+                yield horariosDiaEspecificoMensalService.alterarHorario(compromissoRecorrente, horarioId, dtoUpdateHorario);
+            }
+            case DATA_ESPECIFICA_ANUAL -> {
+                if (!(dtoUpdateHorariosPorDia instanceof DTOUpdateHorariosDataEspecificaAnual dtoUpdateHorario)) {
+                    throw new BadRequestException("DTO incompatível para DATA_ESPECIFICA_ANUAL");
+                }
+                yield horariosDataEspecificaAnualService.alterarHorario(compromissoRecorrente, horarioId, dtoUpdateHorario);
+            }
+            default -> throw new IllegalArgumentException("Modo de recorrência inválido: " + compromissoRecorrente.getModoDeRecorrencia());
+        };
     }
 
     @Transactional
-    public DTOSaidaHorariosPorDia alterarHorario(Long compromissoRecorrenteId,Long horarioId,DTOUpdateHorariosPorDia dtoUpdateHorariosPorDia){
+    public List<DTORespostaCompromisso> criarCompromissosPorModoDeRecorrencia(CompromissosRecorrentesModel compromissoRecorrente){
 
-        CompromissosRecorrentesModel compromissoRecorrente = compromissosRecorrentesRepository.findById(compromissoRecorrenteId)
-                .orElseThrow(() -> new ResourceNotFindException("Compromisso recorrente não encontrado"));
-
-        HorariosPorDiaModel horariosPorDia = compromissoRecorrente.getHorariosPorDias().stream()
-                .filter(h -> h.getId().equals(horarioId))
-                .findFirst()
-                .orElseThrow(() -> new ResourceNotFindException("Horário não encontrado nesse compromisso"));
-
-        mapperHorariosPorDia.atualizacao(dtoUpdateHorariosPorDia, horariosPorDia);
-
-        List<HorariosPorDiaModel> outrosHorarios = compromissoRecorrente.getHorariosPorDias()
-                .stream()
-                .filter(h -> !h.getId().equals(horarioId))
-                .toList();
-
-        boolean haConflitos = verificarConflitosComHorarioNaLista(compromissoRecorrente,horariosPorDia,outrosHorarios);
-
-        if(haConflitos){
-            throw new BadRequestException("Esse horário conflita com outros já criados no mesmo Compromisso Recorrente");
-        }
-
-        compromissosRecorrentesService.apagarCompromissosAtreladosAoHorarioPorDia(horariosPorDia);
-
-        horariosPorDiaRepository.save(horariosPorDia);
-
-        compromissosRecorrentesService.criarCompromissosDiretamentePorHorariosPorDia(horariosPorDia);
-
-        return mapperHorariosPorDia.mapToDto(horariosPorDia);
+        return switch (compromissoRecorrente.getModoDeRecorrencia()){
+            case FREQUENCIA_DIARIA -> {
+                yield horariosFrequenciaDiariaService.criarCompromissosPorRecorrenciaFrequenciaDiaria(compromissoRecorrente);
+            }
+            case FREQUENCIA_SEMANAL -> {
+                yield horariosFrequenciaSemanalService.criarCompromissosPorRecorrenciaFrequenciaSemanal(compromissoRecorrente);
+            }
+            case PADRAO_RELATIVO_MENSAL -> {
+                yield horariosPadraoRelativoMensalService.criarCompromissosPorRecorrenciaPadraoRelativoMensal(compromissoRecorrente);
+            }
+            case DIA_ESPECIFICO_MENSAL -> {
+                yield horariosDiaEspecificoMensalService.criarCompromissosPorRecorrenciaDiaEspecificoMensal(compromissoRecorrente);
+            }
+            case DATA_ESPECIFICA_ANUAL -> {
+                yield horariosDataEspecificaAnualService.criarCompromissosPorRecorrenciaDataEspecificaAnual(compromissoRecorrente);
+            }
+            default ->
+                    throw new IllegalArgumentException("Modo de recorrência inválido: " + compromissoRecorrente.getModoDeRecorrencia());
+        };
     }
 
     @Transactional
-    public List<DTOSaidaCompromissos> deletarHorarioPorId(Long compromissoRecorrenteId, Long horarioId) {
+    public Long deletarHorarioPorId(Long compromissoRecorrenteId, Long horarioId) {
 
-        CompromissosRecorrentesModel compromissoRecorrente = compromissosRecorrentesRepository.findById(compromissoRecorrenteId)
-                .orElseThrow(() -> new ResourceNotFindException("Compromisso recorrente não encontrado"));
+        CompromissosRecorrentesModel compromissoRecorrente = compromissosRecorrentesRepository.
+                findById(compromissoRecorrenteId).
+                orElseThrow(() -> new ResourceNotFindException("Compromisso inexistente"));
 
         HorariosPorDiaModel horario = compromissoRecorrente.getHorariosPorDias()
                 .stream()
                 .filter(h -> h.getId().equals(horarioId))
                 .findFirst()
-                .orElseThrow(() -> new RuntimeException("Horário não encontrado nesse compromisso"));
+                .orElseThrow(() -> new ResourceNotFindException("Horário não encontrado nesse compromisso"));
 
-        List<DTOSaidaCompromissos> compromissosDeletados = compromissosRecorrentesService.apagarCompromissosAtreladosAoHorarioPorDia(horario);
+        long compromissosDeletados = switch (horario){
+            case HorariosFrequenciaDiaria diaria when compromissoRecorrente.getModoDeRecorrencia() == FREQUENCIA_DIARIA-> {
+                yield horariosFrequenciaDiariaService.apagarCompromissosAtreladosAoHorarioPorDia(diaria);
+            }
+            case HorariosFrequenciaSemanal semanal when compromissoRecorrente.getModoDeRecorrencia() == FREQUENCIA_SEMANAL -> {
+                yield horariosFrequenciaSemanalService.apagarCompromissosAtreladosAoHorarioPorDia(semanal);
+            }
+            case HorariosPadraoRelativoMensal relativoMensal when compromissoRecorrente.getModoDeRecorrencia() == PADRAO_RELATIVO_MENSAL-> {
+                yield horariosPadraoRelativoMensalService.apagarCompromissosAtreladosAoHorarioPorDia(relativoMensal);
+            }
+            case HorariosDiaEspecificoMensal mensal when compromissoRecorrente.getModoDeRecorrencia() == DIA_ESPECIFICO_MENSAL-> {
+                yield horariosDiaEspecificoMensalService.apagarCompromissosAtreladosAoHorarioPorDia(mensal);
+
+            }
+            case HorariosDataEspecificaAnual anual when compromissoRecorrente.getModoDeRecorrencia() == DATA_ESPECIFICA_ANUAL -> {
+                yield horariosDataEspecificaAnualService.apagarCompromissosAtreladosAoHorarioPorDia(anual);
+            }
+            default -> throw new IllegalArgumentException("Combinação inválida de tipo e modo de recorrência");
+        };
 
         compromissoRecorrente.getHorariosPorDias().remove(horario);
         return compromissosDeletados;
     }
 
-    public boolean verificarConflitoEntreHorariosDiarios(HorariosPorDiaModel horariosPorDia_1, HorariosPorDiaModel horariosPorDia_2){
+    @Transactional
+    public boolean verificarConflitosComHorarioNaLista(
+            ModoDeRecorrenciaEnum modoDeRecorrencia,
+            HorariosPorDiaModel horarioAnalizado,List<HorariosPorDiaModel> listaHorarios){
 
-        boolean horariosConflitam= horariosPorDia_1.getHoraInicio().isBefore(horariosPorDia_2.getHoraFim())
-                && horariosPorDia_1.getHoraFim().isAfter(horariosPorDia_2.getHoraInicio());
-
-        return horariosConflitam;
-    }
-
-    public boolean verificarConflitoEntreHorariosUsamDiasDaSemana(
-            HorariosPorDiaModel horario_1, HorariosPorDiaModel horario_2) {
-
-        Set<DayOfWeek> dias1 = getDiasDaSemanaEntre(horario_1.getDiaDaSemanaInicio(), horario_1.getDiaDaSemanaFim());
-        Set<DayOfWeek> dias2 = getDiasDaSemanaEntre(horario_2.getDiaDaSemanaInicio(), horario_2.getDiaDaSemanaFim());
-
-        boolean intersecaoDias = dias1.stream().anyMatch(dias2::contains);
-
-        boolean horariosConflitam = verificarConflitoEntreHorariosDiarios(horario_1, horario_2);
-
-        return intersecaoDias && horariosConflitam;
-    }
-
-    private Set<DayOfWeek> getDiasDaSemanaEntre(DayOfWeek inicio, DayOfWeek fim) {
-        Set<DayOfWeek> dias = new HashSet<>();
-        DayOfWeek atual = inicio;
-        do {
-            dias.add(atual);
-            atual = atual.plus(1);
-        } while (atual != fim.plus(1));
-        return dias;
-    }
-    public boolean verificarConflitoEntreHorariosDiaEspecificoMensal(HorariosPorDiaModel horariosPorDia_1, HorariosPorDiaModel horariosPorDia_2){
-        LocalDateTime inicioHorario_1 = LocalDateTime.of(
-                LocalDate.now().getYear(),
-                LocalDate.now().getMonth(),
-                horariosPorDia_1.getInicioDiaEspecificoMes(),
-                horariosPorDia_1.getHoraInicio().getHour(),
-                horariosPorDia_1.getHoraInicio().getMinute()
-        );
-
-        LocalDateTime fimHorario_1 = LocalDateTime.of(
-                LocalDate.now().getYear(),
-                LocalDate.now().getMonth(),
-                horariosPorDia_1.getFimDiaEspecificoMes(),
-                horariosPorDia_1.getHoraFim().getHour(),
-                horariosPorDia_1.getHoraFim().getMinute()
-        );
-
-        LocalDateTime inicioHorario_2 = LocalDateTime.of(
-                LocalDate.now().getYear(),
-                LocalDate.now().getMonth(),
-                horariosPorDia_2.getInicioDiaEspecificoMes(),
-                horariosPorDia_2.getHoraInicio().getHour(),
-                horariosPorDia_2.getHoraInicio().getMinute()
-        );
-
-        LocalDateTime fimHorario_2 = LocalDateTime.of(
-                LocalDate.now().getYear(),
-                LocalDate.now().getMonth(),
-                horariosPorDia_2.getFimDiaEspecificoMes(),
-                horariosPorDia_2.getHoraFim().getHour(),
-                horariosPorDia_2.getHoraFim().getMinute()
-        );
-
-        boolean conflitam = inicioHorario_1.isBefore(fimHorario_2)
-                && fimHorario_1.isAfter(inicioHorario_2);
-
-        return conflitam;
-    }
-
-    public boolean verificarConflitoEntreHorariosDiaEspecificoAnual(HorariosPorDiaModel horariosPorDia_1, HorariosPorDiaModel horariosPorDia_2){
-        MonthDay diaDoMesInicioHorario_1 = horariosPorDia_1.getInicioDataEspecificaDoAno();
-
-        MonthDay diaDoMesFimHorario_1 = horariosPorDia_1.getFimDataEspecificaDoAno();
-
-        LocalDateTime inicioHorario_1 = diaDoMesInicioHorario_1.atYear(LocalDate.now().getYear())
-                .atTime(horariosPorDia_1.getHoraInicio());
-
-        LocalDateTime fimHorario_1 = diaDoMesFimHorario_1.atYear(inicioHorario_1.getYear())
-                .atTime(horariosPorDia_1.getHoraFim());
-
-        MonthDay diaDoMesInicioHorario_2 = horariosPorDia_2.getInicioDataEspecificaDoAno();
-
-        MonthDay diaDoMesFimHorario_2 = horariosPorDia_2.getFimDataEspecificaDoAno();
-
-        LocalDateTime inicioHorario_2 = diaDoMesInicioHorario_2.atYear(LocalDate.now().getYear())
-                .atTime(horariosPorDia_2.getHoraInicio());
-
-        LocalDateTime fimHorario_2 = diaDoMesFimHorario_2.atYear(inicioHorario_2.getYear())
-                .atTime(horariosPorDia_2.getHoraFim());
-
-        boolean conflitam = inicioHorario_1.isBefore(fimHorario_2)
-                && fimHorario_1.isAfter(inicioHorario_2);
-
-        return conflitam;
-    }
-
-    public boolean verificarConflitosComHorarioNaLista(CompromissosRecorrentesModel compromissosAtrelado,HorariosPorDiaModel horariosPorDia,List<HorariosPorDiaModel> listaHorariosPorDia){
-        int i = 0;
-        boolean haConflito = false;
-        switch (compromissosAtrelado.getModoDeRecorrencia()){
+        return switch (modoDeRecorrencia){
             case FREQUENCIA_DIARIA -> {
-                while (!haConflito && i<listaHorariosPorDia.size()){
-                    HorariosPorDiaModel horarioAnalisado = listaHorariosPorDia.get(i);
-
-                    haConflito = verificarConflitoEntreHorariosDiarios(horariosPorDia,horarioAnalisado);
-
-                    i++;
+                if (!(horarioAnalizado instanceof HorariosFrequenciaDiaria horario)) {
+                    throw new BadRequestException("DTO incompatível para FREQUENCIA_DIARIA");
                 }
+                List<HorariosFrequenciaDiaria> listaDiaria = listaHorarios.stream().
+                        map(HorariosFrequenciaDiaria.class::cast).toList();
+
+                yield horariosFrequenciaDiariaService.verificarConflitosComHorarioNaLista(horario, listaDiaria);
             }
-            case FREQUENCIA_SEMANAL,PADRAO_RELATIVO_MENSAL -> {
-                while (!haConflito && i<listaHorariosPorDia.size()){
-                    HorariosPorDiaModel horarioAnalisado = listaHorariosPorDia.get(i);
-
-                    haConflito = verificarConflitoEntreHorariosUsamDiasDaSemana(horariosPorDia,horarioAnalisado);
-                    System.out.println("ha conflito dias da semana:" + haConflito);
-                    i++;
+            case FREQUENCIA_SEMANAL -> {
+                if (!(horarioAnalizado instanceof HorariosFrequenciaSemanal horario)) {
+                    throw new BadRequestException("DTO incompatível para FREQUENCIA_SEMANAL");
                 }
+
+                List<HorariosFrequenciaSemanal> listaSemanal = listaHorarios.stream()
+                        .map(HorariosFrequenciaSemanal.class::cast).toList();
+
+                yield horariosFrequenciaSemanalService.verificarConflitosComHorarioNaLista(horario, listaSemanal);
+            }
+            case PADRAO_RELATIVO_MENSAL -> {
+                if (!(horarioAnalizado instanceof HorariosPadraoRelativoMensal horario)) {
+                    throw new BadRequestException("DTO incompatível para PADRAO_RELATIVO_MENSAL");
+                }
+
+                List<HorariosPadraoRelativoMensal> listaRelativoMensal = listaHorarios.stream()
+                        .map(HorariosPadraoRelativoMensal.class::cast).toList();
+
+                yield horariosPadraoRelativoMensalService.verificarConflitosComHorarioNaLista(horario,listaRelativoMensal);
             }
             case DIA_ESPECIFICO_MENSAL -> {
-                while (!haConflito && i<listaHorariosPorDia.size()){
-                    HorariosPorDiaModel horarioAnalisado = listaHorariosPorDia.get(i);
-
-                    haConflito = verificarConflitoEntreHorariosDiaEspecificoMensal(horariosPorDia,horarioAnalisado);
-
-                    i++;
+                if (!(horarioAnalizado instanceof HorariosDiaEspecificoMensal horario)) {
+                    throw new BadRequestException("DTO incompatível para DIA_ESPECIFICO_MENSAL");
                 }
+
+                List<HorariosDiaEspecificoMensal> listaDiaMensal = listaHorarios.stream()
+                        .map(HorariosDiaEspecificoMensal.class::cast).toList();
+
+                yield horariosDiaEspecificoMensalService.verificarConflitosComHorarioNaLista(horario,listaDiaMensal);
             }
             case DATA_ESPECIFICA_ANUAL -> {
-                while (!haConflito && i<listaHorariosPorDia.size()){
-                    HorariosPorDiaModel horarioAnalisado = listaHorariosPorDia.get(i);
-
-                    haConflito = verificarConflitoEntreHorariosDiaEspecificoAnual(horariosPorDia,horarioAnalisado);
-
-                    i++;
+                if (!(horarioAnalizado instanceof HorariosDataEspecificaAnual horario)) {
+                    throw new BadRequestException("DTO incompatível para DATA_ESPECIFICA_ANUAL");
                 }
-            }
-        }
-        return haConflito;
-    }
 
+                List<HorariosDataEspecificaAnual> listaAnual = listaHorarios.stream()
+                        .map(HorariosDataEspecificaAnual.class::cast).toList();
+
+                yield horariosDataEspecificaAnualService.verificarConflitosComHorarioNaLista(horario,listaAnual);
+            }
+            default -> throw new IllegalArgumentException("Modo de recorrência inválido: " + modoDeRecorrencia);
+        };
+    }
 }
