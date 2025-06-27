@@ -6,7 +6,7 @@ import kisiolar.filipe.Viviane.Ai.Compromissos.MapperCompromissos;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.CompromissosRecorrentes.DTOCreateCompromissosRecorrentes;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.CompromissosRecorrentes.DTOSaidaCompromissosRecorrentes;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.CompromissosRecorrentes.DTOUpdateCompromissosRecorrentes;
-import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.HorariosPorDia.HorariosPorDiaModel;
+import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.HorariosPorDia.HorariosPorDiaModels.HorariosPorDiaModel;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.HorariosPorDia.MappersHorariosPorDia.HelperMapperHorariosPorDia;
 import org.mapstruct.*;
 

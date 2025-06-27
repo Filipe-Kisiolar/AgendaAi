@@ -4,8 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import kisiolar.filipe.Viviane.Ai.Compromissos.CompromissosModel;
 import jakarta.persistence.*;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.Enums.ModoDeRecorrenciaEnum;
-import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.Enums.OrdenamentoDaSemanaNoMesEnum;
-import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.HorariosPorDia.HorariosPorDiaModel;
+import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.HorariosPorDia.HorariosPorDiaModels.HorariosPorDiaModel;
 
 import java.time.LocalDate;
 import java.util.ArrayList;

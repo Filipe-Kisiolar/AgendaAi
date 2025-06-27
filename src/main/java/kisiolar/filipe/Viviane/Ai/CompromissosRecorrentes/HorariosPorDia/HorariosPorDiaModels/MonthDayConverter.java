@@ -1,4 +1,4 @@
-package kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.HorariosPorDia;
+package kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.HorariosPorDia.HorariosPorDiaModels;
 
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;

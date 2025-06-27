@@ -1,28 +1,19 @@
 package kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes;
 
-import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
-import kisiolar.filipe.Viviane.Ai.Compromissos.CompromissosModel;
 import kisiolar.filipe.Viviane.Ai.Compromissos.CompromissosRepository;
 import kisiolar.filipe.Viviane.Ai.Compromissos.CompromissosService;
-import kisiolar.filipe.Viviane.Ai.Compromissos.DTOs.DTOCreateCompromissos;
 import kisiolar.filipe.Viviane.Ai.Compromissos.DTOs.DTORespostaCompromisso;
-import kisiolar.filipe.Viviane.Ai.Compromissos.DTOs.DTOSaidaCompromissos;
 import kisiolar.filipe.Viviane.Ai.Compromissos.MapperCompromissos;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.CompromissosRecorrentes.*;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.Enums.ModoDeRecorrenciaEnum;
-import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.Enums.OrdenamentoDaSemanaNoMesEnum;
-import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.HorariosPorDia.HorariosPorDiaModel;
-import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.HorariosPorDia.ServicesHorariosPorDia.HorariosFrequenciaDiariaService;
+import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.HorariosPorDia.HorariosPorDiaModels.HorariosPorDiaModel;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.HorariosPorDia.ServicesHorariosPorDia.HorariosPorDiaService;
 import kisiolar.filipe.Viviane.Ai.Exceptions.ResourceNotFindException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.*;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAdjuster;
-import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.stream.Collectors;
 
