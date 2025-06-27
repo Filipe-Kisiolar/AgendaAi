@@ -43,10 +43,6 @@ public class CompromissosRecorrentesModel {
     @Column(name = "modo_de_recorrencia")
     private ModoDeRecorrenciaEnum modoDeRecorrencia;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "ordenamento_da_semana_no_mes")
-    private OrdenamentoDaSemanaNoMesEnum ordenamentoDaSemanaNoMes;
-
     @Column(name = "apenas_dias_uteis")
     private Boolean apenasDiasUteis;
 
@@ -60,18 +56,17 @@ public class CompromissosRecorrentesModel {
     public CompromissosRecorrentesModel() {
     }
 
-    public CompromissosRecorrentesModel(Long id, String nome, String descricao, String local, List<HorariosPorDiaModel> horariosPorDiaModel, LocalDate dataInicioRecorrencia, LocalDate dataFimRecorrencia, Integer intervalo, ModoDeRecorrenciaEnum modoDeRecorrencia, OrdenamentoDaSemanaNoMesEnum ordenamentoDaSemanaNoMes, Boolean apenasDiasUteis, List<CompromissosModel> compromissosGerados) {
+    public CompromissosRecorrentesModel(Long id, String nome, String descricao, String local, LocalDate dataInicioRecorrencia, LocalDate dataFimRecorrencia, Integer intervalo, ModoDeRecorrenciaEnum modoDeRecorrencia, Boolean apenasDiasUteis, List<HorariosPorDiaModel> horariosPorDia, List<CompromissosModel> compromissosGerados) {
         this.id = id;
         this.nome = nome;
         this.descricao = descricao;
         this.local = local;
-        this.horariosPorDia = horariosPorDiaModel;
         this.dataInicioRecorrencia = dataInicioRecorrencia;
         this.dataFimRecorrencia = dataFimRecorrencia;
         this.intervalo = intervalo;
         this.modoDeRecorrencia = modoDeRecorrencia;
-        this.ordenamentoDaSemanaNoMes = ordenamentoDaSemanaNoMes;
         this.apenasDiasUteis = apenasDiasUteis;
+        this.horariosPorDia = horariosPorDia;
         this.compromissosGerados = compromissosGerados;
     }
 
@@ -145,14 +140,6 @@ public class CompromissosRecorrentesModel {
 
     public void setModoDeRecorrencia(ModoDeRecorrenciaEnum modoDeRecorrencia) {
         this.modoDeRecorrencia = modoDeRecorrencia;
-    }
-
-    public OrdenamentoDaSemanaNoMesEnum getOrdenamentoDaSemanaNoMes() {
-        return ordenamentoDaSemanaNoMes;
-    }
-
-    public void setOrdenamentoDaSemanaNoMes(OrdenamentoDaSemanaNoMesEnum ordenamentoDaSemanaNoMes) {
-        this.ordenamentoDaSemanaNoMes = ordenamentoDaSemanaNoMes;
     }
 
     public Boolean getApenasDiasUteis() {
