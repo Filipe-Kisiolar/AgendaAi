@@ -30,14 +30,12 @@ public class DTOCreateCompromissosRecorrentes {
 
         private ModoDeRecorrenciaEnum modoDeRecorrencia;
 
-        private OrdenamentoDaSemanaNoMesEnum ordenamentoDaSemanaNoMes;
-
         private boolean apenasDiasUteis;
 
         public DTOCreateCompromissosRecorrentes() {
         }
 
-        public DTOCreateCompromissosRecorrentes(Long id, String nome, String descricao, String local, List<DTOCreateHorariosPorDiaBase> horariosPorDia, LocalDate dataInicioRecorrencia, LocalDate dataFimRecorrencia, Integer intervalo, ModoDeRecorrenciaEnum modoDeRecorrencia, OrdenamentoDaSemanaNoMesEnum ordenamentoDaSemanaNoMes, boolean apenasDiasUteis) {
+        public DTOCreateCompromissosRecorrentes(Long id, String nome, String descricao, String local, List<DTOCreateHorariosPorDiaBase> horariosPorDia, LocalDate dataInicioRecorrencia, LocalDate dataFimRecorrencia, Integer intervalo, ModoDeRecorrenciaEnum modoDeRecorrencia, boolean apenasDiasUteis) {
                 this.id = id;
                 this.nome = nome;
                 this.descricao = descricao;
@@ -47,7 +45,6 @@ public class DTOCreateCompromissosRecorrentes {
                 this.dataFimRecorrencia = dataFimRecorrencia;
                 this.intervalo = intervalo;
                 this.modoDeRecorrencia = modoDeRecorrencia;
-                this.ordenamentoDaSemanaNoMes = ordenamentoDaSemanaNoMes;
                 this.apenasDiasUteis = apenasDiasUteis;
         }
 
@@ -121,14 +118,6 @@ public class DTOCreateCompromissosRecorrentes {
 
         public void setModoDeRecorrencia(ModoDeRecorrenciaEnum modoDeRecorrencia) {
                 this.modoDeRecorrencia = modoDeRecorrencia;
-        }
-
-        public OrdenamentoDaSemanaNoMesEnum getOrdenamentoDaSemanaNoMes() {
-                return ordenamentoDaSemanaNoMes;
-        }
-
-        public void setOrdenamentoDaSemanaNoMes(OrdenamentoDaSemanaNoMesEnum ordenamentoDaSemanaNoMes) {
-                this.ordenamentoDaSemanaNoMes = ordenamentoDaSemanaNoMes;
         }
 
         public boolean isApenasDiasUteis() {

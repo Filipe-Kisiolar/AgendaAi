@@ -23,14 +23,12 @@ public class DTOUpdateCompromissosRecorrentes {
 
     private ModoDeRecorrenciaEnum modoDeRecorrencia;
 
-    private OrdenamentoDaSemanaNoMesEnum ordenamentoDaSemanaNoMes;
-
     private boolean apenasDiasUteis;
 
     public DTOUpdateCompromissosRecorrentes() {
     }
 
-    public DTOUpdateCompromissosRecorrentes(Long id, String nome, String descricao, String local, LocalDate dataInicioRecorrencia, LocalDate dataFimRecorrencia, Integer intervalo, ModoDeRecorrenciaEnum modoDeRecorrencia, OrdenamentoDaSemanaNoMesEnum ordenamentoDaSemanaNoMes, boolean apenasDiasUteis) {
+    public DTOUpdateCompromissosRecorrentes(Long id, String nome, String descricao, String local, LocalDate dataInicioRecorrencia, LocalDate dataFimRecorrencia, Integer intervalo, ModoDeRecorrenciaEnum modoDeRecorrencia, boolean apenasDiasUteis) {
         this.id = id;
         this.nome = nome;
         this.descricao = descricao;
@@ -39,7 +37,6 @@ public class DTOUpdateCompromissosRecorrentes {
         this.dataFimRecorrencia = dataFimRecorrencia;
         this.intervalo = intervalo;
         this.modoDeRecorrencia = modoDeRecorrencia;
-        this.ordenamentoDaSemanaNoMes = ordenamentoDaSemanaNoMes;
         this.apenasDiasUteis = apenasDiasUteis;
     }
 
@@ -105,14 +102,6 @@ public class DTOUpdateCompromissosRecorrentes {
 
     public void setModoDeRecorrencia(ModoDeRecorrenciaEnum modoDeRecorrencia) {
         this.modoDeRecorrencia = modoDeRecorrencia;
-    }
-
-    public OrdenamentoDaSemanaNoMesEnum getOrdenamentoDaSemanaNoMes() {
-        return ordenamentoDaSemanaNoMes;
-    }
-
-    public void setOrdenamentoDaSemanaNoMes(OrdenamentoDaSemanaNoMesEnum ordenamentoDaSemanaNoMes) {
-        this.ordenamentoDaSemanaNoMes = ordenamentoDaSemanaNoMes;
     }
 
     public boolean isApenasDiasUteis() {

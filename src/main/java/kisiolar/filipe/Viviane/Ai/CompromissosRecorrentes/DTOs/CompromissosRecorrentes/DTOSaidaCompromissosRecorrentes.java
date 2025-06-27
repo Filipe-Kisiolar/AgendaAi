@@ -30,8 +30,6 @@ public class DTOSaidaCompromissosRecorrentes {
 
     private ModoDeRecorrenciaEnum modoDeRecorrencia;
 
-    private OrdenamentoDaSemanaNoMesEnum ordenamentoDaSemanaNoMes;
-
     private boolean apenasDiasUteis;
 
     private List<DTOSaidaCompromissos> compromissosGerados;
@@ -39,7 +37,7 @@ public class DTOSaidaCompromissosRecorrentes {
     public DTOSaidaCompromissosRecorrentes() {
     }
 
-    public DTOSaidaCompromissosRecorrentes(Long id, String nome, String descricao, String local, List<DTOSaidaHorariosPorDiaBase> horariosPorDia, LocalDate dataInicioRecorrencia, LocalDate dataFimRecorrencia, Integer intervalo, ModoDeRecorrenciaEnum modoDeRecorrencia, OrdenamentoDaSemanaNoMesEnum ordenamentoDaSemanaNoMes, boolean apenasDiasUteis, List<DTOSaidaCompromissos> compromissosGerados) {
+    public DTOSaidaCompromissosRecorrentes(Long id, String nome, String descricao, String local, List<DTOSaidaHorariosPorDiaBase> horariosPorDia, LocalDate dataInicioRecorrencia, LocalDate dataFimRecorrencia, Integer intervalo, ModoDeRecorrenciaEnum modoDeRecorrencia, boolean apenasDiasUteis, List<DTOSaidaCompromissos> compromissosGerados) {
         this.id = id;
         this.nome = nome;
         this.descricao = descricao;
@@ -49,7 +47,6 @@ public class DTOSaidaCompromissosRecorrentes {
         this.dataFimRecorrencia = dataFimRecorrencia;
         this.intervalo = intervalo;
         this.modoDeRecorrencia = modoDeRecorrencia;
-        this.ordenamentoDaSemanaNoMes = ordenamentoDaSemanaNoMes;
         this.apenasDiasUteis = apenasDiasUteis;
         this.compromissosGerados = compromissosGerados;
     }
@@ -124,14 +121,6 @@ public class DTOSaidaCompromissosRecorrentes {
 
     public void setModoDeRecorrencia(ModoDeRecorrenciaEnum modoDeRecorrencia) {
         this.modoDeRecorrencia = modoDeRecorrencia;
-    }
-
-    public OrdenamentoDaSemanaNoMesEnum getOrdenamentoDaSemanaNoMes() {
-        return ordenamentoDaSemanaNoMes;
-    }
-
-    public void setOrdenamentoDaSemanaNoMes(OrdenamentoDaSemanaNoMesEnum ordenamentoDaSemanaNoMes) {
-        this.ordenamentoDaSemanaNoMes = ordenamentoDaSemanaNoMes;
     }
 
     public boolean isApenasDiasUteis() {
