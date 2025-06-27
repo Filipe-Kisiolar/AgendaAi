@@ -7,13 +7,13 @@ import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.CompromissosRecor
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.CompromissosRecorrentes.DTOSaidaCompromissosRecorrentes;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.CompromissosRecorrentes.DTOUpdateCompromissosRecorrentes;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.HorariosPorDia.HorariosPorDiaModel;
-import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.HorariosPorDia.MapperHorariosPorDia;
+import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.HorariosPorDia.MappersHorariosPorDia.HelperMapperHorariosPorDia;
 import org.mapstruct.*;
 
 import java.time.LocalDateTime;
 
 @Mapper(componentModel = "spring",
-        uses = {MapperHorariosPorDia.class, MapperCompromissos.class},
+        uses = {HelperMapperHorariosPorDia.class, MapperCompromissos.class},
         unmappedTargetPolicy = ReportingPolicy.ERROR)
 public interface MapperCompromissosRecorrentes {
 
@@ -25,7 +25,7 @@ public interface MapperCompromissosRecorrentes {
     @Mapping(source = "compromissosGerados", target = "compromissosGerados")
     DTOSaidaCompromissosRecorrentes  mapToDto(CompromissosRecorrentesModel entity);
 
-    //mapToDto para gerar um compromisso a partir de um compromisso recorrente
+    //mapToModel para gerar um compromisso a partir de um compromisso recorrente
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "inicio", source = "inicioGerado")
     @Mapping(target = "fim", source = "fimGerado")
