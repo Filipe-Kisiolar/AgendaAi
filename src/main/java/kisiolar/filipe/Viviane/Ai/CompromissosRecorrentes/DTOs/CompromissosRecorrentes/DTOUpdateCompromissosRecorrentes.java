@@ -21,14 +21,12 @@ public class DTOUpdateCompromissosRecorrentes {
 
     private Integer intervalo;
 
-    private ModoDeRecorrenciaEnum modoDeRecorrencia;
-
     private boolean apenasDiasUteis;
 
     public DTOUpdateCompromissosRecorrentes() {
     }
 
-    public DTOUpdateCompromissosRecorrentes(Long id, String nome, String descricao, String local, LocalDate dataInicioRecorrencia, LocalDate dataFimRecorrencia, Integer intervalo, ModoDeRecorrenciaEnum modoDeRecorrencia, boolean apenasDiasUteis) {
+    public DTOUpdateCompromissosRecorrentes(Long id, String nome, String descricao, String local, LocalDate dataInicioRecorrencia, LocalDate dataFimRecorrencia, Integer intervalo, boolean apenasDiasUteis) {
         this.id = id;
         this.nome = nome;
         this.descricao = descricao;
@@ -36,7 +34,6 @@ public class DTOUpdateCompromissosRecorrentes {
         this.dataInicioRecorrencia = dataInicioRecorrencia;
         this.dataFimRecorrencia = dataFimRecorrencia;
         this.intervalo = intervalo;
-        this.modoDeRecorrencia = modoDeRecorrencia;
         this.apenasDiasUteis = apenasDiasUteis;
     }
 
@@ -94,14 +91,6 @@ public class DTOUpdateCompromissosRecorrentes {
 
     public void setIntervalo(Integer intervalo) {
         this.intervalo = intervalo;
-    }
-
-    public ModoDeRecorrenciaEnum getModoDeRecorrencia() {
-        return modoDeRecorrencia;
-    }
-
-    public void setModoDeRecorrencia(ModoDeRecorrenciaEnum modoDeRecorrencia) {
-        this.modoDeRecorrencia = modoDeRecorrencia;
     }
 
     public boolean isApenasDiasUteis() {

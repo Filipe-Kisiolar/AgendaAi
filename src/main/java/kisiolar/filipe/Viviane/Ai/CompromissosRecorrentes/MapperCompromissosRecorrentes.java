@@ -33,7 +33,8 @@ public interface MapperCompromissosRecorrentes {
     DTOCreateCompromissos mapGerarCompromisso(CompromissosRecorrentesModel compromissosRecorrentesModel, LocalDateTime inicioGerado
                                                 ,LocalDateTime fimGerado);
 
-    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "id",ignore = true)
+    @Mapping(target = "modoDeRecorrencia",ignore = true)
     @Mapping(target = "horariosPorDias",ignore = true)
     @Mapping(target = "compromissosGerados",ignore = true)
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
