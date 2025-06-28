@@ -10,6 +10,7 @@ import org.mapstruct.*;
 public interface MapperHorariosDiaEspecificoMensal {
 
     @Mapping(target = "id",ignore = true)
+    @Mapping(target = "compromissoRecorrente",ignore = true)
     HorariosDiaEspecificoMensal mapToModel(DTOCreateHorariosDiaEspecificoMensal dtoCreateHorariosDiaEspecificoMensal);
 
     @Mapping(target = "id",ignore = true)

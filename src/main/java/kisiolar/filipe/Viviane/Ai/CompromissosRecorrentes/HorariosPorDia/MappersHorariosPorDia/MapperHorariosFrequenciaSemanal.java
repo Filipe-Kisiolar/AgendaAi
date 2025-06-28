@@ -10,6 +10,7 @@ import org.mapstruct.*;
 public interface MapperHorariosFrequenciaSemanal {
 
     @Mapping(target = "id",ignore = true)
+    @Mapping(target = "compromissoRecorrente",ignore = true)
     HorariosFrequenciaSemanal mapToModel(DTOCreateHorariosFrequenciaSemanal dtoCreateHorariosFrequenciaSemanal);
 
     @Mapping(target = "id",ignore = true)

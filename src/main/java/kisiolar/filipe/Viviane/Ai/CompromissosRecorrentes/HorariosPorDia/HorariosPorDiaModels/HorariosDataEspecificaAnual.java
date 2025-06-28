@@ -1,8 +1,6 @@
 package kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.HorariosPorDia.HorariosPorDiaModels;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.CompromissosRecorrentesModel;
 
 import java.time.LocalTime;
@@ -12,10 +10,12 @@ import java.time.MonthDay;
 @Table(name = "horarios_data_especifica_anual")
 public class HorariosDataEspecificaAnual extends HorariosPorDiaModel {
 
+    @Convert(converter = MonthDayConverter.class)
     @Column(name = "inicio_data_especifica_do_ano",nullable = false)
     private MonthDay inicioDataEspecificaDoAno;
 
-    @Column(name = "inicio_data_especifica_do_ano",nullable = false)
+    @Convert(converter = MonthDayConverter.class)
+    @Column(name = "fim_data_especifica_do_ano",nullable = false)
     private MonthDay fimDataEspecificaDoAno;
 
     @Column(name = "hora_de_inicio",nullable = false)

@@ -9,6 +9,7 @@ import org.mapstruct.*;
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.ERROR)
 public interface MapperHorariosFrequenciaDiaria {
     @Mapping(target = "id",ignore = true)
+    @Mapping(target = "compromissoRecorrente",ignore = true)
     HorariosFrequenciaDiaria mapToModel(DTOCreateHorariosFrequenciaDiaria dtoCreateHorariosFrequenciaDiaria);
 
     @Mapping(target = "id",ignore = true)

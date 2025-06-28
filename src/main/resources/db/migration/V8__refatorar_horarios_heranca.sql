@@ -77,7 +77,7 @@ CREATE TABLE horarios_data_especifica_anual (
         ON DELETE CASCADE
 );
 
--- 10. Migra os dados antigos (assumindo que eram todos semanais) para a nova tabela de frequência semanal
+-- 10. Migra os dados antigos assumidos como semanais
 INSERT INTO horarios_frequencia_semanal (
     id,
     dia_da_semana_inicio,
@@ -87,9 +87,9 @@ INSERT INTO horarios_frequencia_semanal (
 )
 SELECT
     id,
-    dia_da_semana_de_inicio,
-    dia_da_semana_de_fim,
+    dia_de_inicio,
+    dia_de_fim,
     hora_de_inicio,
     hora_de_fim
 FROM horarios_por_dia_compromissos_recorrentes_model
-WHERE dia_de_inicio IS NOT NULL AND dia_de_fim IS NOT NULL;
+WHERE dtype = 'HorariosFrequenciaSemanal';

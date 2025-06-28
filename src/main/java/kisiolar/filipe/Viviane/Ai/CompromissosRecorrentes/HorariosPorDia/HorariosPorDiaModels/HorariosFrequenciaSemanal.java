@@ -1,8 +1,6 @@
 package kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.HorariosPorDia.HorariosPorDiaModels;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.CompromissosRecorrentesModel;
 
 import java.time.DayOfWeek;
@@ -12,9 +10,11 @@ import java.time.LocalTime;
 @Table(name = "horarios_frequencia_semanal")
 public class HorariosFrequenciaSemanal extends HorariosPorDiaModel {
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "dia_da_semana_inicio",nullable = false)
     private DayOfWeek diaDaSemanaInicio;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "dia_da_semana_fim",nullable = false)
     private DayOfWeek diaDaSemanaFim;
 

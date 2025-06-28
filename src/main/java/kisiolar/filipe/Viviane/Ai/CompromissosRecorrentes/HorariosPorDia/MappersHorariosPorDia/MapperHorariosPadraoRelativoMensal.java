@@ -10,6 +10,7 @@ import org.mapstruct.*;
 public interface MapperHorariosPadraoRelativoMensal {
 
     @Mapping(target = "id",ignore = true)
+    @Mapping(target = "compromissoRecorrente",ignore = true)
     HorariosPadraoRelativoMensal mapToModel(DTOCreateHorariosPadraoRelativoMensal dtoCreateHorariosPadraoRelativoMensal);
 
     @Mapping(target = "id",ignore = true)
