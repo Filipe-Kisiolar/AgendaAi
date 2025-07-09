@@ -10,6 +10,7 @@ import java.time.LocalTime;
 
 @Entity
 @Table(name = "horarios_padrao_relativo_mensal")
+@DiscriminatorValue("PADRAO_RELATIVO_MENSAL")
 public class HorariosPadraoRelativoMensal extends HorariosPorDiaModel {
 
     @Enumerated(EnumType.STRING)

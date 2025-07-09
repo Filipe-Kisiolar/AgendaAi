@@ -8,6 +8,7 @@ import java.time.MonthDay;
 
 @Entity
 @Table(name = "horarios_data_especifica_anual")
+@DiscriminatorValue("DATA_ESPECIFICA_ANUAL")
 public class HorariosDataEspecificaAnual extends HorariosPorDiaModel {
 
     @Convert(converter = MonthDayConverter.class)

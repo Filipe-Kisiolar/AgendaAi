@@ -6,6 +6,7 @@ import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.CompromissosRecorrente
 @Entity
 @Table(name = "horarios_por_dia_compromissos_recorrentes_model")
 @Inheritance(strategy = InheritanceType.JOINED)
+@DiscriminatorColumn(name = "tipo_horario", discriminatorType = DiscriminatorType.STRING)
 public abstract class HorariosPorDiaModel {
 
         @Id

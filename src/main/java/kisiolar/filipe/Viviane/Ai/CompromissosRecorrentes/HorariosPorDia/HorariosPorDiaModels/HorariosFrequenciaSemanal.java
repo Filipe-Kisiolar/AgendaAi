@@ -8,6 +8,7 @@ import java.time.LocalTime;
 
 @Entity
 @Table(name = "horarios_frequencia_semanal")
+@DiscriminatorValue("SEMANAL")
 public class HorariosFrequenciaSemanal extends HorariosPorDiaModel {
 
     @Enumerated(EnumType.STRING)

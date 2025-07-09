@@ -1,6 +1,7 @@
 package kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.HorariosPorDia.HorariosPorDiaModels;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.CompromissosRecorrentesModel;
@@ -9,6 +10,7 @@ import java.time.LocalTime;
 
 @Entity
 @Table(name = "horarios_frequencia_diaria")
+@DiscriminatorValue("DIARIA")
 public class HorariosFrequenciaDiaria extends HorariosPorDiaModel {
 
     @Column(name = "hora_de_inicio",nullable = false)
