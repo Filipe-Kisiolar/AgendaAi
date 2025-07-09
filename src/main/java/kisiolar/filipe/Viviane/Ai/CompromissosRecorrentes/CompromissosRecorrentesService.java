@@ -242,11 +242,7 @@ public class CompromissosRecorrentesService{
         ModoDeRecorrenciaEnum modoDeRecorrencia_1 = compromissosRecorrente1.getModoDeRecorrencia();
         ModoDeRecorrenciaEnum modoDeRecorrencia_2 = compromissosRecorrente2.getModoDeRecorrencia();
 
-        boolean saoModosCompativeis = switch (modoDeRecorrencia_1) {
-            case FREQUENCIA_SEMANAL -> modoDeRecorrencia_2 == FREQUENCIA_SEMANAL || modoDeRecorrencia_2 == PADRAO_RELATIVO_MENSAL;
-            case PADRAO_RELATIVO_MENSAL -> modoDeRecorrencia_2 == PADRAO_RELATIVO_MENSAL || modoDeRecorrencia_2 == FREQUENCIA_SEMANAL;
-            default -> modoDeRecorrencia_1 == modoDeRecorrencia_2;
-        };
+        boolean saoModosCompativeis = modoDeRecorrencia_1.equals(modoDeRecorrencia_2);
 
         if (!saoModosCompativeis){
             return false;
