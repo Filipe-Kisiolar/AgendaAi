@@ -48,7 +48,7 @@ public class CompromissosRecorrentesModel {
     @OneToMany(mappedBy = "compromissoRecorrente", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<HorariosPorDiaModel> horariosPorDia = new ArrayList<>();
 
-    @OneToMany(mappedBy = "compromissoRecorrente", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "compromissoRecorrente", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<CompromissosModel> compromissosGerados;
 

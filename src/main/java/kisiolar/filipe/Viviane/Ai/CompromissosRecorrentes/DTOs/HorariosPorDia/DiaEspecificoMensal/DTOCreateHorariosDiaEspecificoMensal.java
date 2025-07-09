@@ -13,8 +13,8 @@ public class DTOCreateHorariosDiaEspecificoMensal extends DTOCreateHorariosPorDi
     public DTOCreateHorariosDiaEspecificoMensal() {
     }
 
-    public DTOCreateHorariosDiaEspecificoMensal(LocalTime horaInicio, LocalTime horaFim, long compromissoRecorrenteId, Integer inicioDiaEspecificoMes, Integer fimDiaEspecificoMes) {
-        super(horaInicio, horaFim, compromissoRecorrenteId);
+    public DTOCreateHorariosDiaEspecificoMensal(LocalTime horaInicio, LocalTime horaFim, Integer inicioDiaEspecificoMes, Integer fimDiaEspecificoMes) {
+        super(horaInicio, horaFim);
         this.inicioDiaEspecificoMes = inicioDiaEspecificoMes;
         this.fimDiaEspecificoMes = fimDiaEspecificoMes;
     }

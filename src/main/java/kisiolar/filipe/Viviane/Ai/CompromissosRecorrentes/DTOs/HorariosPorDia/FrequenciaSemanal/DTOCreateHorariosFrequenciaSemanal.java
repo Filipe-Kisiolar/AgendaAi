@@ -14,8 +14,8 @@ public class DTOCreateHorariosFrequenciaSemanal extends DTOCreateHorariosPorDiaB
     public DTOCreateHorariosFrequenciaSemanal() {
     }
 
-    public DTOCreateHorariosFrequenciaSemanal(LocalTime horaInicio, LocalTime horaFim, long compromissoRecorrenteId, DayOfWeek diaDaSemanaInicio, DayOfWeek diaDaSemanaFim) {
-        super(horaInicio, horaFim, compromissoRecorrenteId);
+    public DTOCreateHorariosFrequenciaSemanal(LocalTime horaInicio, LocalTime horaFim, DayOfWeek diaDaSemanaInicio, DayOfWeek diaDaSemanaFim) {
+        super(horaInicio, horaFim);
         this.diaDaSemanaInicio = diaDaSemanaInicio;
         this.diaDaSemanaFim = diaDaSemanaFim;
     }

@@ -72,33 +72,35 @@ public class CompromissosRecorrentesController {
         return ResponseEntity.ok(compromissoAlterado);
     }
 
-    @PatchMapping("/adicionarhorarionocompromisso/{id}")
-    public ResponseEntity<DTOSaidaHorariosPorDiaBase> adicionarHorario(@PathVariable Long compromissoRecorrenteId,
-                                                                   @RequestBody DTOCreateHorariosPorDiaBase horariosPorDia){
+    @PatchMapping("/adicionarhorarionocompromisso/{compromissoRecorrenteId}")
+    public ResponseEntity<DTOSaidaHorariosPorDiaBase> adicionarHorario(
+            @PathVariable Long compromissoRecorrenteId,
+            @RequestBody DTOCreateHorariosPorDiaBase horariosPorDia){
         DTOSaidaHorariosPorDiaBase saidaHorariosPorDia = horariosPorDiaService.adicionarHorario(compromissoRecorrenteId,horariosPorDia);
 
         return ResponseEntity.ok(saidaHorariosPorDia);
     }
 
-    @PatchMapping("/alterarhorariodocompromisso/{compromissoid}/{idhorario}")
+    @PatchMapping("/alterarhorariodocompromisso/{compromissoRecorrenteId}/{horarioId}")
     public ResponseEntity<DTOSaidaHorariosPorDiaBase> alterarHorario(
-            @PathVariable("compromissoid") Long compromissoRecorrenteId,
-            @PathVariable("idhorario") Long horarioId,
+            @PathVariable Long compromissoRecorrenteId,
+            @PathVariable Long horarioId,
             @RequestBody DTOUpdateHorariosPorDiaBase updateHorariosPorDia) {
 
         DTOSaidaHorariosPorDiaBase saidaHorariosPorDia = horariosPorDiaService.alterarHorario(compromissoRecorrenteId, horarioId, updateHorariosPorDia);
         return ResponseEntity.ok(saidaHorariosPorDia);
     }
 
-    @DeleteMapping("/deletarhorariodocompromisso/{id")
-    public ResponseEntity<Long> deletarHorario(@PathVariable Long compromissoRecorrenteId,
-                                               @PathVariable Long horarioId){
+    @DeleteMapping("/deletarhorariodocompromisso/{compromissoRecorrenteId}/{horarioId}")
+    public ResponseEntity<Long> deletarHorario(
+            @PathVariable Long compromissoRecorrenteId,
+            @PathVariable Long horarioId){
         long compromissosDeletados = horariosPorDiaService.deletarHorarioPorId(compromissoRecorrenteId,horarioId);
 
         return ResponseEntity.ok(compromissosDeletados);
     }
 
-    @DeleteMapping("/deletarcompromisso/{compromissoid}/{horarioid}")
+    @DeleteMapping("/deletarcompromisso/{id}")
     public ResponseEntity<Void> deletarcompromisso(@PathVariable long id){
         compromissosRecorrentesService.deletarCompromissoPorId(id);
 

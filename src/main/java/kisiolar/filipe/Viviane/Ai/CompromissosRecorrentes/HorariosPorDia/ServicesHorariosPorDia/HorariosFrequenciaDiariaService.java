@@ -67,6 +67,12 @@ public class HorariosFrequenciaDiariaService extends HorariosServiceBase {
         HorariosFrequenciaDiaria horarioParaAtualizar = horariosFrequenciaDiariaRepository.findById(horarioId)
                 .orElseThrow(()-> new ResourceNotFindException("Esse id não foi achado nesse tipo de horário"));
 
+        LocalTime horarioAntigo = horarioParaAtualizar.getHoraInicio();
+
+        HorariosFrequenciaDiaria horarioComDadosAntigos = new HorariosFrequenciaDiaria();
+        horarioComDadosAntigos.setHoraInicio(horarioAntigo);
+        horarioComDadosAntigos.setCompromissoRecorrente(compromissoRecorrente);
+
         mapperHorariosFrequenciaDiaria.atualizacao(dtoUpdateHorario,horarioParaAtualizar);
 
         List<HorariosFrequenciaDiaria> outrosHorarios = compromissoRecorrente.getHorariosPorDias().stream()
@@ -80,7 +86,7 @@ public class HorariosFrequenciaDiariaService extends HorariosServiceBase {
             throw new BadRequestException("Esse horário conflita com outros já criados no mesmo Compromisso Recorrente");
         }
 
-        apagarCompromissosAtreladosAoHorarioPorDia(horarioParaAtualizar);
+        apagarCompromissosAtreladosAoHorarioPorDia(horarioComDadosAntigos);
 
         horariosFrequenciaDiariaRepository.save(horarioParaAtualizar);
 
@@ -166,24 +172,14 @@ public class HorariosFrequenciaDiariaService extends HorariosServiceBase {
     public Long apagarCompromissosAtreladosAoHorarioPorDia(HorariosFrequenciaDiaria horariosPorDia){
         CompromissosRecorrentesModel compromissosRecorrentesAtrelado = horariosPorDia.getCompromissoRecorrente();
 
-        List<CompromissosModel> listaDosCompromissos = compromissosRecorrentesAtrelado.getCompromissosGerados();
+        List<CompromissosModel> listaCompromissos = compromissosRecorrentesAtrelado.getCompromissosGerados();
 
-        long numeroCompromissosApagados = 0;
+        int tamanhoInicialLista = listaCompromissos.size();
 
-        for(CompromissosModel compromisso : listaDosCompromissos){
+        listaCompromissos.removeIf(compromisso -> compromisso.getInicio().toLocalTime().equals(horariosPorDia.getHoraInicio()));
 
-            LocalTime horarioInicioCompromisso = compromisso.getInicio().toLocalTime();
+        long numeroCompromissosApagados = tamanhoInicialLista - listaCompromissos.size();
 
-            boolean compromissoFoiGeradoPeloHorario = horarioInicioCompromisso.equals(horariosPorDia.getHoraInicio());
-
-            if(compromissoFoiGeradoPeloHorario){
-
-                compromissosService.deletarCompromissoPorId(compromisso.getId());
-
-                numeroCompromissosApagados++;
-            }
-
-        }
         return numeroCompromissosApagados;
     }
 

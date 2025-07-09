@@ -64,6 +64,14 @@ public class HorariosDataEspecificaAnualService extends HorariosServiceBase {
         HorariosDataEspecificaAnual horarioParaAtualizar = horariosDataEspecificaAnualRepository.findById(horarioId)
                 .orElseThrow(()-> new ResourceNotFindException("Esse id não foi achado nesse tipo de horário"));
 
+        MonthDay dataAnualAntigo = horarioParaAtualizar.getInicioDataEspecificaDoAno();
+        LocalTime inicioHorarioAntigo = horarioParaAtualizar.getHoraInicio();
+
+        HorariosDataEspecificaAnual horarioAntigo = new HorariosDataEspecificaAnual();
+        horarioAntigo.setInicioDataEspecificaDoAno(dataAnualAntigo);
+        horarioAntigo.setHoraInicio(inicioHorarioAntigo);
+        horarioAntigo.setCompromissoRecorrente(compromissoRecorrente);
+
         mapperHorariosDataEspecificaAnual.atualizacao(dtoUpdateHorario,horarioParaAtualizar);
 
         List<HorariosDataEspecificaAnual> outrosHorarios = compromissoRecorrente.getHorariosPorDias().stream()
@@ -77,7 +85,7 @@ public class HorariosDataEspecificaAnualService extends HorariosServiceBase {
             throw new BadRequestException("Esse horário conflita com outros já criados no mesmo Compromisso Recorrente");
         }
 
-        apagarCompromissosAtreladosAoHorarioPorDia(horarioParaAtualizar);
+        apagarCompromissosAtreladosAoHorarioPorDia(horarioAntigo);
 
         horariosDataEspecificaAnualRepository.save(horarioParaAtualizar);
 
@@ -164,27 +172,20 @@ public class HorariosDataEspecificaAnualService extends HorariosServiceBase {
 
         List<CompromissosModel> listaDosCompromissos = compromissosRecorrentesAtrelado.getCompromissosGerados();
 
-        long numeroCompromissosApagados = 0;
+        long tamanhoInicial = listaDosCompromissos.size();
 
-        for(CompromissosModel compromisso : listaDosCompromissos){
-            Month mesDoCompromisso = compromisso.getInicio().getMonth();
-            int diaDoCompromisso = compromisso.getInicio().getDayOfMonth();
-            LocalTime horarioInicioCompromisso = compromisso.getInicio().toLocalTime();
+        Month mesDoHorario = horariosPorDia.getInicioDataEspecificaDoAno().getMonth();
+        int diaDoMesHorario = horariosPorDia.getInicioDataEspecificaDoAno().getDayOfMonth();
+        LocalTime inicioHorario = horariosPorDia.getHoraInicio();
 
+        listaDosCompromissos.removeIf(
+                c -> c.getInicio().getMonth().equals(mesDoHorario)
+                        && c.getInicio().getDayOfMonth() == diaDoMesHorario
+                        && c.getInicio().toLocalTime().equals(inicioHorario)
+        );
 
+        long numeroCompromissosApagados = tamanhoInicial - listaDosCompromissos.size();
 
-
-            boolean compromissoFoiGeradoPeloHorario = mesDoCompromisso.equals(horariosPorDia.getInicioDataEspecificaDoAno().getMonth()) &&
-                    diaDoCompromisso == horariosPorDia.getInicioDataEspecificaDoAno().getDayOfMonth()
-                    && horarioInicioCompromisso.equals(horariosPorDia.getHoraInicio());
-
-            if(compromissoFoiGeradoPeloHorario){
-                compromissosService.deletarCompromissoPorId(compromisso.getId());
-
-                numeroCompromissosApagados++;
-            }
-
-        }
         return numeroCompromissosApagados;
     }
 

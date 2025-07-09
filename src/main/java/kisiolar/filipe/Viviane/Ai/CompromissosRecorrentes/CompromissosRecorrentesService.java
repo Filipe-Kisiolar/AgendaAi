@@ -37,7 +37,7 @@ public class CompromissosRecorrentesService{
     @Autowired
     private HorariosPorDiaService horariosPorDiaService;
 
-    @Transactional
+
     //TODO: refatora para ter outra lista completa mapeada pelos dias da semana
     public DTORespostasListasCompromissoRecorrentes listarCompromissos(){
         List<CompromissosRecorrentesModel> lista = compromissosRecorrentesRepository.findAll();
@@ -87,7 +87,6 @@ public class CompromissosRecorrentesService{
         }
     }
 
-
     public List<List<DTOSaidaCompromissosRecorrentes>> listarCompromissosConflitantes(){
         List<CompromissosRecorrentesModel> listaTodosCompromissos = compromissosRecorrentesRepository.findAll();
         List<List<DTOSaidaCompromissosRecorrentes>> gruposDeConflito = compromissosConflitantesLista(listaTodosCompromissos);
@@ -124,46 +123,60 @@ public class CompromissosRecorrentesService{
 
         CompromissosRecorrentesModel compromissoRecorrente = mapperCompromissosRecorrentes.mapToModel(dtoCreateCompromissosRecorrentes);
 
-        //verificar se ha inconformidade nos tipos de horarios com modo de recorrencia
-        ModoDeRecorrenciaEnum modoDeRecorrencia = compromissoRecorrente.getModoDeRecorrencia();
-        boolean inconformidade = compromissoRecorrente.getHorariosPorDias().stream()
-                .anyMatch(horario -> !verificarConformidadeModoDeRecorrencia_Horario(modoDeRecorrencia, horario));
+        List<String> errosIdentificados = verificarValidadeDasInformacoes(compromissoRecorrente);
 
-        if(inconformidade){
-            throw new BadRequestException("Combinação inválida de tipo e modo de recorrência");
+        if(!errosIdentificados.isEmpty()){
+            throw new BadRequestException("Erros Na Requisicao:\n" + errosIdentificados);
         }
 
-        compromissosRecorrentesRepository.save(compromissoRecorrente);
+        CompromissosRecorrentesModel compromissoSalvo = compromissosRecorrentesRepository.save(compromissoRecorrente);
 
-        //chama o metodo criado para gerar os compromissos atrelados e guarda conflitos(se houver)
-        List<DTORespostaCompromisso> compromissosGeradosComConflito = criarCompromissosPorRecorrencia(compromissoRecorrente);
+        //chama o metodo criado para gerar os compromissos atrelados e guarda conflitosRecorrentes(se houver)
+        List<DTORespostaCompromisso> compromissosGeradosComConflito = criarCompromissosPorRecorrencia(compromissoSalvo);
 
-        List<DTOSaidaCompromissosRecorrentes> conflitos = verificarConflitos(compromissoRecorrente).stream()
+        List<DTOSaidaCompromissosRecorrentes> conflitosRecorrentes = verificarConflitos(compromissoSalvo).stream()
                 .map(mapperCompromissosRecorrentes ::mapToDto)
                 .collect(Collectors.toList());
 
-        DTOSaidaCompromissosRecorrentes saidaCompromissosRecorrentes = mapperCompromissosRecorrentes.mapToDto(compromissoRecorrente);
+        DTOSaidaCompromissosRecorrentes saidaCompromissosRecorrentes = mapperCompromissosRecorrentes.mapToDto(compromissoSalvo);
 
-        if(conflitos.isEmpty() && compromissosGeradosComConflito.isEmpty()){
+        if(conflitosRecorrentes.isEmpty() && compromissosGeradosComConflito.isEmpty()){
             return new DTORespostaCompromissoRecorrente(saidaCompromissosRecorrentes);
-        } else if (conflitos.isEmpty()) {
+        } else if (conflitosRecorrentes.isEmpty()) {
             return DTORespostaCompromissoRecorrente.comConflitosGerados(saidaCompromissosRecorrentes,compromissosGeradosComConflito);
         } else if (compromissosGeradosComConflito.isEmpty()) {
-            return DTORespostaCompromissoRecorrente.comConflitosRecorrentes(saidaCompromissosRecorrentes,conflitos);
+            return DTORespostaCompromissoRecorrente.comConflitosRecorrentes(saidaCompromissosRecorrentes, conflitosRecorrentes);
         } else {
-            return new DTORespostaCompromissoRecorrente(saidaCompromissosRecorrentes,conflitos,compromissosGeradosComConflito);
+            return new DTORespostaCompromissoRecorrente(saidaCompromissosRecorrentes, conflitosRecorrentes,compromissosGeradosComConflito);
         }
     }
 
     @Transactional
      public DTORespostaCompromissoRecorrente alterarCompromissoRecorrente(long id, DTOUpdateCompromissosRecorrentes dtoUpdateCompromissosRecorrentes){
-        //todo nao deixar o update mudar o modo de recorrencia
+
         CompromissosRecorrentesModel compromissosRecorrente = compromissosRecorrentesRepository.findById(id).
                 orElseThrow(() -> new RuntimeException("compromisso recorrente não encontrado"));
+
+        Integer intervalo = dtoUpdateCompromissosRecorrentes.getIntervalo();
+
+        boolean inconformidadeIntervalo = intervalo == null || intervalo < 0;
+
+        if(inconformidadeIntervalo){
+            throw new BadRequestException("intervalo nao pode ser null nem menor que 0\n");
+        }
+
+        boolean atualizouIntervalo =
+                !intervalo.equals(compromissosRecorrente.getIntervalo());
 
         mapperCompromissosRecorrentes.atualizacao(dtoUpdateCompromissosRecorrentes, compromissosRecorrente);
 
         compromissosRecorrentesRepository.save(compromissosRecorrente);
+
+        if(atualizouIntervalo){
+            compromissosRecorrente.getCompromissosGerados().clear();
+
+            criarCompromissosPorRecorrencia(compromissosRecorrente);
+        }
 
         DTOSaidaCompromissosRecorrentes dtoSaidaCompromissosRecorrentes =  mapperCompromissosRecorrentes.mapToDto(compromissosRecorrente);
 
@@ -190,6 +203,29 @@ public class CompromissosRecorrentesService{
                 orElseThrow(() -> new RuntimeException("compromisso recorrente não encontrado"));
 
         return horariosPorDiaService.criarCompromissosPorModoDeRecorrencia(compromissoRecorrente);
+    }
+
+    @Transactional
+    public List<String> verificarValidadeDasInformacoes(CompromissosRecorrentesModel compromissoRecorrente){
+        List<String> errosIdentificados = new ArrayList<>();
+
+        ModoDeRecorrenciaEnum modoDeRecorrencia = compromissoRecorrente.getModoDeRecorrencia();
+
+        boolean inconformidadeModoDeRecorrencia = compromissoRecorrente.getHorariosPorDias().stream()
+                .anyMatch(horario -> !verificarConformidadeModoDeRecorrencia_Horario(modoDeRecorrencia, horario));
+
+        boolean inconformidadeIntervalo = compromissoRecorrente.getIntervalo() == null ||
+                compromissoRecorrente.getIntervalo() <= 0;
+
+        if(inconformidadeModoDeRecorrencia){
+            errosIdentificados.add("Combinação inválida de tipo e modo de recorrência\n");
+        }
+
+        if(inconformidadeIntervalo){
+            errosIdentificados.add("intervalo nao pode ser null nem menor ou igual a 0\n");
+        }
+
+        return errosIdentificados;
     }
 
     @Transactional

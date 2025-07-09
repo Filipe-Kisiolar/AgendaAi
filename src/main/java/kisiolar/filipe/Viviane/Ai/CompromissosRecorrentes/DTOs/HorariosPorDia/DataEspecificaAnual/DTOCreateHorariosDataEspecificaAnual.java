@@ -14,8 +14,8 @@ public class DTOCreateHorariosDataEspecificaAnual extends DTOCreateHorariosPorDi
     public DTOCreateHorariosDataEspecificaAnual() {
     }
 
-    public DTOCreateHorariosDataEspecificaAnual(LocalTime horaInicio, LocalTime horaFim, long compromissoRecorrenteId, MonthDay inicioDataEspecificaDoAno, MonthDay fimDataEspecificaDoAno) {
-        super(horaInicio, horaFim, compromissoRecorrenteId);
+    public DTOCreateHorariosDataEspecificaAnual(LocalTime horaInicio, LocalTime horaFim, MonthDay inicioDataEspecificaDoAno, MonthDay fimDataEspecificaDoAno) {
+        super(horaInicio, horaFim);
         this.inicioDataEspecificaDoAno = inicioDataEspecificaDoAno;
         this.fimDataEspecificaDoAno = fimDataEspecificaDoAno;
     }

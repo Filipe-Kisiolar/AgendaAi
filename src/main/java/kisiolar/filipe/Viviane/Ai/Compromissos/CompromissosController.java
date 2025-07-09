@@ -27,8 +27,8 @@ public class CompromissosController {
         DTORespostaListasCompromissos listarcompromissos = compromissosService.listarCompromissos();
         if (listarcompromissos.getListaCompromissos().isEmpty()){
             Map<String,Object> resposta = new HashMap<>();
-            resposta.put("mensagem","ainda nao a compromissos recorrentes para criar um copromisso recorrente entre no link:");
-            resposta.put("link","/compromissosrecorrentes/criarcompromisso ");
+            resposta.put("mensagem","ainda nao a compromissos registrados, para criar um copromisso recorrente entre no link:");
+            resposta.put("link","/compromissos/criarcompromisso ");
             return ResponseEntity.status(HttpStatus.OK).body(resposta);
         }else {
             return ResponseEntity.ok(listarcompromissos);

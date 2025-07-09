@@ -26,6 +26,7 @@ import java.time.LocalTime;
 import java.time.temporal.TemporalAdjuster;
 import java.time.temporal.TemporalAdjusters;
 import java.util.*;
+import java.util.stream.IntStream;
 
 @Service
 public class HorariosPadraoRelativoMensalService extends HorariosServiceBase{
@@ -68,6 +69,17 @@ public class HorariosPadraoRelativoMensalService extends HorariosServiceBase{
         HorariosPadraoRelativoMensal horarioParaAtualizar = horariosPadraoRelativoMensalRepository.findById(horarioId)
                 .orElseThrow(()-> new ResourceNotFindException("Esse id não foi achado nesse tipo de horário"));
 
+        LocalTime inicioHorarioAntigo = horarioParaAtualizar.getHoraInicio();
+        DayOfWeek diaDaSemanaAntigo = horarioParaAtualizar.getDiaDaSemanaInicio();
+        OrdenamentoDaSemanaNoMesEnum ordenamentoAntigo = horarioParaAtualizar.getOrdenamentoDaSemanaNoMes();
+
+        HorariosPadraoRelativoMensal horarioComDadosAntigos = new HorariosPadraoRelativoMensal();
+        horarioComDadosAntigos.setHoraInicio(inicioHorarioAntigo);
+        horarioComDadosAntigos.setDiaDaSemanaInicio(diaDaSemanaAntigo);
+        horarioComDadosAntigos.setOrdenamentoDaSemanaNoMes(ordenamentoAntigo);
+        horarioComDadosAntigos.setCompromissoRecorrente(compromissoRecorrente);
+
+
         mapperHorariosPadraoRelativoMensal.atualizacao(dtoUpdateHorario,horarioParaAtualizar);
 
         List<HorariosPadraoRelativoMensal> outrosHorarios = compromissoRecorrente.getHorariosPorDias().stream()
@@ -81,7 +93,7 @@ public class HorariosPadraoRelativoMensalService extends HorariosServiceBase{
             throw new BadRequestException("Esse horário conflita com outros já criados no mesmo Compromisso Recorrente");
         }
 
-        apagarCompromissosAtreladosAoHorarioPorDia(horarioParaAtualizar);
+        apagarCompromissosAtreladosAoHorarioPorDia(horarioComDadosAntigos);
 
         horariosPadraoRelativoMensalRepository.save(horarioParaAtualizar);
 
@@ -175,44 +187,54 @@ public class HorariosPadraoRelativoMensalService extends HorariosServiceBase{
         return compromissosGerados;
     }
 
+    private boolean isCompromissoGreadoPeloHorario (
+            CompromissosModel compromisso,HorariosPadraoRelativoMensal horariosPorDia){
+
+        LocalDate diaCompromisso = compromisso.getInicio().toLocalDate();
+        DayOfWeek diaSemanaCompromisso = compromisso.getInicio().getDayOfWeek();
+        LocalTime horaInicioCompromisso = compromisso.getInicio().toLocalTime();
+
+        if (!diaSemanaCompromisso.equals(horariosPorDia.getDiaDaSemanaInicio()) || !horaInicioCompromisso.equals(horariosPorDia.getHoraInicio())) {
+            return false;
+        }
+
+        LocalDate primeiroDiaDoMes = diaCompromisso.withDayOfMonth(1);
+
+        int numOcorrencia = IntStream.rangeClosed(1,diaCompromisso.getDayOfMonth())
+                .map(i -> primeiroDiaDoMes.withDayOfMonth(i)
+                                .getDayOfWeek() == diaSemanaCompromisso
+                                ? 1
+                                :0
+                        ).sum();
+
+        LocalDate proximaOcorrencia = diaCompromisso.plusWeeks(1);
+        boolean ehUltimaOcorrenciaDoMes = proximaOcorrencia.getMonth() != diaCompromisso.getMonth();
+
+        int ordenamentoDaSemanaNoMes = numOcorrencia - 1;
+
+        OrdenamentoDaSemanaNoMesEnum ordenamentoReal = ehUltimaOcorrenciaDoMes
+                ? OrdenamentoDaSemanaNoMesEnum.ULTIMA_SEMANA
+                : OrdenamentoDaSemanaNoMesEnum.values()[ordenamentoDaSemanaNoMes];
+
+        if (ordenamentoReal != horariosPorDia.getOrdenamentoDaSemanaNoMes()) {
+            return false;
+        }
+
+        return true;
+    }
+
     @Transactional
     public Long apagarCompromissosAtreladosAoHorarioPorDia(HorariosPadraoRelativoMensal horariosPorDia){
         CompromissosRecorrentesModel compromissosRecorrentesAtrelado = horariosPorDia.getCompromissoRecorrente();
 
         List<CompromissosModel> listaDosCompromissos = compromissosRecorrentesAtrelado.getCompromissosGerados();
 
-        long numeroCompromissosApagados = 0;
+        long tamanhoInicial = listaDosCompromissos.size();
 
-        for(CompromissosModel compromisso : listaDosCompromissos){
-            LocalDate diaCompromisso = compromisso.getInicio().toLocalDate();
-            DayOfWeek diaSemanaCompromisso = compromisso.getInicio().getDayOfWeek();
-            LocalTime horaInicioCompromisso = compromisso.getInicio().toLocalTime();
+        listaDosCompromissos.removeIf(c -> isCompromissoGreadoPeloHorario(c,horariosPorDia));
 
-            if (!diaSemanaCompromisso.equals(horariosPorDia.getDiaDaSemanaInicio()) || !horaInicioCompromisso.equals(horariosPorDia.getHoraInicio())) {
-                continue;
-            }
+        long numeroCompromissosApagados = tamanhoInicial - listaDosCompromissos.size();
 
-            LocalDate primeiroDiaDoMes = diaCompromisso.withDayOfMonth(1);
-            int ocorrencia = 0;
-
-            for (int dia = 1; dia <= diaCompromisso.getDayOfMonth(); dia++) {
-                if (primeiroDiaDoMes.withDayOfMonth(dia).getDayOfWeek().equals(diaSemanaCompromisso)) {
-                    ocorrencia++;
-                }
-            }
-
-            LocalDate proximaOcorrencia = diaCompromisso.plusWeeks(1);
-            boolean ehUltima = proximaOcorrencia.getMonth() != diaCompromisso.getMonth();
-
-            OrdenamentoDaSemanaNoMesEnum ordenamentoReal = ehUltima
-                    ? OrdenamentoDaSemanaNoMesEnum.ULTIMA_SEMANA
-                    : OrdenamentoDaSemanaNoMesEnum.values()[ocorrencia - 1];
-
-            if (ordenamentoReal == horariosPorDia.getOrdenamentoDaSemanaNoMes()) {
-                compromissosService.deletarCompromissoPorId(compromisso.getId());
-                numeroCompromissosApagados++;
-            }
-        }
         return numeroCompromissosApagados;
     }
 
