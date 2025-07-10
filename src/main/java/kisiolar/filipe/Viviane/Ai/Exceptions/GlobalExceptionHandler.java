@@ -12,16 +12,23 @@ import java.util.Map;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(ResourceNotFindException.class)
-    public ResponseEntity<Map<String,String>> handleResouceNotFound(Exception excecao){
+    public ResponseEntity<Map<String,String>> handleResouceNotFound(Exception exception){
         Map<String, String> body = new HashMap<>();
-        body.put("erro", excecao.getMessage());
+        body.put("erro", exception.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
     }
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<Map<String, String>> handleGeneric(Exception ex) {
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<Map<String,String>> handleBadRequestExcepition(Exception exception){
         Map<String, String> body = new HashMap<>();
-        body.put("erro", ex.getMessage());
+        body.put("erro", exception.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Map<String, String>> handleGeneric(Exception exception) {
+        Map<String, String> body = new HashMap<>();
+        body.put("erro", exception.getMessage());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
     }
 }

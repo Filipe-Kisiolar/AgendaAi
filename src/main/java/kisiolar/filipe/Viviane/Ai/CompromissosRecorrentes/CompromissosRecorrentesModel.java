@@ -3,9 +3,11 @@ package kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import kisiolar.filipe.Viviane.Ai.Compromissos.CompromissosModel;
 import jakarta.persistence.*;
-import java.time.DayOfWeek;
+import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.Enums.ModoDeRecorrenciaEnum;
+import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.HorariosPorDia.HorariosPorDiaModels.HorariosPorDiaModel;
+
 import java.time.LocalDate;
-import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -27,44 +29,43 @@ public class CompromissosRecorrentesModel {
     @Column(name = "local")
     private String local;
 
-    @Column(name = "hora_de_inicio")
-    private LocalTime horaInicial;
-
-    @Column(name = "hora_de_final")
-    private LocalTime horaFinal;
-
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(
-    name = "compromissos_recorrentes_dias_da_semana", // Nome exato da tabela criada no SQL
-    joinColumns = @JoinColumn(name = "compromissos_recorrentes_id") // FK existente na tabela
-    )
-    @Enumerated(EnumType.STRING)
-    @Column(name = "dias_da_semana")
-    private List<DayOfWeek> diasDaSemana;
-
     @Column(name = "inicio_da_recorrencia")
     private LocalDate dataInicioRecorrencia;
 
     @Column(name = "fim_da_recorrencia")
     private LocalDate dataFimRecorrencia;
 
-    @OneToMany(mappedBy = "compromissoRecorrente", cascade = CascadeType.ALL)
+    @Column(name = "intervalo")
+    private Integer intervalo;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "modo_de_recorrencia")
+    private ModoDeRecorrenciaEnum modoDeRecorrencia;
+
+    @Column(name = "apenas_dias_uteis")
+    private Boolean apenasDiasUteis;
+
+    @OneToMany(mappedBy = "compromissoRecorrente", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<HorariosPorDiaModel> horariosPorDia = new ArrayList<>();
+
+    @OneToMany(mappedBy = "compromissoRecorrente", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<CompromissosModel> compromissosGerados;
 
     public CompromissosRecorrentesModel() {
     }
 
-    public CompromissosRecorrentesModel(Long id, String nome, String descricao, String local, LocalTime horaInicial, LocalTime horaFinal, List<DayOfWeek> diasDaSemana, LocalDate dataInicioRecorrencia, LocalDate dataFimRecorrencia, List<CompromissosModel> compromissosGerados) {
+    public CompromissosRecorrentesModel(Long id, String nome, String descricao, String local, LocalDate dataInicioRecorrencia, LocalDate dataFimRecorrencia, Integer intervalo, ModoDeRecorrenciaEnum modoDeRecorrencia, Boolean apenasDiasUteis, List<HorariosPorDiaModel> horariosPorDia, List<CompromissosModel> compromissosGerados) {
         this.id = id;
         this.nome = nome;
         this.descricao = descricao;
         this.local = local;
-        this.horaInicial = horaInicial;
-        this.horaFinal = horaFinal;
-        this.diasDaSemana = diasDaSemana;
         this.dataInicioRecorrencia = dataInicioRecorrencia;
         this.dataFimRecorrencia = dataFimRecorrencia;
+        this.intervalo = intervalo;
+        this.modoDeRecorrencia = modoDeRecorrencia;
+        this.apenasDiasUteis = apenasDiasUteis;
+        this.horariosPorDia = horariosPorDia;
         this.compromissosGerados = compromissosGerados;
     }
 
@@ -100,28 +101,12 @@ public class CompromissosRecorrentesModel {
         this.local = local;
     }
 
-    public LocalTime getHoraInicial() {
-        return horaInicial;
+    public List<HorariosPorDiaModel> getHorariosPorDias() {
+        return horariosPorDia;
     }
 
-    public void setHoraInicial(LocalTime horaInicial) {
-        this.horaInicial = horaInicial;
-    }
-
-    public LocalTime getHoraFinal() {
-        return horaFinal;
-    }
-
-    public void setHoraFinal(LocalTime horaFinal) {
-        this.horaFinal = horaFinal;
-    }
-
-    public List<DayOfWeek> getDiasDaSemana() {
-        return diasDaSemana;
-    }
-
-    public void setDiasDaSemana(List<DayOfWeek> diasDaSemana) {
-        this.diasDaSemana = diasDaSemana;
+    public void setHorariosPorDias(List<HorariosPorDiaModel> horariosPorDiaModels) {
+        this.horariosPorDia = horariosPorDiaModels;
     }
 
     public LocalDate getDataInicioRecorrencia() {
@@ -138,6 +123,30 @@ public class CompromissosRecorrentesModel {
 
     public void setDataFimRecorrencia(LocalDate dataFimRecorrencia) {
         this.dataFimRecorrencia = dataFimRecorrencia;
+    }
+
+    public Integer getIntervalo() {
+        return intervalo;
+    }
+
+    public void setIntervalo(Integer intervalo) {
+        this.intervalo = intervalo;
+    }
+
+    public ModoDeRecorrenciaEnum getModoDeRecorrencia() {
+        return modoDeRecorrencia;
+    }
+
+    public void setModoDeRecorrencia(ModoDeRecorrenciaEnum modoDeRecorrencia) {
+        this.modoDeRecorrencia = modoDeRecorrencia;
+    }
+
+    public Boolean getApenasDiasUteis() {
+        return apenasDiasUteis;
+    }
+
+    public void setApenasDiasUteis(Boolean apenasDiasUteis) {
+        this.apenasDiasUteis = apenasDiasUteis;
     }
 
     public List<CompromissosModel> getCompromissosGerados() {

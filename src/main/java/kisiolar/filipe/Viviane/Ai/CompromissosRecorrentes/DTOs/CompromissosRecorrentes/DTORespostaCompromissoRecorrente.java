@@ -1,4 +1,4 @@
-package kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs;
+package kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.CompromissosRecorrentes;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import kisiolar.filipe.Viviane.Ai.Compromissos.DTOs.DTORespostaCompromisso;
@@ -7,11 +7,11 @@ import java.util.List;
 
 public class DTORespostaCompromissoRecorrente {
 
-    private DTOCompromissosRecorrentes dtoCompromissosRecorrentes;
+    private DTOSaidaCompromissosRecorrentes dtoSaidaCompromissosRecorrentes;
     private Boolean existeConflito;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private List<DTOCompromissosRecorrentes> compromissosConflitantes;
+    private List<DTOSaidaCompromissosRecorrentes> compromissosConflitantes;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<DTORespostaCompromisso> compromissosCriadosComConflito;
@@ -19,17 +19,17 @@ public class DTORespostaCompromissoRecorrente {
     public DTORespostaCompromissoRecorrente() {
     }
 
-    public DTORespostaCompromissoRecorrente(DTOCompromissosRecorrentes dtoCompromissosRecorrentes) {
-        this.dtoCompromissosRecorrentes = dtoCompromissosRecorrentes;
+    public DTORespostaCompromissoRecorrente(DTOSaidaCompromissosRecorrentes dtoSaidaCompromissosRecorrentes) {
+        this.dtoSaidaCompromissosRecorrentes = dtoSaidaCompromissosRecorrentes;
         this.existeConflito = false;
     }
 
     public DTORespostaCompromissoRecorrente(
-            DTOCompromissosRecorrentes dtoCompromissosRecorrentes,
-            List<DTOCompromissosRecorrentes> compromissosConflitantes,
+            DTOSaidaCompromissosRecorrentes dtoSaidaCompromissosRecorrentes,
+            List<DTOSaidaCompromissosRecorrentes> compromissosConflitantes,
             List<DTORespostaCompromisso> compromissosCriadosComConflito
     ) {
-        this.dtoCompromissosRecorrentes = dtoCompromissosRecorrentes;
+        this.dtoSaidaCompromissosRecorrentes = dtoSaidaCompromissosRecorrentes;
         this.compromissosConflitantes = compromissosConflitantes;
         this.compromissosCriadosComConflito = compromissosCriadosComConflito;
         this.existeConflito =
@@ -37,20 +37,20 @@ public class DTORespostaCompromissoRecorrente {
                         (compromissosCriadosComConflito != null && !compromissosCriadosComConflito.isEmpty());
     }
 
-    public static DTORespostaCompromissoRecorrente comConflitosRecorrentes(DTOCompromissosRecorrentes dto, List<DTOCompromissosRecorrentes> conflitos) {
+    public static DTORespostaCompromissoRecorrente comConflitosRecorrentes(DTOSaidaCompromissosRecorrentes dto, List<DTOSaidaCompromissosRecorrentes> conflitos) {
         return new DTORespostaCompromissoRecorrente(dto, conflitos, null);
     }
 
-    public static DTORespostaCompromissoRecorrente comConflitosGerados(DTOCompromissosRecorrentes dto, List<DTORespostaCompromisso> conflitosGerados) {
+    public static DTORespostaCompromissoRecorrente comConflitosGerados(DTOSaidaCompromissosRecorrentes dto, List<DTORespostaCompromisso> conflitosGerados) {
         return new DTORespostaCompromissoRecorrente(dto, null, conflitosGerados);
     }
 
-    public DTOCompromissosRecorrentes getDtoCompromissosRecorrentes() {
-        return dtoCompromissosRecorrentes;
+    public DTOSaidaCompromissosRecorrentes getDtoCompromissosRecorrentes() {
+        return dtoSaidaCompromissosRecorrentes;
     }
 
-    public void setDtoCompromissosRecorrentes(DTOCompromissosRecorrentes dtoCompromissosRecorrentes) {
-        this.dtoCompromissosRecorrentes = dtoCompromissosRecorrentes;
+    public void setDtoCompromissosRecorrentes(DTOSaidaCompromissosRecorrentes dtoCriacaoCompromissosRecorrentes) {
+        this.dtoSaidaCompromissosRecorrentes = dtoCriacaoCompromissosRecorrentes;
     }
 
     public Boolean getExisteConflito() {
@@ -61,11 +61,11 @@ public class DTORespostaCompromissoRecorrente {
         this.existeConflito = existeConflito;
     }
 
-    public List<DTOCompromissosRecorrentes> getCompromissosConflitantes() {
+    public List<DTOSaidaCompromissosRecorrentes> getCompromissosConflitantes() {
         return compromissosConflitantes;
     }
 
-    public void setCompromissosConflitantes(List<DTOCompromissosRecorrentes> compromissosConflitantes) {
+    public void setCompromissosConflitantes(List<DTOSaidaCompromissosRecorrentes> compromissosConflitantes) {
         this.compromissosConflitantes = compromissosConflitantes;
     }
 
