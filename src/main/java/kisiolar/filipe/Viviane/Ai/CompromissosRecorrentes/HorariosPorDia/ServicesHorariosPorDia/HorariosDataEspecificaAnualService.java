@@ -102,12 +102,11 @@ public class HorariosDataEspecificaAnualService extends HorariosServiceBase {
         long intervalo = compromissoRecorrente.getIntervalo();
 
         int anoInicio = inicioRecorrencia.getYear();
-        int anoFim = fimRecorrencia.getYear();
 
         return compromissoRecorrente.getHorariosPorDias().stream()
                 .map(HorariosDataEspecificaAnual.class::cast)
                 .flatMap(horario -> criarCompromissosPorDataEspecificaAnual(compromissoRecorrente,horario,
-                        intervalo,anoInicio,anoFim,fimRecorrencia).stream())
+                        intervalo,anoInicio,inicioRecorrencia,fimRecorrencia).stream())
                 .toList();
     }
 
@@ -119,18 +118,16 @@ public class HorariosDataEspecificaAnualService extends HorariosServiceBase {
         long intervalo = compromissoRecorrente.getIntervalo();
 
         int anoInicio = inicioRecorrencia.getYear();
-        int anoFim = fimRecorrencia.getYear();
-
 
         criarCompromissosPorDataEspecificaAnual(compromissoRecorrente,horario,
-                intervalo,anoInicio,anoFim,fimRecorrencia);
+                intervalo,anoInicio,inicioRecorrencia,fimRecorrencia);
     }
 
     @Transactional
     private List<DTORespostaCompromisso> criarCompromissosPorDataEspecificaAnual(
             CompromissosRecorrentesModel compromissoRecorrente,
             HorariosDataEspecificaAnual horario,
-            long intervalo ,int anoInicio,int anoFim,LocalDate fimRecorrencia
+            long intervalo ,int anoInicio,LocalDate inicioRecorrencia,LocalDate fimRecorrencia
             ){
 
         MonthDay diaDoAnoInicio = horario.getInicioDataEspecificaDoAno();
@@ -138,29 +135,53 @@ public class HorariosDataEspecificaAnualService extends HorariosServiceBase {
         MonthDay diaDoAnoFim = horario.getFimDataEspecificaDoAno();
 
         List<DTORespostaCompromisso> compromissosGerados = new ArrayList<>();
-        int i = 0;
-        int anoAtual;
-        do {
-            anoAtual =(int)(anoInicio + i * intervalo);
 
-            int diaInicio = Math.min(diaDoAnoInicio.getDayOfMonth(),
-                    YearMonth.of(anoAtual, diaDoAnoInicio.getMonth()).lengthOfMonth());
-            int diaFim = Math.min(diaDoAnoFim.getDayOfMonth(),
-                    YearMonth.of(anoAtual, diaDoAnoFim.getMonth()).lengthOfMonth());
+        int anoAtual = anoInicio;
 
-            LocalDateTime inicioCompromisso = LocalDate.of(anoAtual, diaDoAnoInicio.getMonth(), diaInicio)
-                    .atTime(horario.getHoraInicio());
-            LocalDateTime fimCompromisso = LocalDate.of(anoAtual, diaDoAnoFim.getMonth(), diaFim)
-                    .atTime(horario.getHoraFim());
+        int diaInicio = Math.min(diaDoAnoInicio.getDayOfMonth(),
+                YearMonth.of(anoAtual, diaDoAnoInicio.getMonth()).lengthOfMonth());
 
-            if (inicioCompromisso.toLocalDate().isAfter(fimRecorrencia)) break;
+        int diaFim = Math.min(diaDoAnoFim.getDayOfMonth(),
+                YearMonth.of(anoAtual, diaDoAnoFim.getMonth()).lengthOfMonth());
+
+        LocalDateTime inicioCompromisso = LocalDate.of(anoAtual, diaDoAnoInicio.getMonth(), diaInicio)
+                .atTime(horario.getHoraInicio());
+
+        LocalDateTime fimCompromisso = LocalDate.of(anoAtual, diaDoAnoFim.getMonth(), diaFim)
+                .atTime(horario.getHoraFim());
+
+        if(inicioCompromisso.toLocalDate().isBefore(inicioRecorrencia)){
+
+            inicioCompromisso = inicioCompromisso.plusYears(1);
+
+            fimCompromisso = fimCompromisso.plusYears(1);
+        }
+
+        long i = intervalo;
+
+        while (!inicioCompromisso.toLocalDate().isAfter(fimRecorrencia)){
 
             DTOCreateCompromissos dto = mapperCompromissosRecorrentes
                     .mapGerarCompromisso(compromissoRecorrente, inicioCompromisso, fimCompromisso);
             compromissosGerados.add(compromissosService.criarCompromisso(dto));
 
             i++;
-        }while ( anoAtual < anoFim );
+
+            anoAtual =(int)(anoInicio + i * intervalo);
+
+            diaInicio = Math.min(diaDoAnoInicio.getDayOfMonth(),
+                YearMonth.of(anoAtual, diaDoAnoInicio.getMonth()).lengthOfMonth());
+
+            diaFim = Math.min(diaDoAnoFim.getDayOfMonth(),
+                YearMonth.of(anoAtual, diaDoAnoFim.getMonth()).lengthOfMonth());
+
+            inicioCompromisso = LocalDate.of(anoAtual, diaDoAnoInicio.getMonth(), diaInicio)
+                .atTime(horario.getHoraInicio());
+
+            fimCompromisso = LocalDate.of(anoAtual, diaDoAnoFim.getMonth(), diaFim)
+                .atTime(horario.getHoraFim());
+
+        }
 
 
         return compromissosGerados;

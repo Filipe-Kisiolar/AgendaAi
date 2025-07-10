@@ -19,7 +19,6 @@ import kisiolar.filipe.Viviane.Ai.Exceptions.ResourceNotFindException;
 import org.springframework.stereotype.Service;
 
 import java.time.*;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -109,12 +108,10 @@ public class HorariosDiaEspecificoMensalService extends HorariosServiceBase{
 
         long intervalo = compromissoRecorrente.getIntervalo();
 
-        long numeroMesesDeRecorrencia = ChronoUnit.MONTHS.between(inicioRecorrencia, fimRecorrencia);
-
         return compromissoRecorrente.getHorariosPorDias().stream()
                 .map(HorariosDiaEspecificoMensal.class::cast)
                 .flatMap(horario -> criarCompromissosPorDiaEspecificoMensal(compromissoRecorrente,horario
-                ,inicioRecorrencia,fimRecorrencia,intervalo,numeroMesesDeRecorrencia).stream())
+                ,inicioRecorrencia,fimRecorrencia,intervalo).stream())
                 .toList();
     }
 
@@ -127,10 +124,8 @@ public class HorariosDiaEspecificoMensalService extends HorariosServiceBase{
 
         long intervalo = compromissoRecorrente.getIntervalo();
 
-        long numeroMesesDeRecorrencia = ChronoUnit.MONTHS.between(inicioRecorrencia, fimRecorrencia);
-
         criarCompromissosPorDiaEspecificoMensal(compromissoRecorrente,horario,
-            inicioRecorrencia,fimRecorrencia,intervalo,numeroMesesDeRecorrencia);
+            inicioRecorrencia,fimRecorrencia,intervalo);
 
     }
 
@@ -139,8 +134,7 @@ public class HorariosDiaEspecificoMensalService extends HorariosServiceBase{
                 CompromissosRecorrentesModel compromissoRecorrente,
                 HorariosDiaEspecificoMensal horario,
                 LocalDate inicioRecorrencia,LocalDate fimRecorrencia,
-                long intervalo,
-                long numeroMesesDeRecorrencia){
+                long intervalo){
         long pulaUmMes;
 
         int ano = inicioRecorrencia.getYear();
