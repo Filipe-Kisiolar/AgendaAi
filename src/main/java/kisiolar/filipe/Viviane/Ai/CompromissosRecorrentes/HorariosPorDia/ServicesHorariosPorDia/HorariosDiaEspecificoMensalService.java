@@ -176,18 +176,23 @@ public class HorariosDiaEspecificoMensalService extends HorariosServiceBase{
 
         List<DTORespostaCompromisso> compromissosGerados = new ArrayList<>();
 
-        for (long i = pulaUmMes; i < numeroMesesDeRecorrencia; i = i + intervalo) {
-            LocalDateTime inicioCompromisso = inicioPrimeiroCompromisso.plusMonths(i);
+        long i = pulaUmMes;
 
-            if (inicioCompromisso.toLocalDate().isAfter(fimRecorrencia)) {
-                break;
-            }
+        LocalDateTime inicioCompromisso = inicioPrimeiroCompromisso.plusMonths(i);
 
-            LocalDateTime fimCompromisso = fimPrimeiroCompromisso.plusMonths(i);
+        LocalDateTime fimCompromisso = fimPrimeiroCompromisso.plusMonths(i);
+
+        while (!inicioCompromisso.toLocalDate().isAfter(fimRecorrencia)) {
 
             DTOCreateCompromissos dtoCreateCompromissos = mapperCompromissosRecorrentes
                     .mapGerarCompromisso(compromissoRecorrente, inicioCompromisso, fimCompromisso);
             compromissosGerados.add(compromissosService.criarCompromisso(dtoCreateCompromissos));
+
+             i = i + intervalo;
+
+             inicioCompromisso = inicioPrimeiroCompromisso.plusMonths(i);
+
+             fimCompromisso = fimPrimeiroCompromisso.plusMonths(i);
         }
 
         return compromissosGerados;
