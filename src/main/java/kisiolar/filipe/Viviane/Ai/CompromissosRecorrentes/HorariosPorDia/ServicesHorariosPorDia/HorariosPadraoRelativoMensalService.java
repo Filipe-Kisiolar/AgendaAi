@@ -157,33 +157,35 @@ public class HorariosPadraoRelativoMensalService extends HorariosServiceBase{
 
         List<DTORespostaCompromisso> compromissosGerados = new ArrayList<>();
 
+        LocalDateTime inicioCompromisso = diaInicioCompromisso.atTime(horario.getHoraInicio());
+
+        LocalDateTime fimCompromisso = primeiroDiaDoMesDoPrimeiroCompromisso.with(distanciaAteDiaFim).atTime(horario.getHoraFim());
+
+        long i = 1;
+
         //caso o primeiro compromisso que sera criado seja depois do inicio da recorrencia ele é criado
         if(!diaInicioCompromisso.isBefore(inicioRecorrencia)){
 
-            LocalDateTime inicioCompromisso = diaInicioCompromisso.atTime(horario.getHoraInicio());
-
-            LocalDateTime fimCompromisso = primeiroDiaDoMesDoPrimeiroCompromisso.with(distanciaAteDiaFim).atTime(horario.getHoraFim());
-
             DTOCreateCompromissos dtoCreateCompromissos = mapperCompromissosRecorrentes
                     .mapGerarCompromisso(compromissoRecorrente, inicioCompromisso, fimCompromisso);
+
             compromissosGerados.add(compromissosService.criarCompromisso(dtoCreateCompromissos));
+
+            i = intervalo;
         }
-        //criacao dos outros compromissos
-        long i = intervalo;
-        LocalDateTime inicioCompromisso;
-        do{
+        //caso o if a cima nao ocorra a primeira ocorrencia do compromisso sera no mes subsequente e sera espaçado pelo intervalo apos sua criacao
+        while(inicioCompromisso.toLocalDate().isBefore(fimRecorrencia)){
             LocalDate primeiroDiaDoMes = primeiroDiaDoMesDoPrimeiroCompromisso.plusMonths(i);
 
             inicioCompromisso = primeiroDiaDoMes.with(distanciaAteDiaComeco).atTime(horario.getHoraInicio());
 
-            LocalDateTime fimCompromisso = primeiroDiaDoMes.with(distanciaAteDiaFim).atTime(horario.getHoraFim());
+            fimCompromisso = primeiroDiaDoMes.with(distanciaAteDiaFim).atTime(horario.getHoraFim());
 
             DTOCreateCompromissos dtoCreateCompromissos = mapperCompromissosRecorrentes
                     .mapGerarCompromisso(compromissoRecorrente, inicioCompromisso, fimCompromisso);
             compromissosGerados.add(compromissosService.criarCompromisso(dtoCreateCompromissos));
             i= i + intervalo;
-        }while(!inicioCompromisso.toLocalDate().isAfter(fimRecorrencia));
-
+        }
         return compromissosGerados;
     }
 
@@ -238,17 +240,20 @@ public class HorariosPadraoRelativoMensalService extends HorariosServiceBase{
         return numeroCompromissosApagados;
     }
 
-    private boolean verificarConflitoEntreHorariosUsamDiasDaSemana(HorariosPadraoRelativoMensal horario_1, HorariosPadraoRelativoMensal horario_2) {
+    private boolean verificarConflitoEntreHorariosUsamPadraoRelativo(HorariosPadraoRelativoMensal horario_1, HorariosPadraoRelativoMensal horario_2) {
 
         Set<DayOfWeek> dias1 = getDiasDaSemanaEntre(horario_1.getDiaDaSemanaInicio(), horario_1.getDiaDaSemanaFim());
         Set<DayOfWeek> dias2 = getDiasDaSemanaEntre(horario_2.getDiaDaSemanaInicio(), horario_2.getDiaDaSemanaFim());
+
+        boolean mesmoOrdenamentoDaSemana =
+                horario_1.getOrdenamentoDaSemanaNoMes().equals(horario_2.getOrdenamentoDaSemanaNoMes());
 
         boolean intersecaoDias = dias1.stream().anyMatch(dias2::contains);
 
         boolean horariosConflitam = horario_1.getHoraInicio().isBefore(horario_2.getHoraFim())
                 && horario_1.getHoraFim().isAfter(horario_2.getHoraInicio());
 
-        return intersecaoDias && horariosConflitam;
+        return mesmoOrdenamentoDaSemana && intersecaoDias && horariosConflitam;
     }
 
     private Set<DayOfWeek> getDiasDaSemanaEntre(DayOfWeek inicio, DayOfWeek fim) {
@@ -263,7 +268,7 @@ public class HorariosPadraoRelativoMensalService extends HorariosServiceBase{
 
     protected boolean verificarConflitosComHorarioNaLista(HorariosPadraoRelativoMensal horario,List<HorariosPadraoRelativoMensal> listaHorariosPorDia){
         return listaHorariosPorDia.stream()
-                .anyMatch(h -> verificarConflitoEntreHorariosUsamDiasDaSemana(h,horario) &&
+                .anyMatch(h -> verificarConflitoEntreHorariosUsamPadraoRelativo(h,horario) &&
                         !Objects.equals(h.getId(), horario.getId()));
     }
 }
