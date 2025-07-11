@@ -4,8 +4,6 @@ import java.time.LocalDateTime;
 
 public class DTOCreateCompromissos {
 
-    private Long id;
-
     private String nome;
 
     private String descricao;
@@ -21,22 +19,13 @@ public class DTOCreateCompromissos {
     public DTOCreateCompromissos() {
     }
 
-    public DTOCreateCompromissos(Long id, String nome, String descricao, String local, LocalDateTime inicio, LocalDateTime fim, Long compromissoRecorrenteId) {
-        this.id = id;
+    public DTOCreateCompromissos(String nome, String descricao, String local, LocalDateTime inicio, LocalDateTime fim, Long compromissoRecorrenteId) {
         this.nome = nome;
         this.descricao = descricao;
         this.local = local;
         this.inicio = inicio;
         this.fim = fim;
         this.compromissoRecorrenteId = compromissoRecorrenteId;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getNome() {

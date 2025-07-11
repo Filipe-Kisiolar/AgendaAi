@@ -1,6 +1,5 @@
 package kisiolar.filipe.Viviane.Ai.Compromissos.DTOs;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.util.List;
@@ -8,6 +7,7 @@ import java.util.List;
 public class DTORespostaCompromisso {
 
     private DTOSaidaCompromissos compromisso;
+
     private Boolean existeConflito;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)

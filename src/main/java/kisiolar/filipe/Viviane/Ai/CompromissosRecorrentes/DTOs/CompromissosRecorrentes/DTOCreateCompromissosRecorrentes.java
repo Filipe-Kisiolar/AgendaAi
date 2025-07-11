@@ -11,7 +11,6 @@ import java.time.LocalDate;
 import java.util.List;
 
 public class DTOCreateCompromissosRecorrentes {
-        private Long id;
 
         private String nome;
 
@@ -36,8 +35,7 @@ public class DTOCreateCompromissosRecorrentes {
         public DTOCreateCompromissosRecorrentes() {
         }
 
-        public DTOCreateCompromissosRecorrentes(Long id, String nome, String descricao, String local, List<DTOCreateHorariosPorDiaBase> horariosPorDia, LocalDate dataInicioRecorrencia, LocalDate dataFimRecorrencia, Integer intervalo, ModoDeRecorrenciaEnum modoDeRecorrencia, boolean apenasDiasUteis) {
-                this.id = id;
+        public DTOCreateCompromissosRecorrentes(String nome, String descricao, String local, List<DTOCreateHorariosPorDiaBase> horariosPorDia, LocalDate dataInicioRecorrencia, LocalDate dataFimRecorrencia, Integer intervalo, ModoDeRecorrenciaEnum modoDeRecorrencia, boolean apenasDiasUteis) {
                 this.nome = nome;
                 this.descricao = descricao;
                 this.local = local;
@@ -47,14 +45,6 @@ public class DTOCreateCompromissosRecorrentes {
                 this.intervalo = intervalo;
                 this.modoDeRecorrencia = modoDeRecorrencia;
                 this.apenasDiasUteis = apenasDiasUteis;
-        }
-
-        public Long getId() {
-                return id;
-        }
-
-        public void setId(Long id) {
-                this.id = id;
         }
 
         public String getNome() {

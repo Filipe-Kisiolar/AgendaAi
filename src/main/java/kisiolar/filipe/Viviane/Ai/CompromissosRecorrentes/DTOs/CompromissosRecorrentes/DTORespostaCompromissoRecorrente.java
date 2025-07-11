@@ -8,6 +8,7 @@ import java.util.List;
 public class DTORespostaCompromissoRecorrente {
 
     private DTOSaidaCompromissosRecorrentes dtoSaidaCompromissosRecorrentes;
+
     private Boolean existeConflito;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)

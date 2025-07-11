@@ -1,15 +1,8 @@
 package kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.CompromissosRecorrentes;
 
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
-import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.Enums.ModoDeRecorrenciaEnum;
-import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.Enums.OrdenamentoDaSemanaNoMesEnum;
-
 import java.time.LocalDate;
 
 public class DTOUpdateCompromissosRecorrentes {
-
-    private Long id;
 
     private String nome;
 
@@ -28,8 +21,7 @@ public class DTOUpdateCompromissosRecorrentes {
     public DTOUpdateCompromissosRecorrentes() {
     }
 
-    public DTOUpdateCompromissosRecorrentes(Long id, String nome, String descricao, String local, LocalDate dataInicioRecorrencia, LocalDate dataFimRecorrencia, Integer intervalo, boolean apenasDiasUteis) {
-        this.id = id;
+    public DTOUpdateCompromissosRecorrentes(String nome, String descricao, String local, LocalDate dataInicioRecorrencia, LocalDate dataFimRecorrencia, Integer intervalo, boolean apenasDiasUteis) {
         this.nome = nome;
         this.descricao = descricao;
         this.local = local;
@@ -37,14 +29,6 @@ public class DTOUpdateCompromissosRecorrentes {
         this.dataFimRecorrencia = dataFimRecorrencia;
         this.intervalo = intervalo;
         this.apenasDiasUteis = apenasDiasUteis;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getNome() {
