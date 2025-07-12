@@ -6,6 +6,7 @@ import kisiolar.filipe.Viviane.Ai.Compromissos.CompromissosService;
 import kisiolar.filipe.Viviane.Ai.Compromissos.DTOs.DTORespostaCompromisso;
 import kisiolar.filipe.Viviane.Ai.Compromissos.MapperCompromissos;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.CompromissosRecorrentes.*;
+import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.HorariosPorDia.DTOCreateHorariosPorDiaBase;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.Enums.ModoDeRecorrenciaEnum;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.HorariosPorDia.HorariosPorDiaModels.*;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.HorariosPorDia.ServicesHorariosPorDia.HorariosPorDiaService;
@@ -131,12 +132,16 @@ public class CompromissosRecorrentesService{
 
         CompromissosRecorrentesModel compromissoSalvo = compromissosRecorrentesRepository.save(compromissoRecorrente);
 
-        //chama o metodo criado para gerar os compromissos atrelados e guarda conflitosRecorrentes(se houver)
-        List<DTORespostaCompromisso> compromissosGeradosComConflito = criarCompromissosPorRecorrencia(compromissoSalvo);
+        List<DTOCreateHorariosPorDiaBase> listaDosHorarios = dtoCreateCompromissosRecorrentes.getHorariosPorDia();
+
+        //cria os horarios por dia pelo horarios service que por sua vez cria ja cria os compromissos
+        listaDosHorarios.forEach(horario -> horariosPorDiaService.adicionarHorario(compromissoRecorrente.getId(),horario));
 
         List<DTOSaidaCompromissosRecorrentes> conflitosRecorrentes = verificarConflitos(compromissoSalvo).stream()
                 .map(mapperCompromissosRecorrentes ::mapToDto)
                 .collect(Collectors.toList());
+
+        List<DTORespostaCompromisso> compromissosGeradosComConflito = new ArrayList<>();
 
         DTOSaidaCompromissosRecorrentes saidaCompromissosRecorrentes = mapperCompromissosRecorrentes.mapToDto(compromissoSalvo);
 

@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
         unmappedTargetPolicy = ReportingPolicy.ERROR)
 public interface MapperCompromissosRecorrentes {
 
-    @Mapping(source = "horariosPorDia", target = "horariosPorDias")
+    @Mapping(target = "horariosPorDia", ignore = true)
     @Mapping(target = "compromissosGerados",ignore = true)
     CompromissosRecorrentesModel mapToModel(DTOCreateCompromissosRecorrentes dto);
 
