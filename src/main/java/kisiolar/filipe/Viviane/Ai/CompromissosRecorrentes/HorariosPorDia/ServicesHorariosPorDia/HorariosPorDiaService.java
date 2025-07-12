@@ -6,6 +6,7 @@ import kisiolar.filipe.Viviane.Ai.Compromissos.DTOs.DTORespostaCompromisso;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.CompromissosRecorrentesModel;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.CompromissosRecorrentesRepository;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.HorariosPorDia.DTOCreateHorariosPorDiaBase;
+import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.HorariosPorDia.DTORespostaHorariosPorDia;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.HorariosPorDia.DTOSaidaHorariosPorDiaBase;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.HorariosPorDia.DTOUpdateHorariosPorDiaBase;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.HorariosPorDia.DataEspecificaAnual.DTOCreateHorariosDataEspecificaAnual;
@@ -53,7 +54,7 @@ public class HorariosPorDiaService extends HorariosServiceBase {
     }
 
     @Transactional
-    public DTOSaidaHorariosPorDiaBase adicionarHorario(Long compromissoRecorrenteId, DTOCreateHorariosPorDiaBase dtoCreateHorariosPorDia) {
+    public DTORespostaHorariosPorDia adicionarHorario(Long compromissoRecorrenteId, DTOCreateHorariosPorDiaBase dtoCreateHorariosPorDia) {
         CompromissosRecorrentesModel compromissoRecorrente = compromissosRecorrentesRepository.findById(compromissoRecorrenteId)
                 .orElseThrow(() -> new ResourceNotFindException("Compromisso recorrente não encontrado"));
 
@@ -93,7 +94,7 @@ public class HorariosPorDiaService extends HorariosServiceBase {
     }
 
     @Transactional
-    public DTOSaidaHorariosPorDiaBase alterarHorario(Long compromissoRecorrenteId, Long horarioId, DTOUpdateHorariosPorDiaBase dtoUpdateHorariosPorDia) {
+    public DTORespostaHorariosPorDia alterarHorario(Long compromissoRecorrenteId, Long horarioId, DTOUpdateHorariosPorDiaBase dtoUpdateHorariosPorDia) {
 
         CompromissosRecorrentesModel compromissoRecorrente = compromissosRecorrentesRepository.findById(compromissoRecorrenteId)
                 .orElseThrow(() -> new ResourceNotFindException("Compromisso recorrente não encontrado"));

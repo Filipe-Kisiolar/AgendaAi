@@ -7,6 +7,7 @@ import kisiolar.filipe.Viviane.Ai.Compromissos.DTOs.DTOCreateCompromissos;
 import kisiolar.filipe.Viviane.Ai.Compromissos.DTOs.DTORespostaCompromisso;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.CompromissosRecorrentesModel;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.CompromissosRecorrentesRepository;
+import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.HorariosPorDia.DTORespostaHorariosPorDia;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.HorariosPorDia.PadraoRelativoMensal.DTOCreateHorariosPadraoRelativoMensal;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.HorariosPorDia.PadraoRelativoMensal.DTOSaidaHorariosPadraoRelativoMensal;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.HorariosPorDia.PadraoRelativoMensal.DTOUpdateHorariosPadraoRelativoMensal;
@@ -42,7 +43,7 @@ public class HorariosPadraoRelativoMensalService extends HorariosServiceBase{
     }
 
     @Transactional
-    public DTOSaidaHorariosPadraoRelativoMensal adicionarHorario(CompromissosRecorrentesModel compromissoRecorrente, DTOCreateHorariosPadraoRelativoMensal dtoHorario){
+    public DTORespostaHorariosPorDia adicionarHorario(CompromissosRecorrentesModel compromissoRecorrente, DTOCreateHorariosPadraoRelativoMensal dtoHorario){
         HorariosPadraoRelativoMensal horariosCriado = mapperHorariosPadraoRelativoMensal.mapToModel(dtoHorario);
 
         horariosCriado.setCompromissoRecorrente(compromissoRecorrente);
@@ -59,13 +60,16 @@ public class HorariosPadraoRelativoMensalService extends HorariosServiceBase{
 
         horariosPadraoRelativoMensalRepository.save(horariosCriado);
 
-        criarCompromissosDiretamentePorPadraoRelativoMensal(compromissoRecorrente,horariosCriado);
+        List<DTORespostaCompromisso> compromissosCriados =
+                criarCompromissosDiretamentePorPadraoRelativoMensal(compromissoRecorrente,horariosCriado);
 
-        return mapperHorariosPadraoRelativoMensal.mapToDto(horariosCriado);
+        DTOSaidaHorariosPadraoRelativoMensal dtoSaida = mapperHorariosPadraoRelativoMensal.mapToDto(horariosCriado);
+
+        return new DTORespostaHorariosPorDia(dtoSaida,compromissosCriados);
     }
 
     @Transactional
-    public DTOSaidaHorariosPadraoRelativoMensal alterarHorario(CompromissosRecorrentesModel compromissoRecorrente, Long horarioId, DTOUpdateHorariosPadraoRelativoMensal dtoUpdateHorario){
+    public DTORespostaHorariosPorDia alterarHorario(CompromissosRecorrentesModel compromissoRecorrente, Long horarioId, DTOUpdateHorariosPadraoRelativoMensal dtoUpdateHorario){
         HorariosPadraoRelativoMensal horarioParaAtualizar = horariosPadraoRelativoMensalRepository.findById(horarioId)
                 .orElseThrow(()-> new ResourceNotFindException("Esse id não foi achado nesse tipo de horário"));
 
@@ -97,9 +101,12 @@ public class HorariosPadraoRelativoMensalService extends HorariosServiceBase{
 
         horariosPadraoRelativoMensalRepository.save(horarioParaAtualizar);
 
-        criarCompromissosDiretamentePorPadraoRelativoMensal(compromissoRecorrente,horarioParaAtualizar);
+        List<DTORespostaCompromisso> compromissosCriados =
+                criarCompromissosDiretamentePorPadraoRelativoMensal(compromissoRecorrente,horarioParaAtualizar);
 
-        return mapperHorariosPadraoRelativoMensal.mapToDto(horarioParaAtualizar);
+        DTOSaidaHorariosPadraoRelativoMensal dtoSaida = mapperHorariosPadraoRelativoMensal.mapToDto(horarioParaAtualizar);
+
+        return new DTORespostaHorariosPorDia(dtoSaida,compromissosCriados);
     }
 
     @Transactional
@@ -118,13 +125,13 @@ public class HorariosPadraoRelativoMensalService extends HorariosServiceBase{
     }
 
     @Transactional
-    private void criarCompromissosDiretamentePorPadraoRelativoMensal(CompromissosRecorrentesModel compromissoRecorrente, HorariosPadraoRelativoMensal horario){
+    private List<DTORespostaCompromisso> criarCompromissosDiretamentePorPadraoRelativoMensal(CompromissosRecorrentesModel compromissoRecorrente, HorariosPadraoRelativoMensal horario){
         LocalDate inicioRecorrencia = compromissoRecorrente.getDataInicioRecorrencia();
         LocalDate fimRecorrencia = compromissoRecorrente.getDataFimRecorrencia();
 
         long intervalo = compromissoRecorrente.getIntervalo();
 
-        criarCompromissosPorPadraoRelativoMensal(compromissoRecorrente,horario
+        return criarCompromissosPorPadraoRelativoMensal(compromissoRecorrente,horario
             ,inicioRecorrencia,fimRecorrencia,intervalo);
     }
 

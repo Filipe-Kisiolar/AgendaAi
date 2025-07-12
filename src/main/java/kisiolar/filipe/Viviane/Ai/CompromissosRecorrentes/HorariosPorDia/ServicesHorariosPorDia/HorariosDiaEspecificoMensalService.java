@@ -7,6 +7,7 @@ import kisiolar.filipe.Viviane.Ai.Compromissos.DTOs.DTOCreateCompromissos;
 import kisiolar.filipe.Viviane.Ai.Compromissos.DTOs.DTORespostaCompromisso;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.CompromissosRecorrentesModel;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.CompromissosRecorrentesRepository;
+import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.HorariosPorDia.DTORespostaHorariosPorDia;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.HorariosPorDia.DiaEspecificoMensal.DTOCreateHorariosDiaEspecificoMensal;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.HorariosPorDia.DiaEspecificoMensal.DTOSaidaHorariosDiaEspecificoMensal;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.HorariosPorDia.DiaEspecificoMensal.DTOUpdateHorariosDiaEspecificoMensal;
@@ -41,7 +42,7 @@ public class HorariosDiaEspecificoMensalService extends HorariosServiceBase{
     }
 
     @Transactional
-    public DTOSaidaHorariosDiaEspecificoMensal adicionarHorario(CompromissosRecorrentesModel compromissoRecorrente, DTOCreateHorariosDiaEspecificoMensal dtoHorario){
+    public DTORespostaHorariosPorDia adicionarHorario(CompromissosRecorrentesModel compromissoRecorrente, DTOCreateHorariosDiaEspecificoMensal dtoHorario){
         HorariosDiaEspecificoMensal horariosCriado = mapperHorariosDiaEspecificoMensal.mapToModel(dtoHorario);
 
         horariosCriado.setCompromissoRecorrente(compromissoRecorrente);
@@ -58,13 +59,16 @@ public class HorariosDiaEspecificoMensalService extends HorariosServiceBase{
 
         horariosDiaEspecificoMensalRepository.save(horariosCriado);
 
-        criarCompromissosDiretamentePorDiaEspecificoMensal(compromissoRecorrente,horariosCriado);
+        List<DTORespostaCompromisso> compromissosCriados =
+                criarCompromissosDiretamentePorDiaEspecificoMensal(compromissoRecorrente,horariosCriado);
 
-        return mapperHorariosDiaEspecificoMensal.mapToDto(horariosCriado);
+        DTOSaidaHorariosDiaEspecificoMensal dtoSaida = mapperHorariosDiaEspecificoMensal.mapToDto(horariosCriado);
+
+        return new DTORespostaHorariosPorDia(dtoSaida,compromissosCriados);
     }
 
     @Transactional
-    public DTOSaidaHorariosDiaEspecificoMensal alterarHorario(CompromissosRecorrentesModel compromissoRecorrente, Long horarioId, DTOUpdateHorariosDiaEspecificoMensal dtoUpdateHorario){
+    public DTORespostaHorariosPorDia alterarHorario(CompromissosRecorrentesModel compromissoRecorrente, Long horarioId, DTOUpdateHorariosDiaEspecificoMensal dtoUpdateHorario){
         HorariosDiaEspecificoMensal horarioParaAtualizar = horariosDiaEspecificoMensalRepository.findById(horarioId)
                 .orElseThrow(()-> new ResourceNotFindException("Esse id não foi achado nesse tipo de horário"));
 
@@ -94,9 +98,12 @@ public class HorariosDiaEspecificoMensalService extends HorariosServiceBase{
 
         horariosDiaEspecificoMensalRepository.save(horarioParaAtualizar);
 
-        criarCompromissosDiretamentePorDiaEspecificoMensal(compromissoRecorrente,horarioParaAtualizar);
+        List<DTORespostaCompromisso> compromissosCriados =
+                criarCompromissosDiretamentePorDiaEspecificoMensal(compromissoRecorrente,horarioParaAtualizar);
 
-        return mapperHorariosDiaEspecificoMensal.mapToDto(horarioParaAtualizar);
+        DTOSaidaHorariosDiaEspecificoMensal dtoSaida = mapperHorariosDiaEspecificoMensal.mapToDto(horarioParaAtualizar);
+
+        return new DTORespostaHorariosPorDia(dtoSaida,compromissosCriados);
     }
 
     @Transactional
@@ -116,7 +123,7 @@ public class HorariosDiaEspecificoMensalService extends HorariosServiceBase{
     }
 
     @Transactional
-    private void criarCompromissosDiretamentePorDiaEspecificoMensal(CompromissosRecorrentesModel compromissoRecorrente, HorariosDiaEspecificoMensal horario){
+    private List<DTORespostaCompromisso> criarCompromissosDiretamentePorDiaEspecificoMensal(CompromissosRecorrentesModel compromissoRecorrente, HorariosDiaEspecificoMensal horario){
 
         LocalDate inicioRecorrencia = compromissoRecorrente.getDataInicioRecorrencia();
 
@@ -124,7 +131,7 @@ public class HorariosDiaEspecificoMensalService extends HorariosServiceBase{
 
         long intervalo = compromissoRecorrente.getIntervalo();
 
-        criarCompromissosPorDiaEspecificoMensal(compromissoRecorrente,horario,
+        return criarCompromissosPorDiaEspecificoMensal(compromissoRecorrente,horario,
             inicioRecorrencia,fimRecorrencia,intervalo);
 
     }

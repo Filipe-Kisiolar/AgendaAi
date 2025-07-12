@@ -7,6 +7,7 @@ import kisiolar.filipe.Viviane.Ai.Compromissos.DTOs.DTOCreateCompromissos;
 import kisiolar.filipe.Viviane.Ai.Compromissos.DTOs.DTORespostaCompromisso;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.CompromissosRecorrentesModel;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.CompromissosRecorrentesRepository;
+import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.HorariosPorDia.DTORespostaHorariosPorDia;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.HorariosPorDia.DataEspecificaAnual.DTOCreateHorariosDataEspecificaAnual;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.HorariosPorDia.DataEspecificaAnual.DTOSaidaHorariosDataEspecificaAnual;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.HorariosPorDia.DataEspecificaAnual.DTOUpdateHorariosDataEspecificaAnual;
@@ -37,7 +38,7 @@ public class HorariosDataEspecificaAnualService extends HorariosServiceBase {
     }
 
     @Transactional
-    public DTOSaidaHorariosDataEspecificaAnual adicionarHorario(CompromissosRecorrentesModel compromissoRecorrente, DTOCreateHorariosDataEspecificaAnual dtoHorario){
+    public DTORespostaHorariosPorDia adicionarHorario(CompromissosRecorrentesModel compromissoRecorrente, DTOCreateHorariosDataEspecificaAnual dtoHorario){
         HorariosDataEspecificaAnual horariosCriado = mapperHorariosDataEspecificaAnual.mapToModel(dtoHorario);
 
         horariosCriado.setCompromissoRecorrente(compromissoRecorrente);
@@ -54,13 +55,16 @@ public class HorariosDataEspecificaAnualService extends HorariosServiceBase {
 
         horariosDataEspecificaAnualRepository.save(horariosCriado);
 
-        criarCompromissosDiretamentePorDataEspecificaAnual(compromissoRecorrente,horariosCriado);
+        List<DTORespostaCompromisso> compromissosCriados =
+                criarCompromissosDiretamentePorDataEspecificaAnual(compromissoRecorrente,horariosCriado);
 
-        return mapperHorariosDataEspecificaAnual.mapToDto(horariosCriado);
+        DTOSaidaHorariosDataEspecificaAnual dtoSaida = mapperHorariosDataEspecificaAnual.mapToDto(horariosCriado);
+
+        return new DTORespostaHorariosPorDia(dtoSaida,compromissosCriados);
     }
 
     @Transactional
-    public DTOSaidaHorariosDataEspecificaAnual alterarHorario(CompromissosRecorrentesModel compromissoRecorrente, Long horarioId, DTOUpdateHorariosDataEspecificaAnual dtoUpdateHorario){
+    public DTORespostaHorariosPorDia alterarHorario(CompromissosRecorrentesModel compromissoRecorrente, Long horarioId, DTOUpdateHorariosDataEspecificaAnual dtoUpdateHorario){
         HorariosDataEspecificaAnual horarioParaAtualizar = horariosDataEspecificaAnualRepository.findById(horarioId)
                 .orElseThrow(()-> new ResourceNotFindException("Esse id não foi achado nesse tipo de horário"));
 
@@ -89,9 +93,12 @@ public class HorariosDataEspecificaAnualService extends HorariosServiceBase {
 
         horariosDataEspecificaAnualRepository.save(horarioParaAtualizar);
 
-        criarCompromissosDiretamentePorDataEspecificaAnual(compromissoRecorrente,horarioParaAtualizar);
+        List<DTORespostaCompromisso> compromissosCriados =
+                criarCompromissosDiretamentePorDataEspecificaAnual(compromissoRecorrente,horarioParaAtualizar);
 
-        return mapperHorariosDataEspecificaAnual.mapToDto(horarioParaAtualizar);
+        DTOSaidaHorariosDataEspecificaAnual dtoSaida = mapperHorariosDataEspecificaAnual.mapToDto(horarioParaAtualizar);
+
+        return new DTORespostaHorariosPorDia(dtoSaida,compromissosCriados);
     }
 
     @Transactional
@@ -111,7 +118,7 @@ public class HorariosDataEspecificaAnualService extends HorariosServiceBase {
     }
 
     @Transactional
-    private void criarCompromissosDiretamentePorDataEspecificaAnual(CompromissosRecorrentesModel compromissoRecorrente, HorariosDataEspecificaAnual horario){
+    private List<DTORespostaCompromisso> criarCompromissosDiretamentePorDataEspecificaAnual(CompromissosRecorrentesModel compromissoRecorrente, HorariosDataEspecificaAnual horario){
         LocalDate inicioRecorrencia = compromissoRecorrente.getDataInicioRecorrencia();
         LocalDate fimRecorrencia = compromissoRecorrente.getDataFimRecorrencia();
 
@@ -119,7 +126,7 @@ public class HorariosDataEspecificaAnualService extends HorariosServiceBase {
 
         int anoInicio = inicioRecorrencia.getYear();
 
-        criarCompromissosPorDataEspecificaAnual(compromissoRecorrente,horario,
+        return criarCompromissosPorDataEspecificaAnual(compromissoRecorrente,horario,
                 intervalo,anoInicio,inicioRecorrencia,fimRecorrencia);
     }
 

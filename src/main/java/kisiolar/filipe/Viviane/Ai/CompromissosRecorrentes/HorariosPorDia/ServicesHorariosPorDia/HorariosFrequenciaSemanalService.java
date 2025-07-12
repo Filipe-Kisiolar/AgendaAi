@@ -7,6 +7,7 @@ import kisiolar.filipe.Viviane.Ai.Compromissos.DTOs.DTOCreateCompromissos;
 import kisiolar.filipe.Viviane.Ai.Compromissos.DTOs.DTORespostaCompromisso;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.CompromissosRecorrentesModel;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.CompromissosRecorrentesRepository;
+import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.HorariosPorDia.DTORespostaHorariosPorDia;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.HorariosPorDia.FrequenciaSemanal.DTOCreateHorariosFrequenciaSemanal;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.HorariosPorDia.FrequenciaSemanal.DTOSaidaHorariosFrequenciaSemanal;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.HorariosPorDia.FrequenciaSemanal.DTOUpdateHorariosFrequenciaSemanal;
@@ -40,7 +41,7 @@ public class HorariosFrequenciaSemanalService extends HorariosServiceBase{
     }
 
     @Transactional
-    public DTOSaidaHorariosFrequenciaSemanal adicionarHorario(CompromissosRecorrentesModel compromissoRecorrente, DTOCreateHorariosFrequenciaSemanal dtoHorario){
+    public DTORespostaHorariosPorDia adicionarHorario(CompromissosRecorrentesModel compromissoRecorrente, DTOCreateHorariosFrequenciaSemanal dtoHorario){
         HorariosFrequenciaSemanal horariosCriado = mapperHorariosFrequenciaSemanal.mapToModel(dtoHorario);
 
         horariosCriado.setCompromissoRecorrente(compromissoRecorrente);
@@ -52,18 +53,21 @@ public class HorariosFrequenciaSemanalService extends HorariosServiceBase{
         boolean haConflitos = verificarConflitosComHorarioNaLista(horariosCriado,listaHorarios);
 
         if(haConflitos){
-            throw new BadRequestException("Esse horário conflita com outros já criados no mesmo Compromisso Recorrente");
+            throw new BadRequestException("Esse horário conflita com outros já criados no mesmo Compromisso Recorrente" + horariosCriado);
         }
 
         horariosFrequenciaSemanalRepository.save(horariosCriado);
 
-        criarCompromissosDiretamentePorFrequenciaSemanal(compromissoRecorrente,horariosCriado);
+        List<DTORespostaCompromisso> compromissosGerados =
+                criarCompromissosDiretamentePorFrequenciaSemanal(compromissoRecorrente,horariosCriado);
 
-        return mapperHorariosFrequenciaSemanal.mapToDto(horariosCriado);
+        DTOSaidaHorariosFrequenciaSemanal dtoSaida = mapperHorariosFrequenciaSemanal.mapToDto(horariosCriado);
+
+        return new DTORespostaHorariosPorDia(dtoSaida,compromissosGerados);
     }
 
     @Transactional
-    public DTOSaidaHorariosFrequenciaSemanal alterarHorario(CompromissosRecorrentesModel compromissoRecorrente, Long horarioId, DTOUpdateHorariosFrequenciaSemanal dtoUpdateHorario){
+    public DTORespostaHorariosPorDia alterarHorario(CompromissosRecorrentesModel compromissoRecorrente, Long horarioId, DTOUpdateHorariosFrequenciaSemanal dtoUpdateHorario){
         HorariosFrequenciaSemanal horarioParaAtualizar = horariosFrequenciaSemanalRepository.findById(horarioId)
                 .orElseThrow(()-> new ResourceNotFindException("Esse id não foi achado nesse tipo de horário"));
 
@@ -92,9 +96,12 @@ public class HorariosFrequenciaSemanalService extends HorariosServiceBase{
 
         horariosFrequenciaSemanalRepository.save(horarioParaAtualizar);
 
-        criarCompromissosDiretamentePorFrequenciaSemanal(compromissoRecorrente,horarioParaAtualizar);
+        List<DTORespostaCompromisso> compromissosGerados =
+                criarCompromissosDiretamentePorFrequenciaSemanal(compromissoRecorrente,horarioParaAtualizar);
 
-        return mapperHorariosFrequenciaSemanal.mapToDto(horarioParaAtualizar);
+        DTOSaidaHorariosFrequenciaSemanal dtoSaida = mapperHorariosFrequenciaSemanal.mapToDto(horarioParaAtualizar);
+
+        return new DTORespostaHorariosPorDia(dtoSaida,compromissosGerados);
     }
 
     @Transactional
@@ -114,7 +121,7 @@ public class HorariosFrequenciaSemanalService extends HorariosServiceBase{
     }
 
     @Transactional
-    private void criarCompromissosDiretamentePorFrequenciaSemanal(CompromissosRecorrentesModel compromissoRecorrente, HorariosFrequenciaSemanal horario){
+    private List<DTORespostaCompromisso> criarCompromissosDiretamentePorFrequenciaSemanal(CompromissosRecorrentesModel compromissoRecorrente, HorariosFrequenciaSemanal horario){
 
         LocalDate inicioRecorrencia = compromissoRecorrente.getDataInicioRecorrencia();
 
@@ -122,7 +129,7 @@ public class HorariosFrequenciaSemanalService extends HorariosServiceBase{
 
         long intervalo = compromissoRecorrente.getIntervalo();
 
-        criarCompromissosPorFrequenciaSemanal(compromissoRecorrente,horario,inicioRecorrencia,
+        return criarCompromissosPorFrequenciaSemanal(compromissoRecorrente,horario,inicioRecorrencia,
                 fimRecorrencia,intervalo);
     }
 
