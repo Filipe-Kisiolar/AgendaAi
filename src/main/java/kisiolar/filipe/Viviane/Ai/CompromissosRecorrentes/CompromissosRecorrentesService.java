@@ -214,17 +214,24 @@ public class CompromissosRecorrentesService{
         boolean inconformidadeModoDeRecorrencia = compromissoRecorrente.getHorariosPorDias().stream()
                 .anyMatch(horario -> !verificarConformidadeModoDeRecorrencia_Horario(modoDeRecorrencia, horario));
 
-        boolean inconformidadeIntervalo = compromissoRecorrente.getIntervalo() == null ||
-                compromissoRecorrente.getIntervalo() <= 0;
-
         if(inconformidadeModoDeRecorrencia){
             errosIdentificados.add("Combinação inválida de tipo e modo de recorrência\n");
         }
+
+        boolean inconformidadeIntervalo = compromissoRecorrente.getIntervalo() == null ||
+                compromissoRecorrente.getIntervalo() <= 0;
 
         if(inconformidadeIntervalo){
             errosIdentificados.add("intervalo nao pode ser null nem menor ou igual a 0\n");
         }
 
+        boolean inconformidadeInicio_Fim_Recorrencia =
+                compromissoRecorrente.getDataFimRecorrencia()
+                        .isBefore(compromissoRecorrente.getDataInicioRecorrencia());
+        if (inconformidadeInicio_Fim_Recorrencia){
+            errosIdentificados.add("A Data De Inicio Da Recorrencia Não Pode Ser Depois Da Data De Fim Da Recorrencia");
+        }
+        //todo:verificacao dos horarios
         return errosIdentificados;
     }
 
