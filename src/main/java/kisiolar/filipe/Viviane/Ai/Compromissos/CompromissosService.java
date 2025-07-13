@@ -29,7 +29,10 @@ public class CompromissosService {
 
     @Transactional
     public DTORespostaListasCompromissos listarCompromissos(){
-        List<CompromissosModel> lista = compromissosRepository.findAll();
+        LocalDateTime diaAtual = LocalDate.now().atStartOfDay();
+
+        List<CompromissosModel> lista = compromissosRepository.listAllAfterDate(diaAtual);
+
         List<DTOSaidaCompromissos> listaDto =ordenarListaPorHorario(lista).stream()
                 .map(mapperCompromissos::map)
                 .toList();
@@ -57,6 +60,8 @@ public class CompromissosService {
 
     @Transactional
     public DTORespostaListasCompromissos listarCompromissosPorNome(String nome){
+        LocalDateTime diaAtual = LocalDate.now().atStartOfDay();
+
         List<CompromissosModel> lista = compromissosRepository.findByNome(nome);
 
         List<DTOSaidaCompromissos> listaDto =ordenarListaPorHorario(lista).stream()
@@ -143,7 +148,9 @@ public class CompromissosService {
     }
 
     public List<List<DTOSaidaCompromissos>> listarCompromissosConflitantes() {
-        List<CompromissosModel> listaTodosCompromissos = compromissosRepository.findAll();
+        LocalDateTime diaAtual = LocalDate.now().atStartOfDay();
+
+        List<CompromissosModel> listaTodosCompromissos = compromissosRepository.listAllAfterDate(diaAtual);
 
         List<List<DTOSaidaCompromissos>> gruposDeConflito = compromissosConflitantesDaLista(listaTodosCompromissos);
         return gruposDeConflito;
@@ -207,7 +214,7 @@ public class CompromissosService {
         compromissosRepository.deletarCompromissosAntigos(aPartirDe);
     }
 
-    public List<CompromissosModel> ordenarListaPorHorario(List<CompromissosModel> lista){
+    private List<CompromissosModel> ordenarListaPorHorario(List<CompromissosModel> lista){
         return lista.stream().sorted(Comparator
                         .comparing(CompromissosModel::getInicio)
                         .thenComparing(CompromissosModel::getFim)
@@ -216,8 +223,7 @@ public class CompromissosService {
     }
 
     //verifica se ha conflito entre dois compromissos
-    public boolean conflitamEntreSi(CompromissosModel compromisso1,CompromissosModel compromisso2){
-        boolean temMesmoDia,horariosConflitam;
+    private boolean conflitamEntreSi(CompromissosModel compromisso1,CompromissosModel compromisso2){
 
         boolean conflitam = compromisso1.getInicio().isBefore(compromisso2.getFim()) &&
                 compromisso1.getFim().isAfter(compromisso2.getInicio());
@@ -226,7 +232,7 @@ public class CompromissosService {
     }
 
     //confere se ha compromisso recorrente em uma lista que conflita com o que esta sendo passado
-    public List<CompromissosModel> verificarConflitosNaLista(CompromissosModel compromisso,List<CompromissosModel> lista){
+    private List<CompromissosModel> verificarConflitosNaLista(CompromissosModel compromisso,List<CompromissosModel> lista){
 
         List<CompromissosModel> listaConflitos = lista.stream()
                 .filter(c -> !c.getId().equals(compromisso.getId()))//ignora o proprio compromisso
@@ -237,14 +243,16 @@ public class CompromissosService {
     }
 
     //lista conflitos de horario com o compromisso passado
-    public List<CompromissosModel> verificarConflitos(CompromissosModel compromisso) {
-       List<CompromissosModel> listaTodosCompromissos = compromissosRepository.findAll();
+    private List<CompromissosModel> verificarConflitos(CompromissosModel compromisso) {
+        LocalDateTime diaAtual = LocalDate.now().atStartOfDay();
 
-       return verificarConflitosNaLista(compromisso,listaTodosCompromissos);
+        List<CompromissosModel> listaTodosCompromissos = compromissosRepository.listAllAfterDate(diaAtual);
+
+        return verificarConflitosNaLista(compromisso,listaTodosCompromissos);
     }
 
     //retorna grupos de compromissos que conflitam a partir de uma lista
-    public List<List<DTOSaidaCompromissos>> compromissosConflitantesDaLista(List<CompromissosModel> lista){
+    private List<List<DTOSaidaCompromissos>> compromissosConflitantesDaLista(List<CompromissosModel> lista){
         // Mapa de conflitos diretos entre compromissos
         Map<CompromissosModel, Set<CompromissosModel>> conflitosEntreCompromissos = new HashMap<>();
 
