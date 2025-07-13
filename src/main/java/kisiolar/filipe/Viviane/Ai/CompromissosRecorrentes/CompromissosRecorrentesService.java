@@ -42,7 +42,9 @@ public class CompromissosRecorrentesService{
 
     //TODO: refatora para ter outra lista completa mapeada pelos dias da semana
     public DTORespostasListasCompromissoRecorrentes listarCompromissos(){
-        List<CompromissosRecorrentesModel> lista = compromissosRecorrentesRepository.findAll();
+        LocalDate diaAtual = LocalDate.now();
+
+        List<CompromissosRecorrentesModel> lista = compromissosRecorrentesRepository.listAllAfterDate(diaAtual);
 
         List<DTOSaidaCompromissosRecorrentes> listaDto =lista.stream().
                 sorted(Comparator
@@ -90,8 +92,12 @@ public class CompromissosRecorrentesService{
     }
 
     public List<List<DTOSaidaCompromissosRecorrentes>> listarCompromissosConflitantes(){
-        List<CompromissosRecorrentesModel> listaTodosCompromissos = compromissosRecorrentesRepository.findAll();
+        LocalDate diaAtual = LocalDate.now();
+
+        List<CompromissosRecorrentesModel> listaTodosCompromissos = compromissosRecorrentesRepository.listAllAfterDate(diaAtual);
+
         List<List<DTOSaidaCompromissosRecorrentes>> gruposDeConflito = compromissosConflitantesLista(listaTodosCompromissos);
+
         return gruposDeConflito;
     }
 
@@ -291,7 +297,12 @@ public class CompromissosRecorrentesService{
     }
 
     public List<CompromissosRecorrentesModel> verificarConflitos(CompromissosRecorrentesModel compromissoRecorrente){
-        return verificarConflitosNaLista(compromissoRecorrente,compromissosRecorrentesRepository.findAll());
+        LocalDate diaAtual = LocalDate.now();
+
+        List<CompromissosRecorrentesModel> listaCompromissosAtualizada =
+                compromissosRecorrentesRepository.listAllAfterDate(diaAtual);
+
+        return verificarConflitosNaLista(compromissoRecorrente,listaCompromissosAtualizada);
     }
 
     public List<List<DTOSaidaCompromissosRecorrentes>> compromissosConflitantesLista(List<CompromissosRecorrentesModel> lista) {
