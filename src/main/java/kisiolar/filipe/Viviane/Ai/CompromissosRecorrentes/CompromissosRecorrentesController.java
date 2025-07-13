@@ -1,9 +1,8 @@
 package kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes;
 
-import kisiolar.filipe.Viviane.Ai.Compromissos.DTOs.DTOSaidaCompromissos;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.CompromissosRecorrentes.*;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.HorariosPorDia.DTOCreateHorariosPorDiaBase;
-import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.HorariosPorDia.DTOSaidaHorariosPorDiaBase;
+import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.HorariosPorDia.DTORespostaHorariosPorDia;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.HorariosPorDia.DTOUpdateHorariosPorDiaBase;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.HorariosPorDia.ServicesHorariosPorDia.HorariosPorDiaService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,21 +72,21 @@ public class CompromissosRecorrentesController {
     }
 
     @PatchMapping("/adicionarhorarionocompromisso/{compromissoRecorrenteId}")
-    public ResponseEntity<DTOSaidaHorariosPorDiaBase> adicionarHorario(
+    public ResponseEntity<DTORespostaHorariosPorDia> adicionarHorario(
             @PathVariable Long compromissoRecorrenteId,
             @RequestBody DTOCreateHorariosPorDiaBase horariosPorDia){
-        DTOSaidaHorariosPorDiaBase saidaHorariosPorDia = horariosPorDiaService.adicionarHorario(compromissoRecorrenteId,horariosPorDia);
+        DTORespostaHorariosPorDia saidaHorariosPorDia = horariosPorDiaService.adicionarHorario(compromissoRecorrenteId,horariosPorDia);
 
         return ResponseEntity.ok(saidaHorariosPorDia);
     }
 
     @PatchMapping("/alterarhorariodocompromisso/{compromissoRecorrenteId}/{horarioId}")
-    public ResponseEntity<DTOSaidaHorariosPorDiaBase> alterarHorario(
+    public ResponseEntity<DTORespostaHorariosPorDia> alterarHorario(
             @PathVariable Long compromissoRecorrenteId,
             @PathVariable Long horarioId,
             @RequestBody DTOUpdateHorariosPorDiaBase updateHorariosPorDia) {
 
-        DTOSaidaHorariosPorDiaBase saidaHorariosPorDia = horariosPorDiaService.alterarHorario(compromissoRecorrenteId, horarioId, updateHorariosPorDia);
+        DTORespostaHorariosPorDia saidaHorariosPorDia = horariosPorDiaService.alterarHorario(compromissoRecorrenteId, horarioId, updateHorariosPorDia);
         return ResponseEntity.ok(saidaHorariosPorDia);
     }
 

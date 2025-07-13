@@ -17,7 +17,8 @@ import java.time.LocalDateTime;
         unmappedTargetPolicy = ReportingPolicy.ERROR)
 public interface MapperCompromissosRecorrentes {
 
-    @Mapping(target = "horariosPorDia", ignore = true)
+    @Mapping(target = "id",ignore = true)
+    @Mapping(target = "horariosPorDias", ignore = true)
     @Mapping(target = "compromissosGerados",ignore = true)
     CompromissosRecorrentesModel mapToModel(DTOCreateCompromissosRecorrentes dto);
 
@@ -26,7 +27,6 @@ public interface MapperCompromissosRecorrentes {
     DTOSaidaCompromissosRecorrentes  mapToDto(CompromissosRecorrentesModel entity);
 
     //mapToModel para gerar um compromisso a partir de um compromisso recorrente
-    @Mapping(target = "id", ignore = true)
     @Mapping(target = "inicio", source = "inicioGerado")
     @Mapping(target = "fim", source = "fimGerado")
     @Mapping(target = "compromissoRecorrenteId", source = "compromissosRecorrentesModel.id")

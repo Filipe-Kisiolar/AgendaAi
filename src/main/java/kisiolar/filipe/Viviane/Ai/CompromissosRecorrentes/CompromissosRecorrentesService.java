@@ -7,6 +7,7 @@ import kisiolar.filipe.Viviane.Ai.Compromissos.DTOs.DTORespostaCompromisso;
 import kisiolar.filipe.Viviane.Ai.Compromissos.MapperCompromissos;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.CompromissosRecorrentes.*;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.HorariosPorDia.DTOCreateHorariosPorDiaBase;
+import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.HorariosPorDia.DTORespostaHorariosPorDia;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.Enums.ModoDeRecorrenciaEnum;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.HorariosPorDia.HorariosPorDiaModels.*;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.HorariosPorDia.ServicesHorariosPorDia.HorariosPorDiaService;
@@ -134,25 +135,35 @@ public class CompromissosRecorrentesService{
 
         List<DTOCreateHorariosPorDiaBase> listaDosHorarios = dtoCreateCompromissosRecorrentes.getHorariosPorDia();
 
-        //cria os horarios por dia pelo horarios service que por sua vez cria ja cria os compromissos
-        listaDosHorarios.forEach(horario -> horariosPorDiaService.adicionarHorario(compromissoRecorrente.getId(),horario));
+        List<DTORespostaCompromisso> compromissosGeradosComConflito = new ArrayList<>();
+
+        //cria os horarios por dia pelo HorariosPorDiaService que por sua vez cria ja cria os compromissos
+        for (DTOCreateHorariosPorDiaBase horario : listaDosHorarios){
+            DTORespostaHorariosPorDia horarioGerado =
+                horariosPorDiaService.adicionarHorario(compromissoRecorrente.getId(),horario);
+
+            List<DTORespostaCompromisso> compromissosGerados = horarioGerado.compromissosCriados;
+
+            List<DTORespostaCompromisso> geradosComConflito = compromissosGerados.stream()
+                    .filter(DTORespostaCompromisso::getExisteConflito).toList();
+
+            compromissosGeradosComConflito.addAll(geradosComConflito);
+        }
 
         List<DTOSaidaCompromissosRecorrentes> conflitosRecorrentes = verificarConflitos(compromissoSalvo).stream()
                 .map(mapperCompromissosRecorrentes ::mapToDto)
                 .collect(Collectors.toList());
-
-        List<DTORespostaCompromisso> compromissosGeradosComConflito = new ArrayList<>();
 
         DTOSaidaCompromissosRecorrentes saidaCompromissosRecorrentes = mapperCompromissosRecorrentes.mapToDto(compromissoSalvo);
 
         if(conflitosRecorrentes.isEmpty() && compromissosGeradosComConflito.isEmpty()){
             return new DTORespostaCompromissoRecorrente(saidaCompromissosRecorrentes);
         } else if (conflitosRecorrentes.isEmpty()) {
-            return DTORespostaCompromissoRecorrente.comConflitosGerados(saidaCompromissosRecorrentes,compromissosGeradosComConflito);
+            return DTORespostaCompromissoRecorrente.comConflitosGerados(saidaCompromissosRecorrentes, compromissosGeradosComConflito);
         } else if (compromissosGeradosComConflito.isEmpty()) {
             return DTORespostaCompromissoRecorrente.comConflitosRecorrentes(saidaCompromissosRecorrentes, conflitosRecorrentes);
         } else {
-            return new DTORespostaCompromissoRecorrente(saidaCompromissosRecorrentes, conflitosRecorrentes,compromissosGeradosComConflito);
+            return new DTORespostaCompromissoRecorrente(saidaCompromissosRecorrentes, conflitosRecorrentes, compromissosGeradosComConflito);
         }
     }
 
