@@ -195,10 +195,10 @@ public class CompromissosService {
 
         mapperCompromissos.atualizacao(dtoUpdateCompromissos,compromissosModel);
 
-        boolean inconformidade_Inicio_Fim = compromissosModel.getInicio().isAfter(compromissosModel.getFim());
+        List<String> errosIdentificados = verificarValidadeDasInformacoes(compromissosModel);
 
-        if (inconformidade_Inicio_Fim){
-            throw  new BadRequestException("O Fim Do Compromisso nao Pode Ser Antes Do Inicio\n");
+        if(!errosIdentificados.isEmpty()){
+            throw new BadRequestException("Erros Na Requisicao:\n" + errosIdentificados);
         }
 
         compromissosRepository.save(compromissosModel);

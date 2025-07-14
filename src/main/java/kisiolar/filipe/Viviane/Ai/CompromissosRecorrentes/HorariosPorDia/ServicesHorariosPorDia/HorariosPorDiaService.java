@@ -21,6 +21,7 @@ import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.HorariosPorDia.Pa
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.HorariosPorDia.PadraoRelativoMensal.DTOUpdateHorariosPadraoRelativoMensal;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.Enums.ModoDeRecorrenciaEnum;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.HorariosPorDia.HorariosPorDiaModels.*;
+import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.HorariosPorDia.MappersHorariosPorDia.HelperMapperHorariosPorDia;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.MapperCompromissosRecorrentes;
 import kisiolar.filipe.Viviane.Ai.Exceptions.BadRequestException;
 import kisiolar.filipe.Viviane.Ai.Exceptions.ResourceNotFindException;
@@ -33,6 +34,8 @@ import static kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.Enums.ModoDeRec
 @Service
 public class HorariosPorDiaService extends HorariosServiceBase {
 
+    private final HelperMapperHorariosPorDia helperMapperHorariosPorDia;
+
     private final HorariosFrequenciaDiariaService horariosFrequenciaDiariaService;
 
     private final HorariosFrequenciaSemanalService horariosFrequenciaSemanalService;
@@ -44,8 +47,9 @@ public class HorariosPorDiaService extends HorariosServiceBase {
     private final HorariosDataEspecificaAnualService horariosDataEspecificaAnualService;
 
 
-    public HorariosPorDiaService(CompromissosRecorrentesRepository compromissosRecorrentesRepository, MapperCompromissosRecorrentes mapperCompromissosRecorrentes, CompromissosService compromissosService, HorariosFrequenciaDiariaService horariosFrequenciaDiariaService, HorariosFrequenciaSemanalService horariosFrequenciaSemanalService, HorariosPadraoRelativoMensalService horariosPadraoRelativoMensalService, HorariosDiaEspecificoMensalService horariosDiaEspecificoMensalService, HorariosDataEspecificaAnualService horariosDataEspecificaAnualService) {
+    public HorariosPorDiaService(CompromissosRecorrentesRepository compromissosRecorrentesRepository, MapperCompromissosRecorrentes mapperCompromissosRecorrentes, CompromissosService compromissosService, HelperMapperHorariosPorDia helperMapperHorariosPorDia, HorariosFrequenciaDiariaService horariosFrequenciaDiariaService, HorariosFrequenciaSemanalService horariosFrequenciaSemanalService, HorariosPadraoRelativoMensalService horariosPadraoRelativoMensalService, HorariosDiaEspecificoMensalService horariosDiaEspecificoMensalService, HorariosDataEspecificaAnualService horariosDataEspecificaAnualService) {
         super(compromissosRecorrentesRepository, mapperCompromissosRecorrentes, compromissosService);
+        this.helperMapperHorariosPorDia = helperMapperHorariosPorDia;
         this.horariosFrequenciaDiariaService = horariosFrequenciaDiariaService;
         this.horariosFrequenciaSemanalService = horariosFrequenciaSemanalService;
         this.horariosPadraoRelativoMensalService = horariosPadraoRelativoMensalService;
@@ -252,5 +256,35 @@ public class HorariosPorDiaService extends HorariosServiceBase {
             }
             default -> throw new IllegalArgumentException("Modo de recorrência inválido: " + modoDeRecorrencia);
         };
+    }
+
+    public boolean verificarConflitosListaCriacaoHorarios(
+            ModoDeRecorrenciaEnum modoDeRecorrencia,List<DTOCreateHorariosPorDiaBase> listaDtoHorarios
+    ){
+        List<HorariosPorDiaModel> listaHorariosModel = helperMapperHorariosPorDia.mapToModelList(listaDtoHorarios);
+
+        List<HorariosPorDiaModel> listaAuxiliarVerificacao = listaHorariosModel;
+
+        long idFalso = 1;
+
+        for (HorariosPorDiaModel h : listaAuxiliarVerificacao){
+            h.setId(idFalso);
+
+            idFalso++;
+        }
+
+        for (HorariosPorDiaModel horario : listaHorariosModel){
+
+            listaAuxiliarVerificacao = listaAuxiliarVerificacao.stream().filter(h -> !h.equals(horario)).toList();
+
+            boolean temConflito =
+                    verificarConflitosComHorarioNaLista(modoDeRecorrencia,horario,listaAuxiliarVerificacao);
+
+            if (temConflito){
+                return true;
+            }
+        }
+
+        return false;
     }
 }

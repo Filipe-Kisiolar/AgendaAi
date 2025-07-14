@@ -8,6 +8,11 @@ import kisiolar.filipe.Viviane.Ai.Compromissos.MapperCompromissos;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.CompromissosRecorrentes.*;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.HorariosPorDia.DTOCreateHorariosPorDiaBase;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.HorariosPorDia.DTORespostaHorariosPorDia;
+import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.HorariosPorDia.DataEspecificaAnual.DTOCreateHorariosDataEspecificaAnual;
+import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.HorariosPorDia.DiaEspecificoMensal.DTOCreateHorariosDiaEspecificoMensal;
+import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.HorariosPorDia.FrequenciaDiaria.DTOCreateHorariosFrequenciaDiaria;
+import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.HorariosPorDia.FrequenciaSemanal.DTOCreateHorariosFrequenciaSemanal;
+import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.HorariosPorDia.PadraoRelativoMensal.DTOCreateHorariosPadraoRelativoMensal;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.Enums.ModoDeRecorrenciaEnum;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.HorariosPorDia.HorariosPorDiaModels.*;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.HorariosPorDia.ServicesHorariosPorDia.HorariosPorDiaService;
@@ -102,23 +107,23 @@ public class CompromissosRecorrentesService{
     }
 
     private boolean verificarConformidadeModoDeRecorrencia_Horario(
-            ModoDeRecorrenciaEnum modoDeRecorrencia,HorariosPorDiaModel horario){
+            ModoDeRecorrenciaEnum modoDeRecorrencia,DTOCreateHorariosPorDiaBase horario){
 
         return switch (horario){
-            case HorariosFrequenciaDiaria diaria when modoDeRecorrencia == FREQUENCIA_DIARIA-> {
+            case DTOCreateHorariosFrequenciaDiaria diaria when modoDeRecorrencia == FREQUENCIA_DIARIA-> {
                 yield true;
             }
-            case HorariosFrequenciaSemanal semanal when modoDeRecorrencia == FREQUENCIA_SEMANAL -> {
+            case DTOCreateHorariosFrequenciaSemanal semanal when modoDeRecorrencia == FREQUENCIA_SEMANAL -> {
                 yield true;
             }
-            case HorariosPadraoRelativoMensal relativoMensal when modoDeRecorrencia == PADRAO_RELATIVO_MENSAL-> {
+            case DTOCreateHorariosPadraoRelativoMensal relativoMensal when modoDeRecorrencia == PADRAO_RELATIVO_MENSAL-> {
                 yield true;
             }
-            case HorariosDiaEspecificoMensal mensal when modoDeRecorrencia == DIA_ESPECIFICO_MENSAL-> {
+            case DTOCreateHorariosDiaEspecificoMensal mensal when modoDeRecorrencia == DIA_ESPECIFICO_MENSAL-> {
                 yield true;
 
             }
-            case HorariosDataEspecificaAnual anual when modoDeRecorrencia == DATA_ESPECIFICA_ANUAL -> {
+            case DTOCreateHorariosDataEspecificaAnual anual when modoDeRecorrencia == DATA_ESPECIFICA_ANUAL -> {
                 yield true;
             }
             default -> {
@@ -127,11 +132,13 @@ public class CompromissosRecorrentesService{
         };
     }
 
+    @Transactional
     public DTORespostaCompromissoRecorrente criarCompromissoRecorrente(DTOCreateCompromissosRecorrentes dtoCreateCompromissosRecorrentes){
 
         CompromissosRecorrentesModel compromissoRecorrente = mapperCompromissosRecorrentes.mapToModel(dtoCreateCompromissosRecorrentes);
 
-        List<String> errosIdentificados = verificarValidadeDasInformacoes(compromissoRecorrente);
+        List<String> errosIdentificados = verificarValidadeDasInformacoes(
+                compromissoRecorrente,dtoCreateCompromissosRecorrentes.getHorariosPorDia());
 
         if(!errosIdentificados.isEmpty()){
             throw new BadRequestException("Erros Na Requisicao:\n" + errosIdentificados);
@@ -228,12 +235,13 @@ public class CompromissosRecorrentesService{
     }
 
     @Transactional
-    public List<String> verificarValidadeDasInformacoes(CompromissosRecorrentesModel compromissoRecorrente){
+    public List<String> verificarValidadeDasInformacoes(
+            CompromissosRecorrentesModel compromissoRecorrente,List<DTOCreateHorariosPorDiaBase> listaHorarios){
         List<String> errosIdentificados = new ArrayList<>();
 
         ModoDeRecorrenciaEnum modoDeRecorrencia = compromissoRecorrente.getModoDeRecorrencia();
 
-        boolean inconformidadeModoDeRecorrencia = compromissoRecorrente.getHorariosPorDias().stream()
+        boolean inconformidadeModoDeRecorrencia = listaHorarios.stream()
                 .anyMatch(horario -> !verificarConformidadeModoDeRecorrencia_Horario(modoDeRecorrencia, horario));
 
         if(inconformidadeModoDeRecorrencia){
@@ -254,10 +262,17 @@ public class CompromissosRecorrentesService{
             errosIdentificados.add("A Data De Inicio Da Recorrencia Não Pode Ser Depois Da Data De Fim Da Recorrencia");
         }
 
+        boolean horariosConflitamEntreSi =
+                horariosPorDiaService.verificarConflitosListaCriacaoHorarios(
+                        compromissoRecorrente.getModoDeRecorrencia(),listaHorarios);
+
+        if (horariosConflitamEntreSi){
+            errosIdentificados.add("Os Horarios Passados Conflitam");
+        }
+
         return errosIdentificados;
     }
 
-    @Transactional
     public boolean saoConflitantes(CompromissosRecorrentesModel compromissosRecorrente1,
                                    CompromissosRecorrentesModel compromissosRecorrente2){
         boolean periodosDeRecorrenciaConflitam =
