@@ -43,14 +43,10 @@ public class HorariosDataEspecificaAnualService extends HorariosServiceBase {
 
         horariosCriado.setCompromissoRecorrente(compromissoRecorrente);
 
-        List<HorariosDataEspecificaAnual> listaHorarios = compromissoRecorrente.getHorariosPorDias().stream()
-                .map(HorariosDataEspecificaAnual.class::cast)
-                .toList();
+        List<String> errosIdentificados = verificarValidadeDasInformacoes(horariosCriado,compromissoRecorrente);
 
-        boolean haConflitos = verificarConflitosComHorarioNaLista(horariosCriado,listaHorarios);
-
-        if(haConflitos){
-            throw new BadRequestException("Esse horário conflita com outros já criados no mesmo Compromisso Recorrente");
+        if (!errosIdentificados.isEmpty()){
+            throw new BadRequestException("erros identificados no Horario :" + horariosCriado + "\n"+ errosIdentificados);
         }
 
         horariosDataEspecificaAnualRepository.save(horariosCriado);
@@ -78,15 +74,10 @@ public class HorariosDataEspecificaAnualService extends HorariosServiceBase {
 
         mapperHorariosDataEspecificaAnual.atualizacao(dtoUpdateHorario,horarioParaAtualizar);
 
-        List<HorariosDataEspecificaAnual> outrosHorarios = compromissoRecorrente.getHorariosPorDias().stream()
-                .filter(h -> !h.getId().equals(horarioId))
-                .map(HorariosDataEspecificaAnual.class::cast)
-                .toList();
+        List<String> errosIdentificados = verificarValidadeDasInformacoes(horarioParaAtualizar,compromissoRecorrente);
 
-        boolean haConflitos = verificarConflitosComHorarioNaLista(horarioParaAtualizar,outrosHorarios);
-
-        if(haConflitos){
-            throw new BadRequestException("Esse horário conflita com outros já criados no mesmo Compromisso Recorrente");
+        if (!errosIdentificados.isEmpty()){
+            throw new BadRequestException("erros identificados no Horario :" + horarioParaAtualizar + "\n"+ errosIdentificados);
         }
 
         apagarCompromissosAtreladosAoHorarioPorDia(horarioAntigo);
@@ -215,6 +206,40 @@ public class HorariosDataEspecificaAnualService extends HorariosServiceBase {
         long numeroCompromissosApagados = tamanhoInicial - listaDosCompromissos.size();
 
         return numeroCompromissosApagados;
+    }
+
+    @Transactional
+    private List<String> verificarValidadeDasInformacoes(
+            HorariosDataEspecificaAnual horario,
+            CompromissosRecorrentesModel compromissoRecorrente
+    ){
+        List<String> errosIdentificados = new ArrayList<>();
+
+        if (horario.getFimDataEspecificaDoAno().isBefore(horario.getInicioDataEspecificaDoAno())){
+            errosIdentificados.add("O Dia De Fim Do Horario Não Pode Ser Antes Do Dia De Inicio");
+        }
+
+        boolean inconformidade_Inicio_Fim =
+                horario.getInicioDataEspecificaDoAno().equals(horario.getFimDataEspecificaDoAno())
+                        && horario.getHoraInicio().isAfter(horario.getHoraFim());
+
+        if (inconformidade_Inicio_Fim){
+            errosIdentificados
+                    .add("O Fim Do Horario Não Pode Ser Antes Do Inicio" +
+                            " Para Horarios Que O Fim é No Mesmo Dia Que O Inicio\n");
+        }
+
+        List<HorariosDataEspecificaAnual> listaHorarios = compromissoRecorrente.getHorariosPorDias().stream()
+                .map(HorariosDataEspecificaAnual.class::cast)
+                .toList();
+
+        boolean haConflitos = verificarConflitosComHorarioNaLista(horario,listaHorarios);
+
+        if(haConflitos){
+            errosIdentificados.add("Esse horário conflita com outros já criados no mesmo Compromisso Recorrente");
+        }
+
+        return errosIdentificados;
     }
 
     public boolean verificarConflitoEntreHorariosDiaEspecificoAnual(HorariosDataEspecificaAnual h1, HorariosDataEspecificaAnual h2) {

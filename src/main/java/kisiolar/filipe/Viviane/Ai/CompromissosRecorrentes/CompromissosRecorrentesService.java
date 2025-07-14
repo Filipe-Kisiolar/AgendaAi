@@ -253,7 +253,7 @@ public class CompromissosRecorrentesService{
         if (inconformidadeInicio_Fim_Recorrencia){
             errosIdentificados.add("A Data De Inicio Da Recorrencia Não Pode Ser Depois Da Data De Fim Da Recorrencia");
         }
-        //todo:verificacao dos horarios
+
         return errosIdentificados;
     }
 

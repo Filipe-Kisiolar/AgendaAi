@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import kisiolar.filipe.Viviane.Ai.Compromissos.DTOs.*;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.CompromissosRecorrentesModel;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.CompromissosRecorrentesRepository;
+import kisiolar.filipe.Viviane.Ai.Exceptions.BadRequestException;
 import kisiolar.filipe.Viviane.Ai.Exceptions.ResourceNotFindException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -169,6 +170,12 @@ public class CompromissosService {
             compromissosModel.setCompromissoRecorrente(compromissosRecorrentesModel);
         }
 
+        List<String> errosIdentificados = verificarValidadeDasInformacoes(compromissosModel);
+
+        if(!errosIdentificados.isEmpty()){
+            throw new BadRequestException("Erros Na Requisicao:\n" + errosIdentificados);
+        }
+
         compromissosRepository.save(compromissosModel);
 
         List<DTOSaidaCompromissos> conflitos = verificarConflitos(compromissosModel).stream()
@@ -187,6 +194,12 @@ public class CompromissosService {
                 orElseThrow(() -> new RuntimeException("compromisso não encontrado"));
 
         mapperCompromissos.atualizacao(dtoUpdateCompromissos,compromissosModel);
+
+        boolean inconformidade_Inicio_Fim = compromissosModel.getInicio().isAfter(compromissosModel.getFim());
+
+        if (inconformidade_Inicio_Fim){
+            throw  new BadRequestException("O Fim Do Compromisso nao Pode Ser Antes Do Inicio\n");
+        }
 
         compromissosRepository.save(compromissosModel);
 
@@ -212,6 +225,18 @@ public class CompromissosService {
     public void deletarCompromissosAntigos(){
         LocalDateTime aPartirDe = LocalDateTime.now().minusMonths(1);
         compromissosRepository.deletarCompromissosAntigos(aPartirDe);
+    }
+
+    private List<String> verificarValidadeDasInformacoes(CompromissosModel compromisso){
+        List<String> errosIdentificados = new ArrayList<>();
+
+        boolean inconformidade_Inicio_Fim = compromisso.getInicio().isAfter(compromisso.getFim());
+
+        if (inconformidade_Inicio_Fim){
+            errosIdentificados.add("O Fim Do Compromisso nao Pode Ser Antes Do Inicio\n");
+        }
+
+        return errosIdentificados;
     }
 
     private List<CompromissosModel> ordenarListaPorHorario(List<CompromissosModel> lista){

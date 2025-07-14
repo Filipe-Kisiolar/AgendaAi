@@ -46,14 +46,10 @@ public class HorariosFrequenciaDiariaService extends HorariosServiceBase {
 
         horariosCriado.setCompromissoRecorrente(compromissoRecorrente);
 
-        List<HorariosFrequenciaDiaria> listaHorarios = compromissoRecorrente.getHorariosPorDias().stream()
-                .map(HorariosFrequenciaDiaria.class::cast)
-                .toList();
+        List<String> errosIdentificados = verificarValidadeDasInformacoes(horariosCriado,compromissoRecorrente);
 
-        boolean haConflitos = verificarConflitosComHorarioNaLista(horariosCriado,listaHorarios);
-
-        if(haConflitos){
-            throw new BadRequestException("Esse horário conflita com outros já criados no mesmo Compromisso Recorrente");
+        if (!errosIdentificados.isEmpty()){
+            throw new BadRequestException("erros identificados no Horario :" + horariosCriado + "\n"+ errosIdentificados);
         }
 
         horariosFrequenciaDiariaRepository.save(horariosCriado);
@@ -79,15 +75,10 @@ public class HorariosFrequenciaDiariaService extends HorariosServiceBase {
 
         mapperHorariosFrequenciaDiaria.atualizacao(dtoUpdateHorario,horarioParaAtualizar);
 
-        List<HorariosFrequenciaDiaria> outrosHorarios = compromissoRecorrente.getHorariosPorDias().stream()
-                .filter(h -> !h.getId().equals(horarioId))
-                .map(HorariosFrequenciaDiaria.class::cast)
-                .toList();
+        List<String> errosIdentificados = verificarValidadeDasInformacoes(horarioParaAtualizar,compromissoRecorrente);
 
-        boolean haConflitos = verificarConflitosComHorarioNaLista(horarioParaAtualizar,outrosHorarios);
-
-        if(haConflitos){
-            throw new BadRequestException("Esse horário conflita com outros já criados no mesmo Compromisso Recorrente");
+        if (!errosIdentificados.isEmpty()){
+            throw new BadRequestException("erros identificados no Horario :" + horarioParaAtualizar + "\n"+ errosIdentificados);
         }
 
         apagarCompromissosAtreladosAoHorarioPorDia(horarioComDadosAntigos);
@@ -188,6 +179,29 @@ public class HorariosFrequenciaDiariaService extends HorariosServiceBase {
         long numeroCompromissosApagados = tamanhoInicialLista - listaCompromissos.size();
 
         return numeroCompromissosApagados;
+    }
+
+    @Transactional
+    private List<String> verificarValidadeDasInformacoes(HorariosFrequenciaDiaria horario,CompromissosRecorrentesModel compromissoRecorrente){
+        List<String> errosIdentificados = new ArrayList<>();
+
+        boolean inconformidade_Inicio_Fim = horario.getHoraInicio().isAfter(horario.getHoraFim());
+
+        if (inconformidade_Inicio_Fim){
+            errosIdentificados.add("O Fim Do Horario Nao Pode Ser Antes Do Inicio");
+        }
+
+        List<HorariosFrequenciaDiaria> listaHorarios = compromissoRecorrente.getHorariosPorDias().stream()
+                .map(HorariosFrequenciaDiaria.class::cast)
+                .toList();
+
+        boolean haConflitos = verificarConflitosComHorarioNaLista(horario,listaHorarios);
+
+        if(haConflitos){
+            errosIdentificados.add("Esse horário conflita com outros já criados no mesmo Compromisso Recorrente");
+        }
+
+        return errosIdentificados;
     }
 
     public boolean verificarConflitoEntreHorariosDiarios(HorariosFrequenciaDiaria horariosPorDia_1, HorariosFrequenciaDiaria horariosPorDia_2){

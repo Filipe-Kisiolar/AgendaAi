@@ -47,14 +47,10 @@ public class HorariosDiaEspecificoMensalService extends HorariosServiceBase{
 
         horariosCriado.setCompromissoRecorrente(compromissoRecorrente);
 
-        List<HorariosDiaEspecificoMensal> listaHorarios = compromissoRecorrente.getHorariosPorDias().stream()
-                .map(HorariosDiaEspecificoMensal.class::cast)
-                .toList();
+        List<String> errosIdentificados = verificarValidadeDasInformacoes(horariosCriado,compromissoRecorrente);
 
-        boolean haConflitos = verificarConflitosComHorarioNaLista(horariosCriado,listaHorarios);
-
-        if(haConflitos){
-            throw new BadRequestException("Esse horário conflita com outros já criados no mesmo Compromisso Recorrente");
+        if (!errosIdentificados.isEmpty()){
+            throw new BadRequestException("erros identificados no Horario :" + horariosCriado + "\n"+ errosIdentificados);
         }
 
         horariosDiaEspecificoMensalRepository.save(horariosCriado);
@@ -83,15 +79,10 @@ public class HorariosDiaEspecificoMensalService extends HorariosServiceBase{
 
         mapperHorariosDiaEspecificoMensal.atualizacao(dtoUpdateHorario,horarioParaAtualizar);
 
-        List<HorariosDiaEspecificoMensal> outrosHorarios = compromissoRecorrente.getHorariosPorDias().stream()
-                .filter(h -> !h.getId().equals(horarioId))
-                .map(HorariosDiaEspecificoMensal.class::cast)
-                .toList();
+        List<String> errosIdentificados = verificarValidadeDasInformacoes(horarioParaAtualizar,compromissoRecorrente);
 
-        boolean haConflitos = verificarConflitosComHorarioNaLista(horarioParaAtualizar,outrosHorarios);
-
-        if(haConflitos){
-            throw new BadRequestException("Esse horário conflita com outros já criados no mesmo Compromisso Recorrente");
+        if (!errosIdentificados.isEmpty()){
+            throw new BadRequestException("erros identificados no Horario :" + horarioParaAtualizar + "\n"+ errosIdentificados);
         }
 
         apagarCompromissosAtreladosAoHorarioPorDia(horarioAntigo);
@@ -218,6 +209,54 @@ public class HorariosDiaEspecificoMensalService extends HorariosServiceBase{
         long numeroCompromissosApagados = tamanhoInicial - listaDosCompromissos.size();
 
         return numeroCompromissosApagados;
+    }
+
+    @Transactional
+    private List<String> verificarValidadeDasInformacoes(
+            HorariosDiaEspecificoMensal horario,
+            CompromissosRecorrentesModel compromissoRecorrente){
+
+        List<String> errosIdentificados = new ArrayList<>();
+
+        boolean inconformidadeDiaDeInicio = horario.getInicioDiaEspecificoMes() > 0
+                || horario.getInicioDiaEspecificoMes() <= 31;
+
+        if (inconformidadeDiaDeInicio){
+            errosIdentificados.add("O Dia Do Mes De Inicio Deve Ser Maior Que 0 E Menor Ou Igual A 31");
+        }
+
+        boolean inconformidadeDiaDeFim = horario.getFimDiaEspecificoMes() > 0
+                || horario.getFimDiaEspecificoMes() <= 31;
+
+        if (inconformidadeDiaDeFim){
+            errosIdentificados.add("O Dia Do Mes De Fim Deve Ser Maior Que 0 E Menor Ou Igual A 31");
+        }
+
+        if (horario.getFimDiaEspecificoMes() < horario.getInicioDiaEspecificoMes()){
+            errosIdentificados.add("O Dia De Fim Do Horario Não Pode Ser Antes Do Dia De Inicio");
+        }
+
+        boolean inconformidade_Inicio_Fim =
+                horario.getInicioDiaEspecificoMes().equals(horario.getFimDiaEspecificoMes())
+                        && horario.getHoraInicio().isAfter(horario.getHoraFim());
+
+        if (inconformidade_Inicio_Fim){
+            errosIdentificados
+                    .add("O Fim Do Horario Não Pode Ser Antes Do Inicio" +
+                            " Para Horarios Que O Fim é No Mesmo Dia Que O Inicio\n");
+        }
+
+        List<HorariosDiaEspecificoMensal> listaHorarios = compromissoRecorrente.getHorariosPorDias().stream()
+                .map(HorariosDiaEspecificoMensal.class::cast)
+                .toList();
+
+        boolean haConflitos = verificarConflitosComHorarioNaLista(horario,listaHorarios);
+
+        if(haConflitos){
+            errosIdentificados.add("Esse horário conflita com outros já criados no mesmo Compromisso Recorrente\n");
+        }
+
+        return errosIdentificados;
     }
 
     public boolean verificarConflitoEntreHorariosDiaEspecificoMensal(

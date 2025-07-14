@@ -48,14 +48,10 @@ public class HorariosPadraoRelativoMensalService extends HorariosServiceBase{
 
         horariosCriado.setCompromissoRecorrente(compromissoRecorrente);
 
-        List<HorariosPadraoRelativoMensal> listaHorarios = compromissoRecorrente.getHorariosPorDias().stream()
-                .map(HorariosPadraoRelativoMensal.class::cast)
-                .toList();
+        List<String> errosIdentificados = verificarValidadeDasInformacoes(horariosCriado,compromissoRecorrente);
 
-        boolean haConflitos = verificarConflitosComHorarioNaLista(horariosCriado,listaHorarios);
-
-        if(haConflitos){
-            throw new BadRequestException("Esse horário conflita com outros já criados no mesmo Compromisso Recorrente");
+        if (!errosIdentificados.isEmpty()){
+            throw new BadRequestException("erros identificados no Horario :" + horariosCriado + "\n"+ errosIdentificados);
         }
 
         horariosPadraoRelativoMensalRepository.save(horariosCriado);
@@ -86,15 +82,10 @@ public class HorariosPadraoRelativoMensalService extends HorariosServiceBase{
 
         mapperHorariosPadraoRelativoMensal.atualizacao(dtoUpdateHorario,horarioParaAtualizar);
 
-        List<HorariosPadraoRelativoMensal> outrosHorarios = compromissoRecorrente.getHorariosPorDias().stream()
-                .filter(h -> !h.getId().equals(horarioId))
-                .map(HorariosPadraoRelativoMensal.class::cast)
-                .toList();
+        List<String> errosIdentificados = verificarValidadeDasInformacoes(horarioParaAtualizar,compromissoRecorrente);
 
-        boolean haConflitos = verificarConflitosComHorarioNaLista(horarioParaAtualizar,outrosHorarios);
-
-        if(haConflitos){
-            throw new BadRequestException("Esse horário conflita com outros já criados no mesmo Compromisso Recorrente");
+        if (!errosIdentificados.isEmpty()){
+            throw new BadRequestException("erros identificados no Horario :" + horarioParaAtualizar + "\n"+ errosIdentificados);
         }
 
         apagarCompromissosAtreladosAoHorarioPorDia(horarioComDadosAntigos);
@@ -245,6 +236,32 @@ public class HorariosPadraoRelativoMensalService extends HorariosServiceBase{
         long numeroCompromissosApagados = tamanhoInicial - listaDosCompromissos.size();
 
         return numeroCompromissosApagados;
+    }
+
+    @Transactional
+    private List<String> verificarValidadeDasInformacoes(HorariosPadraoRelativoMensal horario, CompromissosRecorrentesModel compromissoRecorrente){
+        List<String> errosIdentificados = new ArrayList<>();
+
+        boolean inconformidade_Inicio_Fim = horario.getDiaDaSemanaInicio().equals(horario.getDiaDaSemanaFim())
+                && horario.getHoraInicio().isAfter(horario.getHoraFim());
+
+        if (inconformidade_Inicio_Fim){
+            errosIdentificados
+                    .add("O Fim Do Horario Nao Pode Ser Antes Do Inicio" +
+                            " Para Horarios Que O Fim é No Mesmo Dia Que O Inicio\n");
+        }
+
+        List<HorariosPadraoRelativoMensal> listaHorarios = compromissoRecorrente.getHorariosPorDias().stream()
+                .map(HorariosPadraoRelativoMensal.class::cast)
+                .toList();
+
+        boolean haConflitos = verificarConflitosComHorarioNaLista(horario,listaHorarios);
+
+        if(haConflitos){
+            errosIdentificados.add("Esse horário conflita com outros já criados no mesmo Compromisso Recorrente\n");
+        }
+
+        return errosIdentificados;
     }
 
     private boolean verificarConflitoEntreHorariosUsamPadraoRelativo(HorariosPadraoRelativoMensal horario_1, HorariosPadraoRelativoMensal horario_2) {
