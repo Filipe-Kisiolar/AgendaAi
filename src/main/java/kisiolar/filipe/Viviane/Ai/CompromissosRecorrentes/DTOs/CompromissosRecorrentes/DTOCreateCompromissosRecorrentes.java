@@ -1,7 +1,7 @@
 package kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.CompromissosRecorrentes;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.HorariosPorDia.DTOCreateHorariosPorDiaBase;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.Enums.ModoDeRecorrenciaEnum;
 
@@ -10,22 +10,30 @@ import java.util.List;
 
 public class DTOCreateCompromissosRecorrentes {
 
+        @NotBlank(message = "O nome é obrigatório")
         private String nome;
 
         private String descricao;
 
+        @NotBlank(message = "O nome é obrigatório")
         private String local;
 
         @Size(min = 1, message = "É necessário ao menos um horário.")
         @Valid
         private List<DTOCreateHorariosPorDiaBase> horariosPorDia;
 
+        @NotNull(message = "Data de início da recorrência é obrigatória")
+        @FutureOrPresent(message = "Data de inícioRecorrencia não pode ser no passado")
         private LocalDate dataInicioRecorrencia;
 
+        @NotNull(message = "Data de fim da recorrência é obrigatória")
+        @Future(message = "Data de fimRecorrencia precisa ser uma data futura")
         private LocalDate dataFimRecorrencia;
 
+        @NotNull(message = "O intervalo é obrigatório")
         private Integer intervalo;
 
+        @NotNull(message = "O tipo de frequência é obrigatório")
         private ModoDeRecorrenciaEnum modoDeRecorrencia;
 
         private boolean apenasDiasUteis;

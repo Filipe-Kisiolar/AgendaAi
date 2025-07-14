@@ -1,18 +1,23 @@
 package kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes;
 
+import jakarta.validation.Valid;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.CompromissosRecorrentes.*;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.HorariosPorDia.DTOCreateHorariosPorDiaBase;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.HorariosPorDia.DTORespostaHorariosPorDia;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.HorariosPorDia.DTOUpdateHorariosPorDiaBase;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.HorariosPorDia.ServicesHorariosPorDia.HorariosPorDiaService;
+import kisiolar.filipe.Viviane.Ai.Exceptions.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/compromissosrecorrentes")
@@ -58,14 +63,34 @@ public class CompromissosRecorrentesController {
     }
 
     @PostMapping("/criarcompromisso")
-    public ResponseEntity<DTORespostaCompromissoRecorrente> criarCompromisso(@RequestBody DTOCreateCompromissosRecorrentes dtoCreateCompromissosRecorrentes){
+    public ResponseEntity<DTORespostaCompromissoRecorrente> criarCompromisso(
+            @Valid @RequestBody DTOCreateCompromissosRecorrentes dtoCreateCompromissosRecorrentes
+            ,BindingResult resultado){
+
+        if (resultado.hasErrors()) {
+            String erros = resultado.getAllErrors().stream()
+                    .map(ObjectError::getDefaultMessage)
+                    .collect(Collectors.joining("; "));
+            throw new BadRequestException("Erros na requisição: " + erros);
+        }
+
         DTORespostaCompromissoRecorrente compromissoCriado = compromissosRecorrentesService.criarCompromissoRecorrente(dtoCreateCompromissosRecorrentes);
 
         return ResponseEntity.ok(compromissoCriado);
     }
 
     @PatchMapping("/alterarcompromisso/{id}")
-    public ResponseEntity<DTORespostaCompromissoRecorrente> alterarCompromisso(@PathVariable long id, @RequestBody DTOUpdateCompromissosRecorrentes updateCompromissosRecorrentes){
+    public ResponseEntity<DTORespostaCompromissoRecorrente> alterarCompromisso(
+            @PathVariable long id,@Valid @RequestBody DTOUpdateCompromissosRecorrentes updateCompromissosRecorrentes
+            ,BindingResult resultado
+    ){
+        if (resultado.hasErrors()) {
+            String erros = resultado.getAllErrors().stream()
+                    .map(ObjectError::getDefaultMessage)
+                    .collect(Collectors.joining("; "));
+            throw new BadRequestException("Erros na requisição: " + erros);
+        }
+
         DTORespostaCompromissoRecorrente compromissoAlterado = compromissosRecorrentesService.alterarCompromissoRecorrente(id,updateCompromissosRecorrentes);
 
         return ResponseEntity.ok(compromissoAlterado);

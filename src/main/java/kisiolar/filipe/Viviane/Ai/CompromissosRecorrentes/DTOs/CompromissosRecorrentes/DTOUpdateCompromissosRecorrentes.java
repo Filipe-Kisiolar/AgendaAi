@@ -1,5 +1,8 @@
 package kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.CompromissosRecorrentes;
 
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.FutureOrPresent;
+
 import java.time.LocalDate;
 
 public class DTOUpdateCompromissosRecorrentes {
@@ -10,8 +13,10 @@ public class DTOUpdateCompromissosRecorrentes {
 
     private String local;
 
+    @FutureOrPresent(message = "Data de inícioRecorrencia não pode ser no passado")
     private LocalDate dataInicioRecorrencia;
 
+    @Future(message = "Data de fimRecorrencia precisa ser uma data futura")
     private LocalDate dataFimRecorrencia;
 
     private Integer intervalo;
