@@ -1,24 +1,48 @@
 package kisiolar.filipe.Viviane.Ai.Usuarios;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import jakarta.validation.Valid;
+import kisiolar.filipe.Viviane.Ai.Exceptions.BadRequestException;
+import kisiolar.filipe.Viviane.Ai.Usuarios.DTOs.DTOCreateUsuario;
+import kisiolar.filipe.Viviane.Ai.Usuarios.DTOs.DTOUpdateUsuario;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/usuarios")
 public class UsuariosController {
 
-    private UsuariosService usuariosService;
+    private final UsuariosService usuariosService;
 
     public UsuariosController(UsuariosService usuariosService) {
         this.usuariosService = usuariosService;
     }
 
-    @GetMapping("/listartodosusuarios")
-    public List<UsuariosModel> listarUsuarios(){
-        return usuariosService.listarUsuarios();
+    @PostMapping("/cadastrarUsuario")
+    public ResponseEntity<String> cadastrarUsuario(@Valid @RequestBody DTOCreateUsuario usuarioDto,
+                                                   BindingResult resultado){
+
+        if (resultado.hasErrors()) {
+            String erros = resultado.getAllErrors().stream()
+                    .map(ObjectError::getDefaultMessage)
+                    .collect(Collectors.joining("; "));
+            throw new BadRequestException("Erros na requisição: " + erros);
+        }
+
+        usuariosService.criarUsuario(usuarioDto);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body("compromisso Salvo");
+    }
+
+    @PatchMapping("/alterarDados/{id}")
+    public ResponseEntity<String> alterarDadosDoUsuario(@PathVariable long id, @RequestBody DTOUpdateUsuario usuario){
+        usuariosService.alterarUsuario(id,usuario);
+
+        return ResponseEntity.ok("Usuário Alterado");
     }
 
 }

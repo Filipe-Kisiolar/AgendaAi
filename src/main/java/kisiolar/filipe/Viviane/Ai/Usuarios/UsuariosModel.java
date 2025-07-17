@@ -18,7 +18,7 @@ public class UsuariosModel {
     @Column(name = "nome")
     private String nome;
 
-    @Column(name = "email")
+    @Column(name = "email",unique = true,nullable = false)
     private String email;
 
     @Column(name = "senha")

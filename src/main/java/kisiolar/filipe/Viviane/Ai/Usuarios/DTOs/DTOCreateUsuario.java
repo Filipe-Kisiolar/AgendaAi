@@ -1,0 +1,45 @@
+package kisiolar.filipe.Viviane.Ai.Usuarios.DTOs;
+
+import jakarta.validation.constraints.NotBlank;
+
+public class DTOCreateUsuario {
+
+    @NotBlank(message = "O Nome é obrigatório")
+    private String nome;
+
+    @NotBlank(message = "O email é obrigatório")
+    private String email;
+
+    @NotBlank(message = "A Senha é obrigatório")
+    private String senha;
+
+    public DTOCreateUsuario(String nome, String email, String senha) {
+        this.nome = nome;
+        this.email = email;
+        this.senha = senha;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getSenha() {
+        return senha;
+    }
+
+    public void setSenha(String senha) {
+        this.senha = senha;
+    }
+}
