@@ -63,7 +63,7 @@ public class CompromissosRecorrentesService{
     @Transactional
     public DTORespostaCompromissoRecorrente buscarCompromissoPorId(long id){
        CompromissosRecorrentesModel compromissosRecorrentesModel = compromissosRecorrentesRepository.findById(id).
-               orElseThrow(() -> new RuntimeException("compromisso recorrente não encontrado"));
+               orElseThrow(() -> new ResourceNotFindException("compromisso recorrente não encontrado"));
 
        DTOSaidaCompromissosRecorrentes dtoCreateCompromissosRecorrentes = mapperCompromissosRecorrentes.mapToDto(compromissosRecorrentesModel);
 
@@ -81,7 +81,7 @@ public class CompromissosRecorrentesService{
     @Transactional
     public DTORespostaCompromissoRecorrente buscarCompromissoPorNome(String nome){
         CompromissosRecorrentesModel compromissosRecorrentesModel = compromissosRecorrentesRepository.findByNome(nome).
-                orElseThrow(() -> new RuntimeException("compromisso recorrente não encontrado"));
+                orElseThrow(() -> new ResourceNotFindException("compromisso recorrente não encontrado"));
 
         DTOSaidaCompromissosRecorrentes dtoCreateCompromissosRecorrentes = mapperCompromissosRecorrentes.mapToDto(compromissosRecorrentesModel);
 
@@ -184,20 +184,24 @@ public class CompromissosRecorrentesService{
      public DTORespostaCompromissoRecorrente alterarCompromissoRecorrente(long id, DTOUpdateCompromissosRecorrentes dtoUpdateCompromissosRecorrentes){
 
         CompromissosRecorrentesModel compromissosRecorrente = compromissosRecorrentesRepository.findById(id).
-                orElseThrow(() -> new RuntimeException("compromisso recorrente não encontrado"));
+                orElseThrow(() -> new ResourceNotFindException("compromisso recorrente não encontrado"));
 
-        Integer intervalo = dtoUpdateCompromissosRecorrentes.getIntervalo();
-
-        boolean inconformidadeIntervalo = intervalo == null || intervalo < 0;
-
-        if(inconformidadeIntervalo){
-            throw new BadRequestException("intervalo nao pode ser null nem menor que 0\n");
-        }
+        Integer intervaloDto = dtoUpdateCompromissosRecorrentes.getIntervalo();
 
         boolean atualizouIntervalo =
-                !intervalo.equals(compromissosRecorrente.getIntervalo());
+                !intervaloDto.equals(compromissosRecorrente.getIntervalo());
 
         mapperCompromissosRecorrentes.atualizacao(dtoUpdateCompromissosRecorrentes, compromissosRecorrente);
+
+        //criada para nao gerar erro na requisicao
+        List<DTOCreateHorariosPorDiaBase> listaFalsa = List.of();
+
+        List<String> errosIdentificados = verificarValidadeDasInformacoes(
+                compromissosRecorrente,listaFalsa);
+
+        if(!errosIdentificados.isEmpty()){
+            throw new BadRequestException("Erros Na Requisicao:\n" + errosIdentificados);
+        }
 
         compromissosRecorrentesRepository.save(compromissosRecorrente);
 
@@ -262,7 +266,7 @@ public class CompromissosRecorrentesService{
             errosIdentificados.add("A Data De Inicio Da Recorrencia Não Pode Ser Depois Da Data De Fim Da Recorrencia");
         }
 
-        boolean horariosConflitamEntreSi =
+        boolean horariosConflitamEntreSi = !listaHorarios.isEmpty() &&
                 horariosPorDiaService.verificarConflitosListaCriacaoHorarios(
                         compromissoRecorrente.getModoDeRecorrencia(),listaHorarios);
 
