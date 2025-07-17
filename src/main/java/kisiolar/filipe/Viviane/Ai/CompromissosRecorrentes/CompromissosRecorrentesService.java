@@ -292,9 +292,9 @@ public class CompromissosRecorrentesService{
             return false;
         }
 
-        List<HorariosPorDiaModel> listaHorariosPorDia_1 = compromissosRecorrente1.getHorariosPorDias();
+        List<HorariosPorDiaModel> listaHorariosPorDia_1 = compromissosRecorrente1.getHorariosPorDia();
 
-        List<HorariosPorDiaModel> listaHorariosPorDia_2 = compromissosRecorrente2.getHorariosPorDias();
+        List<HorariosPorDiaModel> listaHorariosPorDia_2 = compromissosRecorrente2.getHorariosPorDia();
 
         return listaHorariosPorDia_1.stream()
                 .anyMatch(horario -> horariosPorDiaService.verificarConflitosComHorarioNaLista(modoDeRecorrencia_1,

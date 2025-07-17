@@ -7,7 +7,6 @@ import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.CompromissosRecorrente
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.CompromissosRecorrentesRepository;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.HorariosPorDia.DTOCreateHorariosPorDiaBase;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.HorariosPorDia.DTORespostaHorariosPorDia;
-import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.HorariosPorDia.DTOSaidaHorariosPorDiaBase;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.HorariosPorDia.DTOUpdateHorariosPorDiaBase;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.HorariosPorDia.DataEspecificaAnual.DTOCreateHorariosDataEspecificaAnual;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.HorariosPorDia.DataEspecificaAnual.DTOUpdateHorariosDataEspecificaAnual;
@@ -169,7 +168,7 @@ public class HorariosPorDiaService extends HorariosServiceBase {
                 findById(compromissoRecorrenteId).
                 orElseThrow(() -> new ResourceNotFindException("Compromisso inexistente"));
 
-        HorariosPorDiaModel horario = compromissoRecorrente.getHorariosPorDias()
+        HorariosPorDiaModel horario = compromissoRecorrente.getHorariosPorDia()
                 .stream()
                 .filter(h -> h.getId().equals(horarioId))
                 .findFirst()
@@ -195,7 +194,7 @@ public class HorariosPorDiaService extends HorariosServiceBase {
             default -> throw new IllegalArgumentException("Combinação inválida de tipo e modo de recorrência");
         };
 
-        compromissoRecorrente.getHorariosPorDias().remove(horario);
+        compromissoRecorrente.getHorariosPorDia().remove(horario);
         return compromissosDeletados;
     }
 

@@ -5,6 +5,7 @@ import kisiolar.filipe.Viviane.Ai.Compromissos.CompromissosModel;
 import jakarta.persistence.*;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.Enums.ModoDeRecorrenciaEnum;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.HorariosPorDia.HorariosPorDiaModels.HorariosPorDiaModel;
+import kisiolar.filipe.Viviane.Ai.Usuarios.UsuariosModel;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -52,10 +53,14 @@ public class CompromissosRecorrentesModel {
     @JsonIgnore
     private List<CompromissosModel> compromissosGerados;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "usuario_id")
+    private UsuariosModel usuario;
+
     public CompromissosRecorrentesModel() {
     }
 
-    public CompromissosRecorrentesModel(Long id, String nome, String descricao, String local, LocalDate dataInicioRecorrencia, LocalDate dataFimRecorrencia, Integer intervalo, ModoDeRecorrenciaEnum modoDeRecorrencia, Boolean apenasDiasUteis, List<HorariosPorDiaModel> horariosPorDia, List<CompromissosModel> compromissosGerados) {
+    public CompromissosRecorrentesModel(Long id, String nome, String descricao, String local, LocalDate dataInicioRecorrencia, LocalDate dataFimRecorrencia, Integer intervalo, ModoDeRecorrenciaEnum modoDeRecorrencia, Boolean apenasDiasUteis, List<HorariosPorDiaModel> horariosPorDia, List<CompromissosModel> compromissosGerados, UsuariosModel usuario) {
         this.id = id;
         this.nome = nome;
         this.descricao = descricao;
@@ -67,6 +72,7 @@ public class CompromissosRecorrentesModel {
         this.apenasDiasUteis = apenasDiasUteis;
         this.horariosPorDia = horariosPorDia;
         this.compromissosGerados = compromissosGerados;
+        this.usuario = usuario;
     }
 
     public Long getId() {
@@ -101,11 +107,11 @@ public class CompromissosRecorrentesModel {
         this.local = local;
     }
 
-    public List<HorariosPorDiaModel> getHorariosPorDias() {
+    public List<HorariosPorDiaModel> getHorariosPorDia() {
         return horariosPorDia;
     }
 
-    public void setHorariosPorDias(List<HorariosPorDiaModel> horariosPorDiaModels) {
+    public void setHorariosPorDia(List<HorariosPorDiaModel> horariosPorDiaModels) {
         this.horariosPorDia = horariosPorDiaModels;
     }
 
@@ -155,6 +161,14 @@ public class CompromissosRecorrentesModel {
 
     public void setCompromissosGerados(List<CompromissosModel> compromissosGerados) {
         this.compromissosGerados = compromissosGerados;
+    }
+
+    public UsuariosModel getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(UsuariosModel usuario) {
+        this.usuario = usuario;
     }
 
     @Override

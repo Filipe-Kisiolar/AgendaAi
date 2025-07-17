@@ -101,7 +101,7 @@ public class HorariosDataEspecificaAnualService extends HorariosServiceBase {
 
         int anoInicio = inicioRecorrencia.getYear();
 
-        return compromissoRecorrente.getHorariosPorDias().stream()
+        return compromissoRecorrente.getHorariosPorDia().stream()
                 .map(HorariosDataEspecificaAnual.class::cast)
                 .flatMap(horario -> criarCompromissosPorDataEspecificaAnual(compromissoRecorrente,horario,
                         intervalo,anoInicio,inicioRecorrencia,fimRecorrencia).stream())
@@ -229,7 +229,7 @@ public class HorariosDataEspecificaAnualService extends HorariosServiceBase {
                             " Para Horarios Que O Fim é No Mesmo Dia Que O Inicio\n");
         }
 
-        List<HorariosDataEspecificaAnual> listaHorarios = compromissoRecorrente.getHorariosPorDias().stream()
+        List<HorariosDataEspecificaAnual> listaHorarios = compromissoRecorrente.getHorariosPorDia().stream()
                 .map(HorariosDataEspecificaAnual.class::cast)
                 .toList();
 

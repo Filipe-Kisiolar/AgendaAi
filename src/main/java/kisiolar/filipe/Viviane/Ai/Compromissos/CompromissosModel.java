@@ -2,6 +2,8 @@ package kisiolar.filipe.Viviane.Ai.Compromissos;
 
 import jakarta.persistence.*;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.CompromissosRecorrentesModel;
+import kisiolar.filipe.Viviane.Ai.Usuarios.UsuariosModel;
+
 import java.time.LocalDateTime;
 import java.util.Objects;
 
@@ -32,6 +34,10 @@ public class CompromissosModel {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "compromissorecorrente_id") // nome da coluna na tabela compromisso
     private CompromissosRecorrentesModel compromissoRecorrente;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "usuario_id")
+    private UsuariosModel usuario;
 
     public CompromissosModel() {
     }

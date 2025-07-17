@@ -107,7 +107,7 @@ public class HorariosPadraoRelativoMensalService extends HorariosServiceBase{
 
         long intervalo = compromissoRecorrente.getIntervalo();
 
-        return compromissoRecorrente.getHorariosPorDias().stream()
+        return compromissoRecorrente.getHorariosPorDia().stream()
                 .map(HorariosPadraoRelativoMensal.class::cast)
                 .flatMap(horario -> criarCompromissosPorPadraoRelativoMensal(compromissoRecorrente,horario
                 ,inicioRecorrencia,fimRecorrencia,intervalo).stream())
@@ -251,7 +251,7 @@ public class HorariosPadraoRelativoMensalService extends HorariosServiceBase{
                             " Para Horarios Que O Fim é No Mesmo Dia Que O Inicio\n");
         }
 
-        List<HorariosPadraoRelativoMensal> listaHorarios = compromissoRecorrente.getHorariosPorDias().stream()
+        List<HorariosPadraoRelativoMensal> listaHorarios = compromissoRecorrente.getHorariosPorDia().stream()
                 .map(HorariosPadraoRelativoMensal.class::cast)
                 .toList();
 
