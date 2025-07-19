@@ -35,7 +35,7 @@ public class UsuariosController {
 
         usuariosService.criarUsuario(usuarioDto);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body("compromisso Salvo");
+        return ResponseEntity.status(HttpStatus.CREATED).body("Usuário Salvo");
     }
 
     @PatchMapping("/alterarDados/{id}")
@@ -43,6 +43,13 @@ public class UsuariosController {
         usuariosService.alterarUsuario(id,usuario);
 
         return ResponseEntity.ok("Usuário Alterado");
+    }
+
+    @DeleteMapping("/deletar/{id}")
+    private ResponseEntity<String> deletarUsuario(@PathVariable long id){
+        usuariosService.deletarUsuario(id);
+
+        return ResponseEntity.ok("Usuário Deletado");
     }
 
 }

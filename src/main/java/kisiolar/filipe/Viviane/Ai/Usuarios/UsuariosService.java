@@ -22,13 +22,14 @@ public class UsuariosService {
     }
 
     public void criarUsuario(DTOCreateUsuario dtoCreate){
-        UsuariosModel usuario = mapperUsuarios.mapToModel(dtoCreate);
-
-        List<String> errosIdentificados = verificarInformacoes(usuario);
+        List<String> errosIdentificados = verificarInformacoesCriacao(dtoCreate);
 
         if (!errosIdentificados.isEmpty()){
             throw new BadRequestException("erros na criação de usuario:\n" + errosIdentificados);
         }
+
+        UsuariosModel usuario = mapperUsuarios.mapToModel(dtoCreate);
+        usuario.setRole(RoleTypeEnum.USUARIO);
 
         usuariosRepository.save(usuario);
 
@@ -37,22 +38,31 @@ public class UsuariosService {
     public void alterarUsuario(long id,DTOUpdateUsuario dtoUpdate){
 
         UsuariosModel usuarioParaAtualizar = usuariosRepository.findById(id)
-                        .orElseThrow(() -> new ResourceNotFindException("usuario não encontrado"));
+                .orElseThrow(() -> new ResourceNotFindException("usuario não encontrado"));
 
-        mapperUsuarios.atualizacao(dtoUpdate,usuarioParaAtualizar);
-
-        List<String> errosIdentificados = verificarInformacoes(usuarioParaAtualizar);
+        List<String> errosIdentificados = verificarInformacoesUpdate(dtoUpdate,id);
 
         if (!errosIdentificados.isEmpty()){
             throw new BadRequestException("erros na alteracao de usuario:\n" + errosIdentificados);
         }
 
+        mapperUsuarios.atualizacao(dtoUpdate,usuarioParaAtualizar);
+
+
         usuariosRepository.save(usuarioParaAtualizar);
     }
 
-    //todo:fazer delecao de usuarios e encriptar as senhas
+    public void deletarUsuario(long id){
+        if (!usuariosRepository.existsById(id)){
+            throw new ResourceNotFindException("usuario nao encontrado");
+        }
 
-    private List<String> verificarInformacoes(UsuariosModel usuario){
+        usuariosRepository.deleteById(id);
+    }
+
+    //todo:encriptar as senhas
+
+    private List<String> verificarInformacoesCriacao(DTOCreateUsuario usuario){
         List<String> errosIdentificados = new ArrayList<>();
 
         if (usuariosRepository.existsByEmail(usuario.getEmail())){
@@ -79,6 +89,46 @@ public class UsuariosService {
 
         if (senha.matches(".*\\s.*")) {
             errosIdentificados.add("A senha não pode conter espaços ou quebras de linha.");
+        }
+
+        return errosIdentificados;
+    }
+
+    private List<String> verificarInformacoesUpdate(
+            DTOUpdateUsuario dtoUpdateUsuario,long id
+    ) {
+        List<String> errosIdentificados = new ArrayList<>();
+
+        String emailUpdate = dtoUpdateUsuario.getEmail();
+
+        if (emailUpdate != null){
+            if (usuariosRepository.usuarioDiferenteTemEmail(emailUpdate, id)){
+                errosIdentificados.add("Ja existe outra conta com esse email cadastrado" + emailUpdate);
+            }
+        }
+
+        String senhaAtualizada = dtoUpdateUsuario.getSenha();
+
+        if (senhaAtualizada != null){
+            if (senhaAtualizada.isBlank() || senhaAtualizada.length() < 6) {
+                errosIdentificados.add("A senhaAtualizada deve ter no mínimo 6 caracteres.");
+            }
+
+            if (!senhaAtualizada.matches(".*[A-Z].*")) {
+                errosIdentificados.add("A senhaAtualizada deve conter pelo menos uma letra maiúscula.");
+            }
+
+            if (!senhaAtualizada.matches(".*\\d.*")) {
+                errosIdentificados.add("A senhaAtualizada deve conter pelo menos um número.");
+            }
+
+            if (!senhaAtualizada.matches(".*[!@#$%^&*()_+=\\-{}\\[\\]:;\"'<>.,?/\\\\|~`].*")) {
+                errosIdentificados.add("A senhaAtualizada deve conter pelo menos um caractere especial.");
+            }
+
+            if (senhaAtualizada.matches(".*\\s.*")) {
+                errosIdentificados.add("A senhaAtualizada não pode conter espaços ou quebras de linha.");
+            }
         }
 
         return errosIdentificados;

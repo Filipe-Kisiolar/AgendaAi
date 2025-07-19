@@ -8,6 +8,9 @@ public class DTOUpdateUsuario {
 
     private String senha;
 
+    public DTOUpdateUsuario() {
+    }
+
     public DTOUpdateUsuario(String nome, String email, String senha) {
         this.nome = nome;
         this.email = email;

@@ -34,6 +34,9 @@ public class UsuariosModel {
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CompromissosRecorrentesModel> compromissosRecorrentes;
 
+    public UsuariosModel() {
+    }
+
     public UsuariosModel(Long id, String nome, String email, String senha, RoleTypeEnum role, List<CompromissosModel> compromissos, List<CompromissosRecorrentesModel> compromissosRecorrentes) {
         this.id = id;
         this.nome = nome;
