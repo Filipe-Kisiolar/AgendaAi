@@ -161,7 +161,8 @@ public class HorariosDataEspecificaAnualService extends HorariosServiceBase {
 
             DTOCreateCompromissos dto = mapperCompromissosRecorrentes
                     .mapGerarCompromisso(compromissoRecorrente, inicioCompromisso, fimCompromisso);
-            compromissosGerados.add(compromissosService.criarCompromisso(dto));
+            compromissosGerados.add(compromissosService.criarCompromisso(dto,
+                    compromissoRecorrente.getUsuario().getId()));
 
             i++;
 

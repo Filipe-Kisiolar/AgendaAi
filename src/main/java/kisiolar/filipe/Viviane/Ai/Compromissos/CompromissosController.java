@@ -22,9 +22,11 @@ public class CompromissosController {
     CompromissosService compromissosService;
 
 
-    @GetMapping("/listarcompromissos")
-    public ResponseEntity<?> listarCompromissos(){
-        DTORespostaListasCompromissos listarcompromissos = compromissosService.listarCompromissos();
+    @GetMapping("/listarcompromissos/{usuarioId}")
+    public ResponseEntity<?> listarCompromissos(long usuarioId){
+        DTORespostaListasCompromissos listarcompromissos =
+                compromissosService.listarCompromissos(usuarioId);
+
         if (listarcompromissos.getListaCompromissos().isEmpty()){
             Map<String,Object> resposta = new HashMap<>();
             resposta.put("mensagem","ainda nao a compromissos registrados, para criar um copromisso recorrente entre no link:");
@@ -35,52 +37,70 @@ public class CompromissosController {
         }
     }
 
-    @GetMapping("/buscarcompromissoporid/{id}")
-    public ResponseEntity<DTORespostaCompromisso> buscarCompromissoPorId(@PathVariable long id){
-        DTORespostaCompromisso dtoCompromissos = compromissosService.buscarCompromissoPorId(id);
+    @GetMapping("/buscarcompromissoporid/{usuarioId}/{id}")
+    public ResponseEntity<DTORespostaCompromisso> buscarCompromissoPorId(
+            @PathVariable long id,@PathVariable long usuarioId
+    ){
+        DTORespostaCompromisso dtoCompromissos = compromissosService.buscarCompromissoPorId(id,usuarioId);
 
         return ResponseEntity.ok(dtoCompromissos);
     }
 
-    @GetMapping("/listarcompromissopornome/{nome}")
-    public ResponseEntity<DTORespostaListasCompromissos> buscarCompromissoPorNome(@PathVariable String nome){
-        DTORespostaListasCompromissos lista = compromissosService.listarCompromissosPorNome(nome);
+    @GetMapping("/listarcompromissopornome/{usuarioId}/{nome}")
+    public ResponseEntity<DTORespostaListasCompromissos> buscarCompromissoPorNome(
+            @PathVariable String nome,@PathVariable long usuarioId
+    ){
+        DTORespostaListasCompromissos lista =
+                compromissosService.listarCompromissosPorNome(nome,usuarioId);
 
         return ResponseEntity.ok(lista);
     }
 
-    @GetMapping("/listarcompromissosdodia/{dia}")
-    public ResponseEntity<DTORespostaListasCompromissos> listarCompromissosDoDia(@PathVariable @DateTimeFormat(iso=DateTimeFormat.ISO.DATE)
-                                                                             LocalDate dia){
-        DTORespostaListasCompromissos lista = compromissosService.listarCompromissosDoDia(dia);
+    @GetMapping("/listarcompromissosdodia/{usuarioId}/{dia}")
+    public ResponseEntity<DTORespostaListasCompromissos> listarCompromissosDoDia(
+            @PathVariable @DateTimeFormat(iso=DateTimeFormat.ISO.DATE) LocalDate dia,
+            @PathVariable long usuarioId
+    ){
+        DTORespostaListasCompromissos lista = compromissosService.listarCompromissosDoDia(dia, usuarioId);
 
         return ResponseEntity.ok(lista);
     }
 
-    @GetMapping("listarcompromissosdasemana/{dia}")
-    public ResponseEntity<Map<DayOfWeek,DTORespostaListasCompromissos>> listarCompromissosDaSemana(@PathVariable LocalDate dia){
-        Map<DayOfWeek,DTORespostaListasCompromissos> lista = compromissosService.listarCompromissosDaSemana(dia);
+    @GetMapping("listarcompromissosdasemana/{usuarioId}/{dia}")
+    public ResponseEntity<Map<DayOfWeek,DTORespostaListasCompromissos>> listarCompromissosDaSemana(
+            @PathVariable LocalDate dia,@PathVariable long usuarioId
+    ){
+        Map<DayOfWeek,DTORespostaListasCompromissos> lista =
+                compromissosService.listarCompromissosDaSemana(dia,usuarioId);
 
         return ResponseEntity.ok(lista);
     }
 
-    @GetMapping("/listarconflitos")
-    public ResponseEntity<List<List<DTOSaidaCompromissos>>> listarCompromissosConflitantes(){
-        List<List<DTOSaidaCompromissos>> lista = compromissosService.listarCompromissosConflitantes();
+    @GetMapping("/listarconflitos/{usuarioId}")
+    public ResponseEntity<List<List<DTOSaidaCompromissos>>> listarCompromissosConflitantes(
+            @PathVariable long usuarioId
+    ){
+        List<List<DTOSaidaCompromissos>> lista =
+                compromissosService.listarCompromissosConflitantes(usuarioId);
 
         return ResponseEntity.ok(lista);
     }
 
-    @PostMapping("/criarcompromisso")
-    public ResponseEntity<DTORespostaCompromisso> criarCompromisso(@RequestBody DTOCreateCompromissos dtoCompromissos){
-        DTORespostaCompromisso compromissos = compromissosService.criarCompromisso(dtoCompromissos);
+    @PostMapping("/criarcompromisso/{usuarioId}/{usuarioId}")
+    public ResponseEntity<DTORespostaCompromisso> criarCompromisso(
+            @RequestBody DTOCreateCompromissos dtoCompromissos,
+            @PathVariable long usuarioId
+    ){
+        DTORespostaCompromisso compromissos = compromissosService.criarCompromisso(dtoCompromissos,usuarioId);
 
         return ResponseEntity.ok(compromissos);
     }
 
-    @PatchMapping("/alterarcompromisso/{id}")
-    public ResponseEntity<DTORespostaCompromisso> alterarCompromisso(@PathVariable long id, @RequestBody DTOUpdateCompromissos update){
-        DTORespostaCompromisso compromissoAlterado = compromissosService.alterarCompromisso(id,update);
+    @PatchMapping("/alterarcompromisso/{usuarioId}/{id}")
+    public ResponseEntity<DTORespostaCompromisso> alterarCompromisso(
+            @PathVariable long id, @PathVariable long usuarioId,
+            @RequestBody DTOUpdateCompromissos update){
+        DTORespostaCompromisso compromissoAlterado = compromissosService.alterarCompromisso(id,usuarioId,update);
 
         return ResponseEntity.ok(compromissoAlterado);
     }

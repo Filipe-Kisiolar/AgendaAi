@@ -167,7 +167,8 @@ public class HorariosPadraoRelativoMensalService extends HorariosServiceBase{
             DTOCreateCompromissos dtoCreateCompromissos = mapperCompromissosRecorrentes
                     .mapGerarCompromisso(compromissoRecorrente, inicioCompromisso, fimCompromisso);
 
-            compromissosGerados.add(compromissosService.criarCompromisso(dtoCreateCompromissos));
+            compromissosGerados.add(compromissosService.criarCompromisso(dtoCreateCompromissos,
+                    compromissoRecorrente.getUsuario().getId()));
 
             i = intervalo;
         }
@@ -181,7 +182,8 @@ public class HorariosPadraoRelativoMensalService extends HorariosServiceBase{
 
             DTOCreateCompromissos dtoCreateCompromissos = mapperCompromissosRecorrentes
                     .mapGerarCompromisso(compromissoRecorrente, inicioCompromisso, fimCompromisso);
-            compromissosGerados.add(compromissosService.criarCompromisso(dtoCreateCompromissos));
+            compromissosGerados.add(compromissosService.criarCompromisso(dtoCreateCompromissos,
+                    compromissoRecorrente.getUsuario().getId()));
             i= i + intervalo;
         }
         return compromissosGerados;

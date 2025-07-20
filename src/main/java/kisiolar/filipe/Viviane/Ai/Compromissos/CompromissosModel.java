@@ -42,7 +42,16 @@ public class CompromissosModel {
     public CompromissosModel() {
     }
 
-
+    public CompromissosModel(Long id, String nome, String descricao, String local, LocalDateTime inicio, LocalDateTime fim, CompromissosRecorrentesModel compromissoRecorrente, UsuariosModel usuario) {
+        this.id = id;
+        this.nome = nome;
+        this.descricao = descricao;
+        this.local = local;
+        this.inicio = inicio;
+        this.fim = fim;
+        this.compromissoRecorrente = compromissoRecorrente;
+        this.usuario = usuario;
+    }
 
     public Long getId() {
         return id;
@@ -100,6 +109,13 @@ public class CompromissosModel {
         this.compromissoRecorrente = compromissoRecorrente;
     }
 
+    public UsuariosModel getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(UsuariosModel usuario) {
+        this.usuario = usuario;
+    }
 
     @Override
     public boolean equals(Object o){

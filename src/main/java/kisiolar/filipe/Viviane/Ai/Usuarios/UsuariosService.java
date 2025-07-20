@@ -21,6 +21,11 @@ public class UsuariosService {
         this.mapperUsuarios = mapperUsuarios;
     }
 
+    public UsuariosModel findUsuarioById(long usuarioId){
+       return usuariosRepository.findById(usuarioId)
+               .orElseThrow(() -> new ResourceNotFindException("Usuário Não Encontrado"));
+    }
+
     public void criarUsuario(DTOCreateUsuario dtoCreate){
         List<String> errosIdentificados = verificarInformacoesCriacao(dtoCreate);
 

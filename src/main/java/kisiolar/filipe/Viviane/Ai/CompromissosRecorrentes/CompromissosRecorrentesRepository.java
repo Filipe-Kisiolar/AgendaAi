@@ -11,10 +11,36 @@ import java.util.Optional;
 
 public interface CompromissosRecorrentesRepository extends JpaRepository<CompromissosRecorrentesModel,Long> {
 
-    @Query("SELECT c FROM CompromissosRecorrentesModel c WHERE c.dataFimRecorrencia >= :dataAtual")
-    List<CompromissosRecorrentesModel> listAllAfterDate(@Param("dataAtual")LocalDate dataAtual);
+    @Query("""
+    SELECT c
+       FROM CompromissosRecorrentesModel c
+        WHERE c.id = :compromissoId
+        AND c.usuario.id = :usuarioId
+    """)
+    Optional<CompromissosRecorrentesModel> findByIdByUser(
+            @Param("compromissoId") long compromissoId,@Param("usuarioId") long usuarioId
+    );
 
-    Optional<CompromissosRecorrentesModel> findByNome(String nome);
+    @Query("""
+    SELECT c
+      FROM CompromissosRecorrentesModel c
+        WHERE c.dataFimRecorrencia >= :dataAtual
+        AND c.usuario.id = :usuarioId
+    """)
+    List<CompromissosRecorrentesModel> listAllByUserAfterDate(
+            @Param("dataAtual")LocalDate dataAtual,@Param("usuarioId") long usuarioId
+    );
+
+    @Query("""
+    SELECT c
+      FROM CompromissosRecorrentesModel c
+        WHERE c.nome = :nome AND c.usuario.id = :usuarioId
+    """)
+    Optional<CompromissosRecorrentesModel> findByNomeByUser(
+            @Param("nome") String nome,@Param("usuarioId") long usuarioId
+    );
+
+    boolean existsByIdAndUsuarioId(long id, long usuarioId);
 
     @Modifying
     @Query("DELETE FROM CompromissosRecorrentesModel c WHERE c.dataFimRecorrencia < :limite")
