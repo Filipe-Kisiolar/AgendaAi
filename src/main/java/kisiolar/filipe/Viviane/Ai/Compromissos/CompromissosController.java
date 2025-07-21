@@ -58,8 +58,8 @@ public class CompromissosController {
 
     @GetMapping("/listarcompromissosdodia/{usuarioId}/{dia}")
     public ResponseEntity<DTORespostaListasCompromissos> listarCompromissosDoDia(
-            @PathVariable @DateTimeFormat(iso=DateTimeFormat.ISO.DATE) LocalDate dia,
-            @PathVariable long usuarioId
+            @PathVariable("dia") @DateTimeFormat(pattern = "MM-dd-yyyy") LocalDate dia,
+            @PathVariable("usuarioId") long usuarioId
     ){
         DTORespostaListasCompromissos lista = compromissosService.listarCompromissosDoDia(dia, usuarioId);
 
@@ -68,7 +68,8 @@ public class CompromissosController {
 
     @GetMapping("listarcompromissosdasemana/{usuarioId}/{dia}")
     public ResponseEntity<Map<DayOfWeek,DTORespostaListasCompromissos>> listarCompromissosDaSemana(
-            @PathVariable LocalDate dia,@PathVariable long usuarioId
+            @PathVariable("dia") @DateTimeFormat(pattern = "MM-dd-yyyy") LocalDate dia,
+            @PathVariable("usuarioId") long usuarioId
     ){
         Map<DayOfWeek,DTORespostaListasCompromissos> lista =
                 compromissosService.listarCompromissosDaSemana(dia,usuarioId);
@@ -86,7 +87,7 @@ public class CompromissosController {
         return ResponseEntity.ok(lista);
     }
 
-    @PostMapping("/criarcompromisso/{usuarioId}/{usuarioId}")
+    @PostMapping("/criarcompromisso/{usuarioId}")
     public ResponseEntity<DTORespostaCompromisso> criarCompromisso(
             @RequestBody DTOCreateCompromissos dtoCompromissos,
             @PathVariable long usuarioId
