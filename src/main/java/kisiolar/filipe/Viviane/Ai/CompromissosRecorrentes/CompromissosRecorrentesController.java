@@ -115,7 +115,8 @@ public class CompromissosRecorrentesController {
             @PathVariable long usuarioId,
             @PathVariable Long compromissoRecorrenteId,
             @RequestBody DTOCreateHorariosPorDiaBase horariosPorDia){
-        DTORespostaHorariosPorDia saidaHorariosPorDia = horariosPorDiaService.adicionarHorario(compromissoRecorrenteId,horariosPorDia);
+        DTORespostaHorariosPorDia saidaHorariosPorDia =
+                horariosPorDiaService.adicionarHorario(compromissoRecorrenteId,usuarioId,horariosPorDia);
 
         return ResponseEntity.ok(saidaHorariosPorDia);
     }
@@ -127,7 +128,10 @@ public class CompromissosRecorrentesController {
             @PathVariable Long horarioId,
             @RequestBody DTOUpdateHorariosPorDiaBase updateHorariosPorDia) {
 
-        DTORespostaHorariosPorDia saidaHorariosPorDia = horariosPorDiaService.alterarHorario(compromissoRecorrenteId, horarioId, updateHorariosPorDia);
+        DTORespostaHorariosPorDia saidaHorariosPorDia =
+                horariosPorDiaService.alterarHorario(
+                        compromissoRecorrenteId, horarioId,usuarioId,updateHorariosPorDia);
+
         return ResponseEntity.ok(saidaHorariosPorDia);
     }
 
@@ -136,7 +140,8 @@ public class CompromissosRecorrentesController {
             @PathVariable long usuarioId,
             @PathVariable Long compromissoRecorrenteId,
             @PathVariable Long horarioId){
-        long compromissosDeletados = horariosPorDiaService.deletarHorarioPorId(compromissoRecorrenteId,horarioId);
+        long compromissosDeletados =
+                horariosPorDiaService.deletarHorarioPorId(compromissoRecorrenteId,horarioId,usuarioId);
 
         return ResponseEntity.ok(compromissosDeletados);
     }

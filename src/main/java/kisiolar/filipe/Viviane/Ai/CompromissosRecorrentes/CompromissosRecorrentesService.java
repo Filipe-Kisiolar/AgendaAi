@@ -177,7 +177,8 @@ public class CompromissosRecorrentesService{
         //cria os horarios por dia pelo HorariosPorDiaService que por sua vez cria ja cria os compromissos
         for (DTOCreateHorariosPorDiaBase horario : listaDosHorarios){
             DTORespostaHorariosPorDia horarioGerado =
-                horariosPorDiaService.adicionarHorario(compromissoRecorrente.getId(),horario);
+                horariosPorDiaService.adicionarHorario(
+                        compromissoRecorrente.getId(),compromissoRecorrente.getUsuario().getId(),horario);
 
             List<DTORespostaCompromisso> compromissosGerados = horarioGerado.compromissosCriados;
 
