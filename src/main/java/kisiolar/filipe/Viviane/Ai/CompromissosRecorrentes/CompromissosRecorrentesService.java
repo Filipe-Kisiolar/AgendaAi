@@ -246,7 +246,7 @@ public class CompromissosRecorrentesService{
         return new DTORespostaCompromissoRecorrente(dtoSaidaCompromissosRecorrentes);
     }
 
-    public void deletarCompromissoPorId(long usuarioId,long compromissoid){
+    public void deletarCompromissoPorId(long compromissoid,long usuarioId){
         usuariosService.findUsuarioById(usuarioId);
 
         if(!compromissosRecorrentesRepository.existsByIdAndUsuarioId(compromissoid,usuarioId)) {

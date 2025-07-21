@@ -23,7 +23,7 @@ public class CompromissosController {
 
 
     @GetMapping("/listarcompromissos/{usuarioId}")
-    public ResponseEntity<?> listarCompromissos(long usuarioId){
+    public ResponseEntity<?> listarCompromissos(@PathVariable long usuarioId){
         DTORespostaListasCompromissos listarcompromissos =
                 compromissosService.listarCompromissos(usuarioId);
 

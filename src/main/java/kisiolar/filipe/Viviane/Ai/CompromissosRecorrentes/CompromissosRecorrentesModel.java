@@ -1,6 +1,7 @@
 package kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.validation.constraints.NotNull;
 import kisiolar.filipe.Viviane.Ai.Compromissos.CompromissosModel;
 import jakarta.persistence.*;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.Enums.ModoDeRecorrenciaEnum;
@@ -53,6 +54,7 @@ public class CompromissosRecorrentesModel {
     @JsonIgnore
     private List<CompromissosModel> compromissosGerados;
 
+    @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_id")
     private UsuariosModel usuario;
