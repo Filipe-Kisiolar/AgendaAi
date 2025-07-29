@@ -1,9 +1,11 @@
 package kisiolar.filipe.Viviane.Ai.Seguranca;
 
+import kisiolar.filipe.Viviane.Ai.Exceptions.UsernameOrPasswordInvalidException;
 import kisiolar.filipe.Viviane.Ai.Usuarios.UsuariosModel;
 import kisiolar.filipe.Viviane.Ai.Usuarios.UsuariosRepository;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -28,22 +30,23 @@ public class AuthService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        UsuariosModel usuariosModel = usuariosRepository.findByEmail(username)
-                .orElseThrow(() -> new UsernameNotFoundException("O usuário ou senha inválido"));
-
-        System.out.println("senha carregada do banco" + usuariosModel.getSenha());
-
-        return usuariosModel;
+        return usuariosRepository.findByEmail(username)
+                .orElseThrow(() -> new UsernameNotFoundException("usuário ou senha inválido"));
     }
 
     public String Autenticacao(String email, String senha){
-        UsernamePasswordAuthenticationToken userAndPass =
-                new UsernamePasswordAuthenticationToken(email,senha);
+        try {
+            UsernamePasswordAuthenticationToken userAndPass =
+                    new UsernamePasswordAuthenticationToken(email,senha);
 
-        Authentication authenticate = authenticationManager.authenticate(userAndPass);
+            Authentication authenticate = authenticationManager.authenticate(userAndPass);
 
-        UsuariosModel usuario = (UsuariosModel) authenticate.getPrincipal();
+            UsuariosModel usuario = (UsuariosModel) authenticate.getPrincipal();
 
-        return tokenService.generateToken(usuario);
+            return tokenService.generateToken(usuario);
+        }catch (BadCredentialsException exception){
+            throw new UsernameOrPasswordInvalidException("usuário ou senha inválido");
+        }
+
     }
 }

@@ -25,6 +25,13 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
     }
 
+    @ExceptionHandler(UsernameOrPasswordInvalidException.class)
+    public ResponseEntity<Map<String,String>> handleBadCredentialException(Exception exception){
+        Map<String,String> body = new HashMap<>();
+        body.put("erro", exception.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, String>> handleGeneric(Exception exception) {
         Map<String, String> body = new HashMap<>();
