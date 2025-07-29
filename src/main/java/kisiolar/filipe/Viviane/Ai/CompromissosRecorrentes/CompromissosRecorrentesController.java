@@ -7,6 +7,7 @@ import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.HorariosPorDia.DT
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.HorariosPorDia.DTOUpdateHorariosPorDiaBase;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.HorariosPorDia.ServicesHorariosPorDia.HorariosPorDiaService;
 import kisiolar.filipe.Viviane.Ai.Exceptions.BadRequestException;
+import kisiolar.filipe.Viviane.Ai.Seguranca.AuthUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,8 +30,10 @@ public class CompromissosRecorrentesController {
     @Autowired
     private HorariosPorDiaService horariosPorDiaService;
 
-    @GetMapping("/listarcompromissos/{usuarioId}")
-    public ResponseEntity<?> listarCompromissos(@PathVariable long usuarioId){
+    @GetMapping("/listarcompromissos")
+    public ResponseEntity<?> listarCompromissos(){
+        long usuarioId = AuthUtils.getIdUsuarioLogado();
+
         DTORespostasListasCompromissoRecorrentes listarcompromissos =
                 compromissosRecorrentesService.listarCompromissos(usuarioId);
 
@@ -46,36 +49,43 @@ public class CompromissosRecorrentesController {
 
     @GetMapping("/buscarcompromissoporid/{compromissoId}")
     public ResponseEntity<DTORespostaCompromissoRecorrente> buscarCompromissoPorId(
-            @PathVariable long compromissoId,@PathVariable long usuarioId
+            @PathVariable long compromissoId
     ){
+        long usuarioId = AuthUtils.getIdUsuarioLogado();
+
         DTORespostaCompromissoRecorrente dtoCompromissosRecorrentes =
                 compromissosRecorrentesService.buscarCompromissoPorId(compromissoId,usuarioId);
 
         return ResponseEntity.ok(dtoCompromissosRecorrentes);
     }
 
-    @GetMapping("/buscarcompromissopornome/{usuarioId}/{nome}")
+    @GetMapping("/buscarcompromissopornome/{nome}")
     public ResponseEntity<DTORespostaCompromissoRecorrente> buscarCompromissoPornome(
-            @PathVariable String nome,@PathVariable long usuarioId
+            @PathVariable String nome
     ){
+        long usuarioId = AuthUtils.getIdUsuarioLogado();
+
         DTORespostaCompromissoRecorrente dtoCompromissosRecorrentes =
                 compromissosRecorrentesService.buscarCompromissoPorNome(nome,usuarioId);
 
         return ResponseEntity.ok(dtoCompromissosRecorrentes);
     }
 
-    @GetMapping("/listarconflitos/{usuarioId}")
-    public ResponseEntity<List<List<DTOSaidaCompromissosRecorrentes>>> listarCompromissosConflitantes(@PathVariable long usuarioId){
+    @GetMapping("/listarconflitos")
+    public ResponseEntity<List<List<DTOSaidaCompromissosRecorrentes>>> listarCompromissosConflitantes(){
+        long usuarioId = AuthUtils.getIdUsuarioLogado();
+
         List<List<DTOSaidaCompromissosRecorrentes>> lista =
                 compromissosRecorrentesService.listarCompromissosConflitantes(usuarioId);
         return ResponseEntity.ok(lista);
     }
 
-    @PostMapping("/criarcompromisso/{usuarioId}")
+    @PostMapping("/criarcompromisso")
     public ResponseEntity<DTORespostaCompromissoRecorrente> criarCompromisso(
-            @PathVariable long usuarioId,
             @Valid @RequestBody DTOCreateCompromissosRecorrentes dtoCreateCompromissosRecorrentes
             ,BindingResult resultado){
+
+        long usuarioId = AuthUtils.getIdUsuarioLogado();
 
         if (resultado.hasErrors()) {
             String erros = resultado.getAllErrors().stream()
@@ -90,12 +100,14 @@ public class CompromissosRecorrentesController {
         return ResponseEntity.ok(compromissoCriado);
     }
 
-    @PatchMapping("/alterarcompromisso/{usuarioId}/{compromissoId}")
+    @PatchMapping("/alterarcompromisso/{compromissoId}")
     public ResponseEntity<DTORespostaCompromissoRecorrente> alterarCompromisso(
-            @PathVariable long usuarioId,
-            @PathVariable long compromissoId,@Valid @RequestBody DTOUpdateCompromissosRecorrentes updateCompromissosRecorrentes
-            ,BindingResult resultado
+            @PathVariable long compromissoId,
+            @Valid @RequestBody DTOUpdateCompromissosRecorrentes updateCompromissosRecorrentes,
+            BindingResult resultado
     ){
+        long usuarioId = AuthUtils.getIdUsuarioLogado();
+
         if (resultado.hasErrors()) {
             String erros = resultado.getAllErrors().stream()
                     .map(ObjectError::getDefaultMessage)
@@ -110,23 +122,28 @@ public class CompromissosRecorrentesController {
         return ResponseEntity.ok(compromissoAlterado);
     }
 
-    @PatchMapping("/adicionarhorarionocompromisso//{usuarioId}/{compromissoRecorrenteId}")
+    @PatchMapping("/adicionarhorarionocompromisso/{compromissoRecorrenteId}")
     public ResponseEntity<DTORespostaHorariosPorDia> adicionarHorario(
-            @PathVariable long usuarioId,
             @PathVariable Long compromissoRecorrenteId,
-            @RequestBody DTOCreateHorariosPorDiaBase horariosPorDia){
+            @RequestBody DTOCreateHorariosPorDiaBase horariosPorDia
+    ){
+
+        long usuarioId = AuthUtils.getIdUsuarioLogado();
+
         DTORespostaHorariosPorDia saidaHorariosPorDia =
                 horariosPorDiaService.adicionarHorario(compromissoRecorrenteId,usuarioId,horariosPorDia);
 
         return ResponseEntity.ok(saidaHorariosPorDia);
     }
 
-    @PatchMapping("/alterarhorariodocompromisso/{usuarioId}/{compromissoRecorrenteId}/{horarioId}")
+    @PatchMapping("/alterarhorariodocompromisso/{compromissoRecorrenteId}/{horarioId}")
     public ResponseEntity<DTORespostaHorariosPorDia> alterarHorario(
-            @PathVariable long usuarioId,
             @PathVariable Long compromissoRecorrenteId,
             @PathVariable Long horarioId,
-            @RequestBody DTOUpdateHorariosPorDiaBase updateHorariosPorDia) {
+            @RequestBody DTOUpdateHorariosPorDiaBase updateHorariosPorDia
+    ) {
+
+        long usuarioId = AuthUtils.getIdUsuarioLogado();
 
         DTORespostaHorariosPorDia saidaHorariosPorDia =
                 horariosPorDiaService.alterarHorario(
@@ -135,19 +152,23 @@ public class CompromissosRecorrentesController {
         return ResponseEntity.ok(saidaHorariosPorDia);
     }
 
-    @DeleteMapping("/deletarhorariodocompromisso/{usuarioId}/{compromissoRecorrenteId}/{horarioId}")
+    @DeleteMapping("/deletarhorariodocompromisso/{compromissoRecorrenteId}/{horarioId}")
     public ResponseEntity<Long> deletarHorario(
-            @PathVariable long usuarioId,
             @PathVariable Long compromissoRecorrenteId,
-            @PathVariable Long horarioId){
+            @PathVariable Long horarioId
+    ){
+        long usuarioId = AuthUtils.getIdUsuarioLogado();
+
         long compromissosDeletados =
                 horariosPorDiaService.deletarHorarioPorId(compromissoRecorrenteId,horarioId,usuarioId);
 
         return ResponseEntity.ok(compromissosDeletados);
     }
 
-    @DeleteMapping("/deletarcompromisso/{usuarioId}/{compromissoId}")
-    public ResponseEntity<Void> deletarcompromisso(@PathVariable long usuarioId,@PathVariable long compromissoId){
+    @DeleteMapping("/deletarcompromisso/{compromissoId}")
+    public ResponseEntity<Void> deletarcompromisso(@PathVariable long compromissoId){
+        long usuarioId = AuthUtils.getIdUsuarioLogado();
+
         compromissosRecorrentesService.deletarCompromissoPorId(compromissoId,usuarioId);
 
         return ResponseEntity.noContent().build();

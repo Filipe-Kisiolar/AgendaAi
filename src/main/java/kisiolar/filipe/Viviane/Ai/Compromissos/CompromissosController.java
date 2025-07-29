@@ -2,6 +2,7 @@ package kisiolar.filipe.Viviane.Ai.Compromissos;
 
 
 import kisiolar.filipe.Viviane.Ai.Compromissos.DTOs.*;
+import kisiolar.filipe.Viviane.Ai.Seguranca.AuthUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -22,8 +23,10 @@ public class CompromissosController {
     CompromissosService compromissosService;
 
 
-    @GetMapping("/listarcompromissos/{usuarioId}")
-    public ResponseEntity<?> listarCompromissos(@PathVariable long usuarioId){
+    @GetMapping("/listarcompromissos")
+    public ResponseEntity<?> listarCompromissos(){
+        long usuarioId = AuthUtils.getIdUsuarioLogado();
+
         DTORespostaListasCompromissos listarcompromissos =
                 compromissosService.listarCompromissos(usuarioId);
 
@@ -37,70 +40,80 @@ public class CompromissosController {
         }
     }
 
-    @GetMapping("/buscarcompromissoporid/{usuarioId}/{id}")
+    @GetMapping("/buscarcompromissoporid/{id}")
     public ResponseEntity<DTORespostaCompromisso> buscarCompromissoPorId(
-            @PathVariable long id,@PathVariable long usuarioId
+            @PathVariable long id
     ){
+        long usuarioId = AuthUtils.getIdUsuarioLogado();
+
         DTORespostaCompromisso dtoCompromissos = compromissosService.buscarCompromissoPorId(id,usuarioId);
 
         return ResponseEntity.ok(dtoCompromissos);
     }
 
-    @GetMapping("/listarcompromissopornome/{usuarioId}/{nome}")
+    @GetMapping("/listarcompromissopornome/{nome}")
     public ResponseEntity<DTORespostaListasCompromissos> buscarCompromissoPorNome(
-            @PathVariable String nome,@PathVariable long usuarioId
+            @PathVariable String nome
     ){
+        long usuarioId = AuthUtils.getIdUsuarioLogado();
+
         DTORespostaListasCompromissos lista =
                 compromissosService.listarCompromissosPorNome(nome,usuarioId);
 
         return ResponseEntity.ok(lista);
     }
 
-    @GetMapping("/listarcompromissosdodia/{usuarioId}/{dia}")
+    @GetMapping("/listarcompromissosdodia/{dia}")
     public ResponseEntity<DTORespostaListasCompromissos> listarCompromissosDoDia(
-            @PathVariable("dia") @DateTimeFormat(pattern = "MM-dd-yyyy") LocalDate dia,
-            @PathVariable("usuarioId") long usuarioId
+            @PathVariable("dia") @DateTimeFormat(pattern = "MM-dd-yyyy") LocalDate dia
     ){
+        long usuarioId = AuthUtils.getIdUsuarioLogado();
+
         DTORespostaListasCompromissos lista = compromissosService.listarCompromissosDoDia(dia, usuarioId);
 
         return ResponseEntity.ok(lista);
     }
 
-    @GetMapping("listarcompromissosdasemana/{usuarioId}/{dia}")
+    @GetMapping("listarcompromissosdasemana/{dia}")
     public ResponseEntity<Map<DayOfWeek,DTORespostaListasCompromissos>> listarCompromissosDaSemana(
-            @PathVariable("dia") @DateTimeFormat(pattern = "MM-dd-yyyy") LocalDate dia,
-            @PathVariable("usuarioId") long usuarioId
+            @PathVariable("dia") @DateTimeFormat(pattern = "MM-dd-yyyy") LocalDate dia
     ){
+        long usuarioId = AuthUtils.getIdUsuarioLogado();
+
         Map<DayOfWeek,DTORespostaListasCompromissos> lista =
                 compromissosService.listarCompromissosDaSemana(dia,usuarioId);
 
         return ResponseEntity.ok(lista);
     }
 
-    @GetMapping("/listarconflitos/{usuarioId}")
-    public ResponseEntity<List<List<DTOSaidaCompromissos>>> listarCompromissosConflitantes(
-            @PathVariable long usuarioId
-    ){
+    @GetMapping("/listarconflitos")
+    public ResponseEntity<List<List<DTOSaidaCompromissos>>> listarCompromissosConflitantes(){
+        long usuarioId = AuthUtils.getIdUsuarioLogado();
+
         List<List<DTOSaidaCompromissos>> lista =
                 compromissosService.listarCompromissosConflitantes(usuarioId);
 
         return ResponseEntity.ok(lista);
     }
 
-    @PostMapping("/criarcompromisso/{usuarioId}")
+    @PostMapping("/criarcompromisso")
     public ResponseEntity<DTORespostaCompromisso> criarCompromisso(
-            @RequestBody DTOCreateCompromissos dtoCompromissos,
-            @PathVariable long usuarioId
+            @RequestBody DTOCreateCompromissos dtoCompromissos
     ){
+        long usuarioId = AuthUtils.getIdUsuarioLogado();
+
         DTORespostaCompromisso compromissos = compromissosService.criarCompromisso(dtoCompromissos,usuarioId);
 
         return ResponseEntity.ok(compromissos);
     }
 
-    @PatchMapping("/alterarcompromisso/{usuarioId}/{id}")
+    @PatchMapping("/alterarcompromisso/{id}")
     public ResponseEntity<DTORespostaCompromisso> alterarCompromisso(
-            @PathVariable long id, @PathVariable long usuarioId,
-            @RequestBody DTOUpdateCompromissos update){
+            @PathVariable long id,
+            @RequestBody DTOUpdateCompromissos update
+    ){
+        long usuarioId = AuthUtils.getIdUsuarioLogado();
+
         DTORespostaCompromisso compromissoAlterado = compromissosService.alterarCompromisso(id,usuarioId,update);
 
         return ResponseEntity.ok(compromissoAlterado);
@@ -108,7 +121,9 @@ public class CompromissosController {
 
     @DeleteMapping("/deletarcompromisso/{id}")
     public ResponseEntity<Void> deletarcompromisso(@PathVariable long id){
-        compromissosService.deletarCompromissoPorId(id);
+        long usuarioId = AuthUtils.getIdUsuarioLogado();
+
+        compromissosService.deletarCompromissoPorId(id,usuarioId);
 
         return ResponseEntity.noContent().build();
     }

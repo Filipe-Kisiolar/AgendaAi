@@ -55,6 +55,7 @@ public interface CompromissosRepository extends JpaRepository<CompromissosModel,
             @Param("fim") LocalDateTime fim,
             @Param("usuarioId") long usuarioId);
 
+    boolean existsByIdAndUsuarioId(long id, long usuarioId);
 
     @Modifying
     @Query("DELETE FROM CompromissosModel c WHERE c.inicio < :limite")

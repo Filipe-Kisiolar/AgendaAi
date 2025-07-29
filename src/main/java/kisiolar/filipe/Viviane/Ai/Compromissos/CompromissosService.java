@@ -238,11 +238,13 @@ public class CompromissosService {
         }
     }
 
-    public void deletarCompromissoPorId(long id){
-        if(!compromissosRepository.existsById(id)){
-            throw new ResourceNotFindException("Compromisso com ID:" +id +"não foi encontrado");
+    public void deletarCompromissoPorId(long compromissoId, long usuarioId){
+        if(!compromissosRepository.existsByIdAndUsuarioId(compromissoId,usuarioId)) {
+            throw new ResourceNotFindException("Compromisso com ID:" +compromissoId +"não foi encontrado" +
+                    "nesse usuário");
         }
-        compromissosRepository.deleteById(id);
+
+        compromissosRepository.deleteById(compromissoId);
     }
 
     @Transactional
