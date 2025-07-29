@@ -3,6 +3,9 @@ package kisiolar.filipe.Viviane.Ai.Usuarios;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.Optional;
 
 public interface UsuariosRepository extends JpaRepository<UsuariosModel,Long> {
 
@@ -16,5 +19,10 @@ public interface UsuariosRepository extends JpaRepository<UsuariosModel,Long> {
     """)
     boolean usuarioDiferenteTemEmail(@Param("email") String email, @Param("id")    Long id);
 
-    UsuariosModel findBYByEmail(String email);
+    @Query("""
+         SELECT u
+         FROM UsuariosModel u
+         WHERE u.email = :email
+    """)
+    Optional<UsuariosModel> findByEmail(String email);
 }

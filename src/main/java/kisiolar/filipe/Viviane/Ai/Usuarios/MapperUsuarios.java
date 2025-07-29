@@ -9,12 +9,14 @@ public interface MapperUsuarios {
 
     @Mapping(target = "id",ignore = true)
     @Mapping(target = "role",ignore = true)
+    @Mapping(target = "authorities",ignore = true)
     @Mapping(target = "compromissos",ignore = true)
     @Mapping(target = "compromissosRecorrentes",ignore = true)
     UsuariosModel mapToModel(DTOCreateUsuario dtoCreateUsuario);
 
     @Mapping(target = "id",ignore = true)
     @Mapping(target = "role",ignore = true)
+    @Mapping(target = "authorities",ignore = true)
     @Mapping(target = "compromissos",ignore = true)
     @Mapping(target = "compromissosRecorrentes",ignore = true)
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)

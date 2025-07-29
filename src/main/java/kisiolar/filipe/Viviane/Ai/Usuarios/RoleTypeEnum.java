@@ -1,5 +1,5 @@
 package kisiolar.filipe.Viviane.Ai.Usuarios;
 
 public enum RoleTypeEnum {
-    USUARIO, ADMIN
+    ROLE_USUARIO, ROLE_ADMIN
 }

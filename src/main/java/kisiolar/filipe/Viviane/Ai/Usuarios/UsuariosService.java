@@ -4,6 +4,7 @@ import kisiolar.filipe.Viviane.Ai.Exceptions.BadRequestException;
 import kisiolar.filipe.Viviane.Ai.Exceptions.ResourceNotFindException;
 import kisiolar.filipe.Viviane.Ai.Usuarios.DTOs.DTOCreateUsuario;
 import kisiolar.filipe.Viviane.Ai.Usuarios.DTOs.DTOUpdateUsuario;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -16,9 +17,12 @@ public class UsuariosService {
 
     private final MapperUsuarios mapperUsuarios;
 
-    public UsuariosService(UsuariosRepository usuariosRepository, MapperUsuarios mapperUsuarios) {
+    private final PasswordEncoder passwordEncoder;
+
+    public UsuariosService(UsuariosRepository usuariosRepository, MapperUsuarios mapperUsuarios,PasswordEncoder passwordEncoder) {
         this.usuariosRepository = usuariosRepository;
         this.mapperUsuarios = mapperUsuarios;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public UsuariosModel findUsuarioById(long usuarioId){
@@ -34,10 +38,14 @@ public class UsuariosService {
         }
 
         UsuariosModel usuario = mapperUsuarios.mapToModel(dtoCreate);
-        usuario.setRole(RoleTypeEnum.USUARIO);
+
+        String senhaEncriptada = passwordEncoder.encode(usuario.getSenha());
+
+        usuario.setSenha(senhaEncriptada);
+
+        usuario.setRole(RoleTypeEnum.ROLE_USUARIO);
 
         usuariosRepository.save(usuario);
-
     }
 
     public void alterarUsuario(long id,DTOUpdateUsuario dtoUpdate){
@@ -64,8 +72,6 @@ public class UsuariosService {
 
         usuariosRepository.deleteById(id);
     }
-
-    //todo:encriptar as senhas
 
     private List<String> verificarInformacoesCriacao(DTOCreateUsuario usuario){
         List<String> errosIdentificados = new ArrayList<>();
