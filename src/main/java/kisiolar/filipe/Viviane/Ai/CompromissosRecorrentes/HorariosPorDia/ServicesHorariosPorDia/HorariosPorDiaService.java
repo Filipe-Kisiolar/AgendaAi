@@ -7,7 +7,6 @@ import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.CompromissosRecorrente
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.CompromissosRecorrentesRepository;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.HorariosPorDia.DTOCreateHorariosPorDiaBase;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.HorariosPorDia.DTORespostaHorariosPorDia;
-import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.HorariosPorDia.DTOSaidaHorariosPorDiaBase;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.HorariosPorDia.DTOUpdateHorariosPorDiaBase;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.HorariosPorDia.DataEspecificaAnual.DTOCreateHorariosDataEspecificaAnual;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.HorariosPorDia.DataEspecificaAnual.DTOUpdateHorariosDataEspecificaAnual;
@@ -58,8 +57,12 @@ public class HorariosPorDiaService extends HorariosServiceBase {
     }
 
     @Transactional
-    public DTORespostaHorariosPorDia adicionarHorario(Long compromissoRecorrenteId, DTOCreateHorariosPorDiaBase dtoCreateHorariosPorDia) {
-        CompromissosRecorrentesModel compromissoRecorrente = compromissosRecorrentesRepository.findById(compromissoRecorrenteId)
+    public DTORespostaHorariosPorDia adicionarHorario(
+            long compromissoRecorrenteId, long usuarioId,
+            DTOCreateHorariosPorDiaBase dtoCreateHorariosPorDia
+    ) {
+        CompromissosRecorrentesModel compromissoRecorrente =
+                compromissosRecorrentesRepository.findByIdByUser(compromissoRecorrenteId,usuarioId)
                 .orElseThrow(() -> new ResourceNotFindException("Compromisso recorrente não encontrado"));
 
         return switch (compromissoRecorrente.getModoDeRecorrencia()) {
@@ -98,9 +101,13 @@ public class HorariosPorDiaService extends HorariosServiceBase {
     }
 
     @Transactional
-    public DTORespostaHorariosPorDia alterarHorario(Long compromissoRecorrenteId, Long horarioId, DTOUpdateHorariosPorDiaBase dtoUpdateHorariosPorDia) {
+    public DTORespostaHorariosPorDia alterarHorario(
+            Long compromissoRecorrenteId, Long horarioId,long usuarioId,
+            DTOUpdateHorariosPorDiaBase dtoUpdateHorariosPorDia
+    ) {
 
-        CompromissosRecorrentesModel compromissoRecorrente = compromissosRecorrentesRepository.findById(compromissoRecorrenteId)
+        CompromissosRecorrentesModel compromissoRecorrente =
+                compromissosRecorrentesRepository.findByIdByUser(compromissoRecorrenteId,usuarioId)
                 .orElseThrow(() -> new ResourceNotFindException("Compromisso recorrente não encontrado"));
 
         return switch (compromissoRecorrente.getModoDeRecorrencia()) {
@@ -163,13 +170,15 @@ public class HorariosPorDiaService extends HorariosServiceBase {
     }
 
     @Transactional
-    public Long deletarHorarioPorId(Long compromissoRecorrenteId, Long horarioId) {
+    public Long deletarHorarioPorId(
+            Long compromissoRecorrenteId, Long horarioId,long usuarioId
+    ) {
 
         CompromissosRecorrentesModel compromissoRecorrente = compromissosRecorrentesRepository.
-                findById(compromissoRecorrenteId).
-                orElseThrow(() -> new ResourceNotFindException("Compromisso inexistente"));
+                findByIdByUser(compromissoRecorrenteId,usuarioId)
+                .orElseThrow(() -> new ResourceNotFindException("Compromisso inexistente"));
 
-        HorariosPorDiaModel horario = compromissoRecorrente.getHorariosPorDias()
+        HorariosPorDiaModel horario = compromissoRecorrente.getHorariosPorDia()
                 .stream()
                 .filter(h -> h.getId().equals(horarioId))
                 .findFirst()
@@ -195,7 +204,7 @@ public class HorariosPorDiaService extends HorariosServiceBase {
             default -> throw new IllegalArgumentException("Combinação inválida de tipo e modo de recorrência");
         };
 
-        compromissoRecorrente.getHorariosPorDias().remove(horario);
+        compromissoRecorrente.getHorariosPorDia().remove(horario);
         return compromissosDeletados;
     }
 

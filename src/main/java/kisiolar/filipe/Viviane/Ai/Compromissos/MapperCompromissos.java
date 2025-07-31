@@ -12,15 +12,18 @@ import java.util.List;
 public interface MapperCompromissos {
      @Mapping(target = "id",ignore = true)
      @Mapping(target = "compromissoRecorrente", ignore = true)
+     @Mapping(target = "usuario",ignore = true)
      CompromissosModel map(DTOCreateCompromissos dto);
 
      DTOSaidaCompromissos map(CompromissosModel compromissosModel);
 
      @Mapping(target = "compromissoRecorrente", ignore = true)
+     @Mapping(target = "usuario",ignore = true)
      CompromissosModel map(DTOSaidaCompromissos dto);
 
      @Mapping(target = "id", ignore = true)
      @Mapping(target = "compromissoRecorrente", ignore = true)
+     @Mapping(target = "usuario",ignore = true)
      @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
      void atualizacao(DTOUpdateCompromissos dto, @MappingTarget CompromissosModel entity);
 

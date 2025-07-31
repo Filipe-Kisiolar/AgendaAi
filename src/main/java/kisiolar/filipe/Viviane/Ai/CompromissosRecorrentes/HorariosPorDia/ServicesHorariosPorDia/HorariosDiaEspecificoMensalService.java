@@ -106,7 +106,7 @@ public class HorariosDiaEspecificoMensalService extends HorariosServiceBase{
 
         long intervalo = compromissoRecorrente.getIntervalo();
 
-        return compromissoRecorrente.getHorariosPorDias().stream()
+        return compromissoRecorrente.getHorariosPorDia().stream()
                 .map(HorariosDiaEspecificoMensal.class::cast)
                 .flatMap(horario -> criarCompromissosPorDiaEspecificoMensal(compromissoRecorrente,horario
                 ,inicioRecorrencia,fimRecorrencia,intervalo).stream())
@@ -178,7 +178,8 @@ public class HorariosDiaEspecificoMensalService extends HorariosServiceBase{
 
             DTOCreateCompromissos dtoCreateCompromissos = mapperCompromissosRecorrentes
                     .mapGerarCompromisso(compromissoRecorrente, inicioCompromisso, fimCompromisso);
-            compromissosGerados.add(compromissosService.criarCompromisso(dtoCreateCompromissos));
+            compromissosGerados.add(compromissosService.criarCompromisso(dtoCreateCompromissos,
+                    compromissoRecorrente.getUsuario().getId()));
 
              i = i + intervalo;
 
@@ -222,14 +223,14 @@ public class HorariosDiaEspecificoMensalService extends HorariosServiceBase{
                 || horario.getInicioDiaEspecificoMes() <= 31;
 
         if (inconformidadeDiaDeInicio){
-            errosIdentificados.add("O Dia Do Mes De Inicio Deve Ser Maior Que 0 E Menor Ou Igual A 31");
+            errosIdentificados.add("O Dia Do Mes De Inicio Deve Ser Maior Que 0 E Menor Ou Igual ADMIN 31");
         }
 
         boolean inconformidadeDiaDeFim = horario.getFimDiaEspecificoMes() > 0
                 || horario.getFimDiaEspecificoMes() <= 31;
 
         if (inconformidadeDiaDeFim){
-            errosIdentificados.add("O Dia Do Mes De Fim Deve Ser Maior Que 0 E Menor Ou Igual A 31");
+            errosIdentificados.add("O Dia Do Mes De Fim Deve Ser Maior Que 0 E Menor Ou Igual ADMIN 31");
         }
 
         if (horario.getFimDiaEspecificoMes() < horario.getInicioDiaEspecificoMes()){
@@ -246,7 +247,7 @@ public class HorariosDiaEspecificoMensalService extends HorariosServiceBase{
                             " Para Horarios Que O Fim é No Mesmo Dia Que O Inicio\n");
         }
 
-        List<HorariosDiaEspecificoMensal> listaHorarios = compromissoRecorrente.getHorariosPorDias().stream()
+        List<HorariosDiaEspecificoMensal> listaHorarios = compromissoRecorrente.getHorariosPorDia().stream()
                 .map(HorariosDiaEspecificoMensal.class::cast)
                 .toList();
 

@@ -102,7 +102,7 @@ public class HorariosFrequenciaDiariaService extends HorariosServiceBase {
 
         long intervalo = compromissoRecorrente.getIntervalo();
 
-        return compromissoRecorrente.getHorariosPorDias().stream()
+        return compromissoRecorrente.getHorariosPorDia().stream()
                 .map(HorariosFrequenciaDiaria.class::cast)
                 .flatMap(horario -> criarCompromissosPorFrequenciaDiaria(compromissoRecorrente,
                         horario,inicioRecorrencia,fimRecorrencia,intervalo).stream())
@@ -145,7 +145,8 @@ public class HorariosFrequenciaDiariaService extends HorariosServiceBase {
                 DTOCreateCompromissos dtoCreateCompromissos = mapperCompromissosRecorrentes
                         .mapGerarCompromisso(compromissoRecorrente, inicioCompromisso, fimCompromisso);
 
-                compromissosGerados.add(compromissosService.criarCompromisso(dtoCreateCompromissos));
+                compromissosGerados.add(compromissosService.criarCompromisso(dtoCreateCompromissos,
+                        compromissoRecorrente.getUsuario().getId()));
 
                 i = i + intervalo;
             }
@@ -158,7 +159,8 @@ public class HorariosFrequenciaDiariaService extends HorariosServiceBase {
                 DTOCreateCompromissos dtoCreateCompromissos = mapperCompromissosRecorrentes
                         .mapGerarCompromisso(compromissoRecorrente, inicioCompromisso, fimCompromisso);
 
-                compromissosGerados.add(compromissosService.criarCompromisso(dtoCreateCompromissos));
+                compromissosGerados.add(compromissosService.criarCompromisso(dtoCreateCompromissos,
+                        compromissoRecorrente.getUsuario().getId()));
 
                 i = i + intervalo;
             }
@@ -191,7 +193,7 @@ public class HorariosFrequenciaDiariaService extends HorariosServiceBase {
             errosIdentificados.add("O Fim Do Horario Nao Pode Ser Antes Do Inicio");
         }
 
-        List<HorariosFrequenciaDiaria> listaHorarios = compromissoRecorrente.getHorariosPorDias().stream()
+        List<HorariosFrequenciaDiaria> listaHorarios = compromissoRecorrente.getHorariosPorDia().stream()
                 .map(HorariosFrequenciaDiaria.class::cast)
                 .toList();
 

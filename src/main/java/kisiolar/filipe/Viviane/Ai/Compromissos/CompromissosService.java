@@ -6,6 +6,8 @@ import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.CompromissosRecorrente
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.CompromissosRecorrentesRepository;
 import kisiolar.filipe.Viviane.Ai.Exceptions.BadRequestException;
 import kisiolar.filipe.Viviane.Ai.Exceptions.ResourceNotFindException;
+import kisiolar.filipe.Viviane.Ai.Usuarios.UsuariosModel;
+import kisiolar.filipe.Viviane.Ai.Usuarios.UsuariosService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,11 +30,16 @@ public class CompromissosService {
     @Autowired
     private MapperCompromissos mapperCompromissos;
 
+    @Autowired
+    private UsuariosService usuariosService;
+
     @Transactional
-    public DTORespostaListasCompromissos listarCompromissos(){
+    public DTORespostaListasCompromissos listarCompromissos(long usuarioId){
+        usuariosService.findUsuarioById(usuarioId);
+
         LocalDateTime diaAtual = LocalDate.now().atStartOfDay();
 
-        List<CompromissosModel> lista = compromissosRepository.listAllAfterDate(diaAtual);
+        List<CompromissosModel> lista = compromissosRepository.listAllByUserAfterDate(diaAtual,usuarioId);
 
         List<DTOSaidaCompromissos> listaDto =ordenarListaPorHorario(lista).stream()
                 .map(mapperCompromissos::map)
@@ -42,9 +49,12 @@ public class CompromissosService {
     }
 
     @Transactional
-    public DTORespostaCompromisso buscarCompromissoPorId(long id){
-        CompromissosModel compromissosModel = compromissosRepository.findById(id).
-                orElseThrow(() -> new ResourceNotFindException("compromisso não encontrado"));
+    public DTORespostaCompromisso buscarCompromissoPorId(long id,long usuarioId){
+        usuariosService.findUsuarioById(usuarioId);
+
+        CompromissosModel compromissosModel = compromissosRepository.findByIdByUser(id,usuarioId)
+                .orElseThrow(() -> new ResourceNotFindException("compromisso não encontrado" +
+                        "para esse usuário"));
 
         DTOSaidaCompromissos dtoSaidaCompromissos = mapperCompromissos.map(compromissosModel);
 
@@ -60,10 +70,12 @@ public class CompromissosService {
     }
 
     @Transactional
-    public DTORespostaListasCompromissos listarCompromissosPorNome(String nome){
+    public DTORespostaListasCompromissos listarCompromissosPorNome(String nome,long usuarioId){
+        usuariosService.findUsuarioById(usuarioId);
+
         LocalDateTime diaAtual = LocalDate.now().atStartOfDay();
 
-        List<CompromissosModel> lista = compromissosRepository.findByNome(nome);
+        List<CompromissosModel> lista = compromissosRepository.findByNomeByUser(nome,usuarioId,diaAtual);
 
         List<DTOSaidaCompromissos> listaDto =ordenarListaPorHorario(lista).stream()
                 .map(mapperCompromissos::map)
@@ -79,10 +91,10 @@ public class CompromissosService {
     }
 
     @Transactional
-    public DTORespostaListasCompromissos listarCompromissosDoDia(LocalDate dia){
+    public DTORespostaListasCompromissos listarCompromissosDoDia(LocalDate dia,long usuarioId){
         LocalDateTime comecoDoDia = dia.atStartOfDay();
         LocalDateTime finalDoDia = dia.plusDays(1).atStartOfDay();
-        List<CompromissosModel> lista = compromissosRepository.findCompromissoByInicioBetwenn(comecoDoDia,finalDoDia);
+        List<CompromissosModel> lista = compromissosRepository.findCompromissoByInicioBetwenn(comecoDoDia,finalDoDia,usuarioId);
         List<DTOSaidaCompromissos> listaDto =ordenarListaPorHorario(lista).stream()
                 .map(mapperCompromissos::map)
                 .toList();
@@ -98,12 +110,14 @@ public class CompromissosService {
 
     //gera uma lista de compromissos da semana a partir do dia que a requisicao foi feita
     @Transactional
-    public Map<DayOfWeek, DTORespostaListasCompromissos> listarCompromissosDaSemana(LocalDate diaAtual) {
+    public Map<DayOfWeek, DTORespostaListasCompromissos> listarCompromissosDaSemana(
+            LocalDate diaAtual,long usuarioId
+    ) {
         LocalDateTime primeiroDiaDaSemana = diaAtual.atStartOfDay();
         LocalDateTime ultimoDiaDaSemana = diaAtual.plusWeeks(1).atStartOfDay();
 
         List<CompromissosModel> compromissosDaSemana = compromissosRepository
-                .findCompromissoByInicioBetwenn(primeiroDiaDaSemana,ultimoDiaDaSemana);
+                .findCompromissoByInicioBetwenn(primeiroDiaDaSemana,ultimoDiaDaSemana,usuarioId);
 
         //Define a ordem dos dias da semana a partir da data atual
         List<DayOfWeek> ordemDosDias = IntStream.range(0, 7)
@@ -148,19 +162,24 @@ public class CompromissosService {
         return respostaPorDia;
     }
 
-    public List<List<DTOSaidaCompromissos>> listarCompromissosConflitantes() {
+    public List<List<DTOSaidaCompromissos>> listarCompromissosConflitantes(long usuarioId) {
         LocalDateTime diaAtual = LocalDate.now().atStartOfDay();
 
-        List<CompromissosModel> listaTodosCompromissos = compromissosRepository.listAllAfterDate(diaAtual);
+        List<CompromissosModel> listaTodosCompromissos =
+                compromissosRepository.listAllByUserAfterDate(diaAtual,usuarioId);
 
-        List<List<DTOSaidaCompromissos>> gruposDeConflito = compromissosConflitantesDaLista(listaTodosCompromissos);
+        List<List<DTOSaidaCompromissos>> gruposDeConflito =
+                compromissosConflitantesDaLista(listaTodosCompromissos);
+
         return gruposDeConflito;
-
     }
 
-
-    public DTORespostaCompromisso criarCompromisso(DTOCreateCompromissos dtoCreateCompromissos) {
+    public DTORespostaCompromisso criarCompromisso(DTOCreateCompromissos dtoCreateCompromissos,long usuarioId) {
         CompromissosModel compromissosModel = mapperCompromissos.map(dtoCreateCompromissos);
+
+        UsuariosModel usuarioDoCompromisso = usuariosService.findUsuarioById(usuarioId);
+
+        compromissosModel.setUsuario(usuarioDoCompromisso);
 
         if  (dtoCreateCompromissos.getCompromissoRecorrenteId() != 0) {
             CompromissosRecorrentesModel compromissosRecorrentesModel = compromissosRecorrentesRepository
@@ -189,9 +208,14 @@ public class CompromissosService {
         }
     }
 
-    public DTORespostaCompromisso alterarCompromisso(long id, DTOUpdateCompromissos dtoUpdateCompromissos){
-        CompromissosModel compromissosModel = compromissosRepository.findById(id).
-                orElseThrow(() -> new RuntimeException("compromisso não encontrado"));
+    public DTORespostaCompromisso alterarCompromisso(
+            long id,long usuarioId,
+            DTOUpdateCompromissos dtoUpdateCompromissos
+    ){
+        usuariosService.findUsuarioById(usuarioId);
+
+        CompromissosModel compromissosModel = compromissosRepository.findByIdByUser(id,usuarioId)
+                .orElseThrow(() -> new RuntimeException("compromisso não encontrado para esse usuário"));
 
         mapperCompromissos.atualizacao(dtoUpdateCompromissos,compromissosModel);
 
@@ -214,11 +238,13 @@ public class CompromissosService {
         }
     }
 
-    public void deletarCompromissoPorId(long id){
-        if(!compromissosRepository.existsById(id)){
-            throw new ResourceNotFindException("Compromisso com ID:" +id +"não foi encontrado");
+    public void deletarCompromissoPorId(long compromissoId, long usuarioId){
+        if(!compromissosRepository.existsByIdAndUsuarioId(compromissoId,usuarioId)) {
+            throw new ResourceNotFindException("Compromisso com ID:" +compromissoId +"não foi encontrado" +
+                    "nesse usuário");
         }
-        compromissosRepository.deleteById(id);
+
+        compromissosRepository.deleteById(compromissoId);
     }
 
     @Transactional
@@ -271,7 +297,8 @@ public class CompromissosService {
     private List<CompromissosModel> verificarConflitos(CompromissosModel compromisso) {
         LocalDateTime diaAtual = LocalDate.now().atStartOfDay();
 
-        List<CompromissosModel> listaTodosCompromissos = compromissosRepository.listAllAfterDate(diaAtual);
+        List<CompromissosModel> listaTodosCompromissos =
+                compromissosRepository.listAllByUserAfterDate(diaAtual,compromisso.getUsuario().getId());
 
         return verificarConflitosNaLista(compromisso,listaTodosCompromissos);
     }

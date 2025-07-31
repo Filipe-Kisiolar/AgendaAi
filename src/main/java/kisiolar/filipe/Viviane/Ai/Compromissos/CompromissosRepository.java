@@ -7,17 +7,55 @@ import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface CompromissosRepository extends JpaRepository<CompromissosModel,Long> {
 
-    @Query("SELECT c FROM CompromissosModel c WHERE c.inicio >= :inicioDoDiaAtual")
-    List<CompromissosModel> listAllAfterDate(@Param("inicioDoDiaAtual") LocalDateTime inicioDiaAtual);
+    @Query("""
+    SELECT c
+       FROM CompromissosModel c
+        WHERE c.id = :compromissoId
+        AND c.usuario.id = :usuarioId
+    """)
+    Optional<CompromissosModel> findByIdByUser(
+            @Param("compromissoId") long compromissoId,@Param("usuarioId") long usuarioId
+    );
 
-    List<CompromissosModel> findByNome(String nome);
+    @Query("""
+    SELECT c
+      FROM CompromissosModel c
+        WHERE c.fim >= :dataAtual
+        AND c.usuario.id = :usuarioId
+    """)
+    List<CompromissosModel> listAllByUserAfterDate(
+            @Param("dataAtual") LocalDateTime dataAtual, @Param("usuarioId") long usuarioId
+    );
 
-    @Query("SELECT c FROM CompromissosModel c WHERE c.inicio >= :inicio AND c.inicio < :fim")
-    List<CompromissosModel> findCompromissoByInicioBetwenn(@Param("inicio") LocalDateTime inicio, @Param("fim") LocalDateTime fim);
+    @Query("""
+    SELECT c
+      FROM CompromissosModel c
+        WHERE c.nome = :nome
+        AND c.usuario.id = :usuarioId
+        AND c.fim >= :dataAtual
+    """)
+    List<CompromissosModel> findByNomeByUser(
+            @Param("nome") String nome,@Param("usuarioId") long usuarioId,
+            @Param("dataAtual") LocalDateTime dataAtual
+    );
 
+    @Query("""
+    SELECT c
+      FROM CompromissosModel c
+     WHERE c.inicio >= :inicio
+       AND c.inicio <  :fim
+       AND c.usuario.id = :usuarioId
+    """)
+    List<CompromissosModel> findCompromissoByInicioBetwenn(
+            @Param("inicio") LocalDateTime inicio,
+            @Param("fim") LocalDateTime fim,
+            @Param("usuarioId") long usuarioId);
+
+    boolean existsByIdAndUsuarioId(long id, long usuarioId);
 
     @Modifying
     @Query("DELETE FROM CompromissosModel c WHERE c.inicio < :limite")

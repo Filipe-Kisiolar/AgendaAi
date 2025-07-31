@@ -18,11 +18,12 @@ import java.time.LocalDateTime;
 public interface MapperCompromissosRecorrentes {
 
     @Mapping(target = "id",ignore = true)
-    @Mapping(target = "horariosPorDias", ignore = true)
+    @Mapping(target = "horariosPorDia", ignore = true)
     @Mapping(target = "compromissosGerados",ignore = true)
+    @Mapping(target = "usuario",ignore = true)
     CompromissosRecorrentesModel mapToModel(DTOCreateCompromissosRecorrentes dto);
 
-    @Mapping(source = "horariosPorDias", target = "horariosPorDia")
+    @Mapping(source = "horariosPorDia", target = "horariosPorDia")
     @Mapping(source = "compromissosGerados", target = "compromissosGerados")
     DTOSaidaCompromissosRecorrentes  mapToDto(CompromissosRecorrentesModel entity);
 
@@ -35,18 +36,10 @@ public interface MapperCompromissosRecorrentes {
 
     @Mapping(target = "id",ignore = true)
     @Mapping(target = "modoDeRecorrencia",ignore = true)
-    @Mapping(target = "horariosPorDias",ignore = true)
+    @Mapping(target = "horariosPorDia",ignore = true)
     @Mapping(target = "compromissosGerados",ignore = true)
+    @Mapping(target = "usuario",ignore = true)
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void atualizacao(DTOUpdateCompromissosRecorrentes dto, @MappingTarget CompromissosRecorrentesModel entity);
 
-    //vincula os horarios por dia que serao criados ao compromisso recorrente que os cria
-    @AfterMapping
-    default void vincularPai(@MappingTarget CompromissosRecorrentesModel entity) {
-        if (entity.getHorariosPorDias() != null) {
-            for (HorariosPorDiaModel h : entity.getHorariosPorDias()) {
-                h.setCompromissoRecorrente(entity);
-            }
-        }
-    }
 }

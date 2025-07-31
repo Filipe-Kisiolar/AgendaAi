@@ -18,6 +18,8 @@ import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.HorariosPorDia.Horario
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.HorariosPorDia.ServicesHorariosPorDia.HorariosPorDiaService;
 import kisiolar.filipe.Viviane.Ai.Exceptions.BadRequestException;
 import kisiolar.filipe.Viviane.Ai.Exceptions.ResourceNotFindException;
+import kisiolar.filipe.Viviane.Ai.Usuarios.UsuariosModel;
+import kisiolar.filipe.Viviane.Ai.Usuarios.UsuariosService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,7 +32,6 @@ import static kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.Enums.ModoDeRec
 @Service
 public class CompromissosRecorrentesService{
     //TODO:usar @transacional quando for fazer requisisao com mapper
-    //TODO:NAO deixar o inicio da recorrencia,o final da recorrencia a data e o horario e os dias como opcionais
     @Autowired
     private CompromissosRecorrentesRepository compromissosRecorrentesRepository;
     @Autowired
@@ -42,14 +43,17 @@ public class CompromissosRecorrentesService{
     @Autowired
     private MapperCompromissos mapperCompromissos;
     @Autowired
+    private UsuariosService usuariosService;
+    @Autowired
     private HorariosPorDiaService horariosPorDiaService;
 
+    public DTORespostasListasCompromissoRecorrentes listarCompromissos(long usuarioId){
+        usuariosService.findUsuarioById(usuarioId);
 
-    //TODO: refatora para ter outra lista completa mapeada pelos dias da semana
-    public DTORespostasListasCompromissoRecorrentes listarCompromissos(){
         LocalDate diaAtual = LocalDate.now();
 
-        List<CompromissosRecorrentesModel> lista = compromissosRecorrentesRepository.listAllAfterDate(diaAtual);
+        List<CompromissosRecorrentesModel> lista =
+                compromissosRecorrentesRepository.listAllByUserAfterDate(diaAtual,usuarioId);
 
         List<DTOSaidaCompromissosRecorrentes> listaDto =lista.stream().
                 sorted(Comparator
@@ -61,13 +65,19 @@ public class CompromissosRecorrentesService{
     }
 
     @Transactional
-    public DTORespostaCompromissoRecorrente buscarCompromissoPorId(long id){
-       CompromissosRecorrentesModel compromissosRecorrentesModel = compromissosRecorrentesRepository.findById(id).
-               orElseThrow(() -> new RuntimeException("compromisso recorrente não encontrado"));
+    public DTORespostaCompromissoRecorrente buscarCompromissoPorId(long id,long usuarioId){
+        usuariosService.findUsuarioById(usuarioId);
 
-       DTOSaidaCompromissosRecorrentes dtoCreateCompromissosRecorrentes = mapperCompromissosRecorrentes.mapToDto(compromissosRecorrentesModel);
+       CompromissosRecorrentesModel compromissosRecorrentesModel =
+               compromissosRecorrentesRepository.findByIdByUser(id,usuarioId)
+               .orElseThrow(() -> new ResourceNotFindException("compromisso recorrente não encontrado" +
+                       "para esse usuário"));
 
-       List<DTOSaidaCompromissosRecorrentes> conflitos = verificarConflitos(compromissosRecorrentesModel).stream()
+       DTOSaidaCompromissosRecorrentes dtoCreateCompromissosRecorrentes =
+               mapperCompromissosRecorrentes.mapToDto(compromissosRecorrentesModel);
+
+       List<DTOSaidaCompromissosRecorrentes> conflitos =
+               verificarConflitos(compromissosRecorrentesModel).stream()
                .map(mapperCompromissosRecorrentes::mapToDto)
                .toList();
 
@@ -79,9 +89,13 @@ public class CompromissosRecorrentesService{
     }
 
     @Transactional
-    public DTORespostaCompromissoRecorrente buscarCompromissoPorNome(String nome){
-        CompromissosRecorrentesModel compromissosRecorrentesModel = compromissosRecorrentesRepository.findByNome(nome).
-                orElseThrow(() -> new RuntimeException("compromisso recorrente não encontrado"));
+    public DTORespostaCompromissoRecorrente buscarCompromissoPorNome(String nome,long usuarioId){
+        usuariosService.findUsuarioById(usuarioId);
+
+        CompromissosRecorrentesModel compromissosRecorrentesModel =
+                compromissosRecorrentesRepository.findByNomeByUser(nome,usuarioId)
+                .orElseThrow(() -> new ResourceNotFindException("compromisso recorrente não encontrado" +
+                        " para esse compromisso"));
 
         DTOSaidaCompromissosRecorrentes dtoCreateCompromissosRecorrentes = mapperCompromissosRecorrentes.mapToDto(compromissosRecorrentesModel);
 
@@ -96,10 +110,13 @@ public class CompromissosRecorrentesService{
         }
     }
 
-    public List<List<DTOSaidaCompromissosRecorrentes>> listarCompromissosConflitantes(){
+    public List<List<DTOSaidaCompromissosRecorrentes>> listarCompromissosConflitantes(long usuarioId){
+        usuariosService.findUsuarioById(usuarioId);
+
         LocalDate diaAtual = LocalDate.now();
 
-        List<CompromissosRecorrentesModel> listaTodosCompromissos = compromissosRecorrentesRepository.listAllAfterDate(diaAtual);
+        List<CompromissosRecorrentesModel> listaTodosCompromissos =
+                compromissosRecorrentesRepository.listAllByUserAfterDate(diaAtual,usuarioId);
 
         List<List<DTOSaidaCompromissosRecorrentes>> gruposDeConflito = compromissosConflitantesLista(listaTodosCompromissos);
 
@@ -133,9 +150,16 @@ public class CompromissosRecorrentesService{
     }
 
     @Transactional
-    public DTORespostaCompromissoRecorrente criarCompromissoRecorrente(DTOCreateCompromissosRecorrentes dtoCreateCompromissosRecorrentes){
+    public DTORespostaCompromissoRecorrente criarCompromissoRecorrente(
+            long usuarioId,
+            DTOCreateCompromissosRecorrentes dtoCreateCompromissosRecorrentes
+    ){
+
+        UsuariosModel usuario = usuariosService.findUsuarioById(usuarioId);
 
         CompromissosRecorrentesModel compromissoRecorrente = mapperCompromissosRecorrentes.mapToModel(dtoCreateCompromissosRecorrentes);
+
+        compromissoRecorrente.setUsuario(usuario);
 
         List<String> errosIdentificados = verificarValidadeDasInformacoes(
                 compromissoRecorrente,dtoCreateCompromissosRecorrentes.getHorariosPorDia());
@@ -153,7 +177,8 @@ public class CompromissosRecorrentesService{
         //cria os horarios por dia pelo HorariosPorDiaService que por sua vez cria ja cria os compromissos
         for (DTOCreateHorariosPorDiaBase horario : listaDosHorarios){
             DTORespostaHorariosPorDia horarioGerado =
-                horariosPorDiaService.adicionarHorario(compromissoRecorrente.getId(),horario);
+                horariosPorDiaService.adicionarHorario(
+                        compromissoRecorrente.getId(),compromissoRecorrente.getUsuario().getId(),horario);
 
             List<DTORespostaCompromisso> compromissosGerados = horarioGerado.compromissosCriados;
 
@@ -181,23 +206,33 @@ public class CompromissosRecorrentesService{
     }
 
     @Transactional
-     public DTORespostaCompromissoRecorrente alterarCompromissoRecorrente(long id, DTOUpdateCompromissosRecorrentes dtoUpdateCompromissosRecorrentes){
+     public DTORespostaCompromissoRecorrente alterarCompromissoRecorrente(
+             long usuarioId,long compromissoId,
+             DTOUpdateCompromissosRecorrentes dtoUpdateCompromissosRecorrentes
+    ){
 
-        CompromissosRecorrentesModel compromissosRecorrente = compromissosRecorrentesRepository.findById(id).
-                orElseThrow(() -> new RuntimeException("compromisso recorrente não encontrado"));
+        usuariosService.findUsuarioById(usuarioId);
 
-        Integer intervalo = dtoUpdateCompromissosRecorrentes.getIntervalo();
+        CompromissosRecorrentesModel compromissosRecorrente =
+                compromissosRecorrentesRepository.findByIdByUser(compromissoId,usuarioId)
+                .orElseThrow(() -> new ResourceNotFindException("compromisso recorrente não encontrado"));
 
-        boolean inconformidadeIntervalo = intervalo == null || intervalo < 0;
-
-        if(inconformidadeIntervalo){
-            throw new BadRequestException("intervalo nao pode ser null nem menor que 0\n");
-        }
+        Integer intervaloDto = dtoUpdateCompromissosRecorrentes.getIntervalo();
 
         boolean atualizouIntervalo =
-                !intervalo.equals(compromissosRecorrente.getIntervalo());
+                !intervaloDto.equals(compromissosRecorrente.getIntervalo());
 
         mapperCompromissosRecorrentes.atualizacao(dtoUpdateCompromissosRecorrentes, compromissosRecorrente);
+
+        //criada para nao gerar erro na requisicao
+        List<DTOCreateHorariosPorDiaBase> listaFalsa = List.of();
+
+        List<String> errosIdentificados = verificarValidadeDasInformacoes(
+                compromissosRecorrente,listaFalsa);
+
+        if(!errosIdentificados.isEmpty()){
+            throw new BadRequestException("Erros Na Requisicao:\n" + errosIdentificados);
+        }
 
         compromissosRecorrentesRepository.save(compromissosRecorrente);
 
@@ -212,11 +247,14 @@ public class CompromissosRecorrentesService{
         return new DTORespostaCompromissoRecorrente(dtoSaidaCompromissosRecorrentes);
     }
 
-    public void deletarCompromissoPorId(long id){
-        if(!compromissosRecorrentesRepository.existsById(id)) {
-            throw new ResourceNotFindException("Compromisso com ID:" +id +"não foi encontrado");
+    public void deletarCompromissoPorId(long compromissoid,long usuarioId){
+        usuariosService.findUsuarioById(usuarioId);
+
+        if(!compromissosRecorrentesRepository.existsByIdAndUsuarioId(compromissoid,usuarioId)) {
+            throw new ResourceNotFindException("Compromisso com ID:" +compromissoid +"não foi encontrado" +
+                    "nesse usuário");
         }
-        compromissosRecorrentesRepository.deleteById(id);
+        compromissosRecorrentesRepository.deleteById(compromissoid);
     }
 
     @Transactional
@@ -262,7 +300,7 @@ public class CompromissosRecorrentesService{
             errosIdentificados.add("A Data De Inicio Da Recorrencia Não Pode Ser Depois Da Data De Fim Da Recorrencia");
         }
 
-        boolean horariosConflitamEntreSi =
+        boolean horariosConflitamEntreSi = !listaHorarios.isEmpty() &&
                 horariosPorDiaService.verificarConflitosListaCriacaoHorarios(
                         compromissoRecorrente.getModoDeRecorrencia(),listaHorarios);
 
@@ -292,9 +330,9 @@ public class CompromissosRecorrentesService{
             return false;
         }
 
-        List<HorariosPorDiaModel> listaHorariosPorDia_1 = compromissosRecorrente1.getHorariosPorDias();
+        List<HorariosPorDiaModel> listaHorariosPorDia_1 = compromissosRecorrente1.getHorariosPorDia();
 
-        List<HorariosPorDiaModel> listaHorariosPorDia_2 = compromissosRecorrente2.getHorariosPorDias();
+        List<HorariosPorDiaModel> listaHorariosPorDia_2 = compromissosRecorrente2.getHorariosPorDia();
 
         return listaHorariosPorDia_1.stream()
                 .anyMatch(horario -> horariosPorDiaService.verificarConflitosComHorarioNaLista(modoDeRecorrencia_1,
@@ -315,7 +353,8 @@ public class CompromissosRecorrentesService{
         LocalDate diaAtual = LocalDate.now();
 
         List<CompromissosRecorrentesModel> listaCompromissosAtualizada =
-                compromissosRecorrentesRepository.listAllAfterDate(diaAtual);
+                compromissosRecorrentesRepository
+                        .listAllByUserAfterDate(diaAtual,compromissoRecorrente.getUsuario().getId());
 
         return verificarConflitosNaLista(compromissoRecorrente,listaCompromissosAtualizada);
     }

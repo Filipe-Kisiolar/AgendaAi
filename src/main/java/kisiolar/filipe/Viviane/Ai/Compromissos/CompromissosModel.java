@@ -1,7 +1,10 @@
 package kisiolar.filipe.Viviane.Ai.Compromissos;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.CompromissosRecorrentesModel;
+import kisiolar.filipe.Viviane.Ai.Usuarios.UsuariosModel;
+
 import java.time.LocalDateTime;
 import java.util.Objects;
 
@@ -33,10 +36,24 @@ public class CompromissosModel {
     @JoinColumn(name = "compromissorecorrente_id") // nome da coluna na tabela compromisso
     private CompromissosRecorrentesModel compromissoRecorrente;
 
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "usuario_id")
+    private UsuariosModel usuario;
+
     public CompromissosModel() {
     }
 
-
+    public CompromissosModel(Long id, String nome, String descricao, String local, LocalDateTime inicio, LocalDateTime fim, CompromissosRecorrentesModel compromissoRecorrente, UsuariosModel usuario) {
+        this.id = id;
+        this.nome = nome;
+        this.descricao = descricao;
+        this.local = local;
+        this.inicio = inicio;
+        this.fim = fim;
+        this.compromissoRecorrente = compromissoRecorrente;
+        this.usuario = usuario;
+    }
 
     public Long getId() {
         return id;
@@ -94,6 +111,13 @@ public class CompromissosModel {
         this.compromissoRecorrente = compromissoRecorrente;
     }
 
+    public UsuariosModel getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(UsuariosModel usuario) {
+        this.usuario = usuario;
+    }
 
     @Override
     public boolean equals(Object o){
