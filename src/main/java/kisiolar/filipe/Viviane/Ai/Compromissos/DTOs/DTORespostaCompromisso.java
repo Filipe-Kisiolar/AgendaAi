@@ -53,10 +53,16 @@ public class DTORespostaCompromisso {
 
     @Override
     public String toString() {
-        return "DTORespostaCompromisso{" +
-                "compromisso=" + compromisso.toString() +
-                ", existeConflito=" + existeConflito.toString() +
-                ", compromissosConflitantes=" + compromissosConflitantes.toString() +
-                '}';
+        return String.format("""
+        DTORespostaCompromisso {
+            compromisso=%s,
+            existeConflito=%s,
+            compromissosConflitantes=%s
+        }
+        """,
+                compromisso != null ? compromisso : "null",
+                existeConflito != null ? existeConflito : "null",
+                compromissosConflitantes != null ? compromissosConflitantes : "null"
+        );
     }
 }

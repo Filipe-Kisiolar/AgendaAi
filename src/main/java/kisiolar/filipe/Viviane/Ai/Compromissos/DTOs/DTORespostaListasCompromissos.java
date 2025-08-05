@@ -41,9 +41,14 @@ public class DTORespostaListasCompromissos {
 
     @Override
     public String toString() {
-        return "DTORespostaListasCompromissos{" +
-                "listaCompromissos=" + listaCompromissos.toString() +
-                ", compromissosConflitantes=" + compromissosConflitantes.toString() +
-                '}';
+        return String.format("""
+        DTORespostaListasCompromissos {
+            listaCompromissos=%s,
+            compromissosConflitantes=%s
+        }
+        """,
+                listaCompromissos != null ? listaCompromissos : "null",
+                compromissosConflitantes != null ? compromissosConflitantes : "null"
+        );
     }
 }

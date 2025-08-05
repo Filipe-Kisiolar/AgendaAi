@@ -169,5 +169,4 @@ public class DTOSaidaCompromissosRecorrentes {
                 compromissosGerados != null ? compromissosGerados : "[]"
         );
     }
-
 }
