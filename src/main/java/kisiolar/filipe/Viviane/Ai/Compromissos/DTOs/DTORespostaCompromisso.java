@@ -50,4 +50,13 @@ public class DTORespostaCompromisso {
     public void setCompromissosConflitantes(List<DTOSaidaCompromissos> compromissosConflitantes) {
         this.compromissosConflitantes = compromissosConflitantes;
     }
+
+    @Override
+    public String toString() {
+        return "DTORespostaCompromisso{" +
+                "compromisso=" + compromisso.toString() +
+                ", existeConflito=" + existeConflito.toString() +
+                ", compromissosConflitantes=" + compromissosConflitantes.toString() +
+                '}';
+    }
 }
