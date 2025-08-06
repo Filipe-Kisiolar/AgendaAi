@@ -1,10 +1,20 @@
 package kisiolar.filipe.Viviane.Ai.IntegrationAI;
 
 import org.springframework.ai.tool.annotation.Tool;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Component;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Component
 public class Instrucoes {
+
+    @Tool(name = "achar_dia_de_hoje",
+            description ="Retorna o dia de hoje para voçê se basear nas requisições que vai fazer")
+    public String diaDeHoje(){
+        return LocalDateTime.now().atZone(LocaleContextHolder.getTimeZone().toZoneId()).toString();
+    }
 
     @Tool(name = "instrucoes_criar_compromisso",
             description = "Mostra um exemplo de JSON válido para criar um compromisso. Use essa função apenas se não souber como preencher o JSON para a tool 'criar_compromisso'.")

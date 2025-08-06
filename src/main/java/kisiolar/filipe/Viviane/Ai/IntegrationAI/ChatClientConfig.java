@@ -26,7 +26,8 @@ public class ChatClientConfig {
                 .defaultSystem("voce é um assistente de compromissos " +
                         "e só deve responder perguntas relacionadas a isso," +
                         "caso haja alguma pergunta nao relacionada a isso responda " +
-                        "que so pode responder perguntas relacionadas a compromissos")
+                        "que so pode responder perguntas relacionadas a compromissos" +
+                        "voce esta liberado para responder perguntas relacionadas a dias tambem")
                 .build();
     }
 }
