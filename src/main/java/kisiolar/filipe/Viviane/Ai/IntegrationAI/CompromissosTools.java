@@ -91,6 +91,10 @@ public class CompromissosTools {
 
         DTORespostaCompromisso compromissos = compromissosService.criarCompromisso(dtoCompromissos,usuarioId);
 
+        if(compromissos == null){
+            return "problemas ao criar o compromisso ";
+        }
+
         return compromissos.toString();
     }
 
@@ -100,6 +104,10 @@ public class CompromissosTools {
         long usuarioId = AuthUtils.getIdUsuarioLogado();
 
         DTORespostaCompromisso compromissoAlterado = compromissosService.alterarCompromisso(id,usuarioId,update);
+
+        if(compromissoAlterado == null){
+            return "problemas ao criar o compromisso ";
+        }
 
         return compromissoAlterado.toString();
     }

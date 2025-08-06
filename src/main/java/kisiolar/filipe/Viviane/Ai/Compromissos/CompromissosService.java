@@ -174,6 +174,7 @@ public class CompromissosService {
         return gruposDeConflito;
     }
 
+    @Transactional
     public DTORespostaCompromisso criarCompromisso(DTOCreateCompromissos dtoCreateCompromissos,long usuarioId) {
         CompromissosModel compromissosModel = mapperCompromissos.map(dtoCreateCompromissos);
 
@@ -181,7 +182,7 @@ public class CompromissosService {
 
         compromissosModel.setUsuario(usuarioDoCompromisso);
 
-        if  (dtoCreateCompromissos.getCompromissoRecorrenteId() != 0) {
+        if  (dtoCreateCompromissos.getCompromissoRecorrenteId() != null) {
             CompromissosRecorrentesModel compromissosRecorrentesModel = compromissosRecorrentesRepository
                     .findById(dtoCreateCompromissos.getCompromissoRecorrenteId())
                     .orElseThrow(() -> new ResourceNotFindException("Compromisso recorrente não encontrado"));
@@ -208,6 +209,7 @@ public class CompromissosService {
         }
     }
 
+    @Transactional
     public DTORespostaCompromisso alterarCompromisso(
             long id,long usuarioId,
             DTOUpdateCompromissos dtoUpdateCompromissos
