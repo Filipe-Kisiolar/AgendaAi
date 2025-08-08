@@ -1,6 +1,10 @@
 package kisiolar.filipe.Viviane.Ai.IntegrationAI;
 
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
+import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.ai.chat.memory.InMemoryChatMemoryRepository;
+import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -23,11 +27,21 @@ public class ChatClientConfig {
     public ChatClient chatClient(ChatClient.Builder builder){
         return builder
                 .defaultTools(compromissosRecorrentesTools,compromissosTools,instrucoes)
-                .defaultSystem("voce é um assistente de compromissos " +
-                        "e só deve responder perguntas relacionadas a isso," +
-                        "caso haja alguma pergunta nao relacionada a isso responda " +
-                        "que so pode responder perguntas relacionadas a compromissos" +
-                        "voce esta liberado para responder perguntas relacionadas a dias tambem")
+                .defaultSystem("""
+                    Você é um assistente de compromissos.
+                    Responda apenas perguntas relacionadas a compromissos ou dias da semana,do mes ou do ano.
+                    Se receber algo fora desse contexto, informe que só responde sobre compromissos.
+                    Seja educado e gentil, podendo agradecer ou cumprimentar o usuário.
+                    """)
+                .defaultAdvisors(MessageChatMemoryAdvisor.builder(chatMemory()).build())
+                .build();
+    }
+
+    @Bean
+    public ChatMemory chatMemory(){
+        return MessageWindowChatMemory
+                .builder()
+                .maxMessages(25)
                 .build();
     }
 }

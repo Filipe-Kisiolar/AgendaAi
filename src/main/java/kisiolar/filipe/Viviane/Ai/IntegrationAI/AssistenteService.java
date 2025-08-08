@@ -1,6 +1,8 @@
 package kisiolar.filipe.Viviane.Ai.IntegrationAI;
 
+import kisiolar.filipe.Viviane.Ai.Seguranca.AuthUtils;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -13,8 +15,11 @@ public class AssistenteService {
     }
 
     public String responderPergunta(String pergunta) {
+        long usuarioId = AuthUtils.getIdUsuarioLogado();
+
         return chatClient.prompt()
                 .user(pergunta)
+                .advisors(advisor -> advisor.param(ChatMemory.CONVERSATION_ID,usuarioId))
                 .call()
                 .content();
     }
