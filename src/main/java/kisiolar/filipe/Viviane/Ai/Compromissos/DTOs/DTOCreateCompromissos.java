@@ -68,7 +68,7 @@ public class DTOCreateCompromissos {
         this.fim = fim;
     }
 
-    public long getCompromissoRecorrenteId() {
+    public Long getCompromissoRecorrenteId() {
         return compromissoRecorrenteId;
     }
 

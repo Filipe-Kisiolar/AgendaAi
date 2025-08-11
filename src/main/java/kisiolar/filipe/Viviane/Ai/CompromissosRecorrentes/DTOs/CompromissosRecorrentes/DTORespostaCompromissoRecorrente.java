@@ -77,4 +77,21 @@ public class DTORespostaCompromissoRecorrente {
     public void setCompromissosCriadosComConflito(List<DTORespostaCompromisso> compromissosCriadosComConflito) {
         this.compromissosCriadosComConflito = compromissosCriadosComConflito;
     }
+
+    @Override
+    public String toString() {
+        return String.format("""
+        DTORespostaCompromissoRecorrente{
+            dtoSaidaCompromissosRecorrentes=%s,
+            existeConflito=%s,
+            compromissosConflitantes=%s,
+            compromissosCriadosComConflito=%s
+        }
+        """,
+                dtoSaidaCompromissosRecorrentes != null ? dtoSaidaCompromissosRecorrentes : "null",
+                existeConflito != null ? existeConflito : "null",
+                compromissosConflitantes != null ? compromissosConflitantes : "null",
+                compromissosCriadosComConflito != null ? compromissosCriadosComConflito : "null"
+        );
+    }
 }

@@ -138,4 +138,35 @@ public class DTOSaidaCompromissosRecorrentes {
     public void setCompromissosGerados(List<DTOSaidaCompromissos> compromissosGerados) {
         this.compromissosGerados = compromissosGerados;
     }
+
+    @Override
+    public String toString() {
+        return String.format("""
+        DTOSaidaCompromissosRecorrentes {
+            id=%s,
+            nome='%s',
+            descricao='%s',
+            local='%s',
+            horariosPorDia=%s,
+            dataInicioRecorrencia=%s,
+            dataFimRecorrencia=%s,
+            intervalo=%s,
+            modoDeRecorrencia=%s,
+            apenasDiasUteis=%s,
+            compromissosGerados=%s
+        }
+        """,
+                id != null ? id : "null",
+                nome != null ? nome : "",
+                descricao != null ? descricao : "",
+                local != null ? local : "",
+                horariosPorDia != null ? horariosPorDia : "[]",
+                dataInicioRecorrencia != null ? dataInicioRecorrencia : "null",
+                dataFimRecorrencia != null ? dataFimRecorrencia : "null",
+                intervalo != null ? intervalo : "null",
+                modoDeRecorrencia != null ? modoDeRecorrencia : "null",
+                apenasDiasUteis,
+                compromissosGerados != null ? compromissosGerados : "[]"
+        );
+    }
 }

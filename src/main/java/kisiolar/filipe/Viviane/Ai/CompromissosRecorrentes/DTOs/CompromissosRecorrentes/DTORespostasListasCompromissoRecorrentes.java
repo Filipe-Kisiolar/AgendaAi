@@ -38,4 +38,17 @@ public class DTORespostasListasCompromissoRecorrentes {
     public void setCompromissosConflitantes(List<List<DTOSaidaCompromissosRecorrentes>> compromissosConflitantes) {
         this.compromissosConflitantes = compromissosConflitantes;
     }
+
+    @Override
+    public String toString() {
+        return String.format("""
+                DTORespostasListasCompromissoRecorrentes{
+                    listaCompromissosRecorrentes=%s
+                    compromissosConflitantes=%s
+                }
+                """,
+                listaCompromissosRecorrentes != null ? listaCompromissosRecorrentes : "null",
+                compromissosConflitantes != null ? compromissosConflitantes : "null"
+                );
+    }
 }

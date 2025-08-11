@@ -75,4 +75,25 @@ public class DTOSaidaCompromissos {
     public void setFim(LocalDateTime fim) {
         this.fim = fim;
     }
+
+    @Override
+    public String toString() {
+        return String.format("""
+        DTOSaidaCompromissos {
+            id=%s,
+            nome='%s',
+            descricao='%s',
+            local='%s',
+            inicio=%s,
+            fim=%s
+        }
+        """,
+                id != null ? id : "null",
+                nome != null ? nome : "",
+                descricao != null ? descricao : "",
+                local != null ? local : "",
+                inicio != null ? inicio : "null",
+                fim != null ? fim : "null"
+        );
+    }
 }
