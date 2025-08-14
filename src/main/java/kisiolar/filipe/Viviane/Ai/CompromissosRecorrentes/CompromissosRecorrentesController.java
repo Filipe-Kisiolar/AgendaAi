@@ -1,6 +1,7 @@
 package kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes;
 
 import jakarta.validation.Valid;
+import kisiolar.filipe.Viviane.Ai.Compromissos.DTOs.DTORespostaListasCompromissos;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.CompromissosRecorrentes.*;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.HorariosPorDia.DTOCreateHorariosPorDiaBase;
 import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.DTOs.HorariosPorDia.DTORespostaHorariosPorDia;
@@ -60,12 +61,12 @@ public class CompromissosRecorrentesController {
     }
 
     @GetMapping("/buscarcompromissopornome/{nome}")
-    public ResponseEntity<DTORespostaCompromissoRecorrente> buscarCompromissoPornome(
+    public ResponseEntity<DTORespostasListasCompromissoRecorrentes> buscarCompromissoPornome(
             @PathVariable String nome
     ){
         long usuarioId = AuthUtils.getIdUsuarioLogado();
 
-        DTORespostaCompromissoRecorrente dtoCompromissosRecorrentes =
+        DTORespostasListasCompromissoRecorrentes dtoCompromissosRecorrentes =
                 compromissosRecorrentesService.buscarCompromissoPorNome(nome,usuarioId);
 
         return ResponseEntity.ok(dtoCompromissosRecorrentes);

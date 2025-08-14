@@ -89,25 +89,19 @@ public class CompromissosRecorrentesService{
     }
 
     @Transactional
-    public DTORespostaCompromissoRecorrente buscarCompromissoPorNome(String nome,long usuarioId){
+    public DTORespostasListasCompromissoRecorrentes buscarCompromissoPorNome(String nome,long usuarioId){
         usuariosService.findUsuarioById(usuarioId);
 
-        CompromissosRecorrentesModel compromissosRecorrentesModel =
-                compromissosRecorrentesRepository.findByNomeByUser(nome,usuarioId)
-                .orElseThrow(() -> new ResourceNotFindException("compromisso recorrente não encontrado" +
-                        " para esse compromisso"));
+        List<CompromissosRecorrentesModel> listaRecorrentes =
+                compromissosRecorrentesRepository.findByNomeByUser(nome,usuarioId);
 
-        DTOSaidaCompromissosRecorrentes dtoCreateCompromissosRecorrentes = mapperCompromissosRecorrentes.mapToDto(compromissosRecorrentesModel);
+        List<DTOSaidaCompromissosRecorrentes> listaDto =listaRecorrentes.stream().
+                sorted(Comparator
+                        .comparing(CompromissosRecorrentesModel::getDataInicioRecorrencia)).
+                map(mapperCompromissosRecorrentes ::mapToDto).
+                collect(Collectors.toList());
 
-        List<DTOSaidaCompromissosRecorrentes> conflitos = verificarConflitos(compromissosRecorrentesModel).stream()
-                .map(mapperCompromissosRecorrentes::mapToDto)
-                .toList();
-
-        if (conflitos.isEmpty()){
-            return new DTORespostaCompromissoRecorrente(dtoCreateCompromissosRecorrentes);
-        }else{
-            return DTORespostaCompromissoRecorrente.comConflitosRecorrentes(dtoCreateCompromissosRecorrentes,conflitos);
-        }
+        return new DTORespostasListasCompromissoRecorrentes(listaDto);
     }
 
     public List<List<DTOSaidaCompromissosRecorrentes>> listarCompromissosConflitantes(long usuarioId){

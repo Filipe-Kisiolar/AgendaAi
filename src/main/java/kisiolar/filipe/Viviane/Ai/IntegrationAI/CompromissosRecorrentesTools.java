@@ -47,7 +47,7 @@ public class CompromissosRecorrentesTools {
 
         long usuarioId = AuthUtils.getIdUsuarioLogado();
 
-        DTORespostaCompromissoRecorrente dtoCompromissosRecorrentes =
+        DTORespostasListasCompromissoRecorrentes dtoCompromissosRecorrentes =
                 compromissosRecorrentesService.buscarCompromissoPorNome(nome,usuarioId);
 
         return dtoCompromissosRecorrentes.toString();

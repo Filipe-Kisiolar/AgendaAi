@@ -34,9 +34,10 @@ public interface CompromissosRecorrentesRepository extends JpaRepository<Comprom
     @Query("""
     SELECT c
       FROM CompromissosRecorrentesModel c
-        WHERE c.nome = :nome AND c.usuario.id = :usuarioId
+     WHERE LOWER(c.nome) LIKE LOWER(CONCAT('%', :nome, '%'))
+       AND c.usuario.id = :usuarioId
     """)
-    Optional<CompromissosRecorrentesModel> findByNomeByUser(
+    List<CompromissosRecorrentesModel> findByNomeByUser(
             @Param("nome") String nome,@Param("usuarioId") long usuarioId
     );
 

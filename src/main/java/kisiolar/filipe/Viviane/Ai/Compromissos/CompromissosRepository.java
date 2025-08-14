@@ -34,12 +34,13 @@ public interface CompromissosRepository extends JpaRepository<CompromissosModel,
     @Query("""
     SELECT c
       FROM CompromissosModel c
-        WHERE c.nome = :nome
-        AND c.usuario.id = :usuarioId
-        AND c.fim >= :dataAtual
+     WHERE LOWER(c.nome) LIKE LOWER(CONCAT('%', :nome, '%'))
+       AND c.usuario.id = :usuarioId
+       AND c.fim >= :dataAtual
     """)
     List<CompromissosModel> findByNomeByUser(
-            @Param("nome") String nome,@Param("usuarioId") long usuarioId,
+            @Param("nome") String nome,
+            @Param("usuarioId") long usuarioId,
             @Param("dataAtual") LocalDateTime dataAtual
     );
 
