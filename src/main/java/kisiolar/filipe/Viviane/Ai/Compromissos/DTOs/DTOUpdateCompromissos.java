@@ -1,67 +1,21 @@
 package kisiolar.filipe.Viviane.Ai.Compromissos.DTOs;
 
+import jakarta.validation.constraints.FutureOrPresent;
+
 import java.time.LocalDateTime;
 
-public class DTOUpdateCompromissos {
+public record DTOUpdateCompromissos(
 
-    private String nome;
+        String nome,
 
-    private String descricao;
+        String descricao,
 
-    private String local;
+        String local,
 
-    private LocalDateTime inicio;
+        @FutureOrPresent(message = "Data de início não pode ser no passado")
+        LocalDateTime inicio,
 
-    private LocalDateTime fim;
-
-    public DTOUpdateCompromissos() {
-    }
-
-    public DTOUpdateCompromissos(String nome, String descricao, String local, LocalDateTime inicio, LocalDateTime fim) {
-        this.nome = nome;
-        this.descricao = descricao;
-        this.local = local;
-        this.inicio = inicio;
-        this.fim = fim;
-    }
-
-    public String getNome() {
-        return nome;
-    }
-
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
-
-    public String getDescricao() {
-        return descricao;
-    }
-
-    public void setDescricao(String descricao) {
-        this.descricao = descricao;
-    }
-
-    public String getLocal() {
-        return local;
-    }
-
-    public void setLocal(String local) {
-        this.local = local;
-    }
-
-    public LocalDateTime getInicio() {
-        return inicio;
-    }
-
-    public void setInicio(LocalDateTime inicio) {
-        this.inicio = inicio;
-    }
-
-    public LocalDateTime getFim() {
-        return fim;
-    }
-
-    public void setFim(LocalDateTime fim) {
-        this.fim = fim;
-    }
+        @FutureOrPresent(message = "Data de fim não pode ser no passado")
+        LocalDateTime fim
+) {
 }

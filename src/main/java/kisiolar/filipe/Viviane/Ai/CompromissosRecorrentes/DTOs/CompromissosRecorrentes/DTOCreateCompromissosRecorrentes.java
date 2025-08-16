@@ -8,120 +8,37 @@ import kisiolar.filipe.Viviane.Ai.CompromissosRecorrentes.Enums.ModoDeRecorrenci
 import java.time.LocalDate;
 import java.util.List;
 
-public class DTOCreateCompromissosRecorrentes {
+public record DTOCreateCompromissosRecorrentes (
+        @NotBlank(message = "O nome é obrigatório")
+        String nome,
+
+        String descricao,
 
         @NotBlank(message = "O nome é obrigatório")
-        private String nome;
-
-        private String descricao;
-
-        @NotBlank(message = "O nome é obrigatório")
-        private String local;
+       String local,
 
         @Size(min = 1, message = "É necessário ao menos um horário.")
         @Valid
-        private List<DTOCreateHorariosPorDiaBase> horariosPorDia;
+        List<DTOCreateHorariosPorDiaBase> horariosPorDia,
 
         @NotNull(message = "Data de início da recorrência é obrigatória")
         @FutureOrPresent(message = "Data de inícioRecorrencia não pode ser no passado")
-        private LocalDate dataInicioRecorrencia;
+        LocalDate dataInicioRecorrencia,
 
         @NotNull(message = "Data de fim da recorrência é obrigatória")
         @Future(message = "Data de fimRecorrencia precisa ser uma data futura")
-        private LocalDate dataFimRecorrencia;
+        LocalDate dataFimRecorrencia,
 
         @NotNull(message = "O intervalo é obrigatório")
-        private Integer intervalo;
+        Integer intervalo,
 
         @NotNull(message = "O tipo de frequência é obrigatório")
-        private ModoDeRecorrenciaEnum modoDeRecorrencia;
+        ModoDeRecorrenciaEnum modoDeRecorrencia,
 
-        private boolean apenasDiasUteis;
-
-        public DTOCreateCompromissosRecorrentes() {
-        }
-
-        public DTOCreateCompromissosRecorrentes(String nome, String descricao, String local, List<DTOCreateHorariosPorDiaBase> horariosPorDia, LocalDate dataInicioRecorrencia, LocalDate dataFimRecorrencia, Integer intervalo, ModoDeRecorrenciaEnum modoDeRecorrencia, boolean apenasDiasUteis) {
-                this.nome = nome;
-                this.descricao = descricao;
-                this.local = local;
-                this.horariosPorDia = horariosPorDia;
-                this.dataInicioRecorrencia = dataInicioRecorrencia;
-                this.dataFimRecorrencia = dataFimRecorrencia;
-                this.intervalo = intervalo;
-                this.modoDeRecorrencia = modoDeRecorrencia;
-                this.apenasDiasUteis = apenasDiasUteis;
-        }
-
-        public String getNome() {
-                return nome;
-        }
-
-        public void setNome(String nome) {
-                this.nome = nome;
-        }
-
-        public String getDescricao() {
-                return descricao;
-        }
-
-        public void setDescricao(String descricao) {
-                this.descricao = descricao;
-        }
-
-        public String getLocal() {
-                return local;
-        }
-
-        public void setLocal(String local) {
-                this.local = local;
-        }
+        boolean apenasDiasUteis
+) {
 
         public @Size(min = 1, message = "É necessário ao menos um horário.") @Valid List<DTOCreateHorariosPorDiaBase> getHorariosPorDia() {
                 return horariosPorDia;
-        }
-
-        public void setHorariosPorDia(@Size(min = 1, message = "É necessário ao menos um horário.") @Valid List<DTOCreateHorariosPorDiaBase> horariosPorDia) {
-                this.horariosPorDia = horariosPorDia;
-        }
-
-        public LocalDate getDataInicioRecorrencia() {
-                return dataInicioRecorrencia;
-        }
-
-        public void setDataInicioRecorrencia(LocalDate dataInicioRecorrencia) {
-                this.dataInicioRecorrencia = dataInicioRecorrencia;
-        }
-
-        public LocalDate getDataFimRecorrencia() {
-                return dataFimRecorrencia;
-        }
-
-        public void setDataFimRecorrencia(LocalDate dataFimRecorrencia) {
-                this.dataFimRecorrencia = dataFimRecorrencia;
-        }
-
-        public Integer getIntervalo() {
-                return intervalo;
-        }
-
-        public void setIntervalo(Integer intervalo) {
-                this.intervalo = intervalo;
-        }
-
-        public ModoDeRecorrenciaEnum getModoDeRecorrencia() {
-                return modoDeRecorrencia;
-        }
-
-        public void setModoDeRecorrencia(ModoDeRecorrenciaEnum modoDeRecorrencia) {
-                this.modoDeRecorrencia = modoDeRecorrencia;
-        }
-
-        public boolean isApenasDiasUteis() {
-                return apenasDiasUteis;
-        }
-
-        public void setApenasDiasUteis(boolean apenasDiasUteis) {
-                this.apenasDiasUteis = apenasDiasUteis;
         }
 }

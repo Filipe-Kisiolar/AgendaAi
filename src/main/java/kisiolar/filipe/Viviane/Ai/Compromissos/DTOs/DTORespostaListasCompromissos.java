@@ -4,40 +4,13 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.util.List;
 
-public class DTORespostaListasCompromissos {
+public record DTORespostaListasCompromissos (
 
-    private List<DTOSaidaCompromissos> listaCompromissos;
+    List<DTOSaidaCompromissos> listaCompromissos,
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private List<List<DTOSaidaCompromissos>> compromissosConflitantes;
-
-    public DTORespostaListasCompromissos() {
-    }
-
-    public DTORespostaListasCompromissos(List<DTOSaidaCompromissos> listaCompromissos) {
-        this.listaCompromissos = listaCompromissos;
-    }
-
-    public DTORespostaListasCompromissos(List<DTOSaidaCompromissos> listaCompromissos, List<List<DTOSaidaCompromissos>> compromissosConflitantes) {
-        this.listaCompromissos = listaCompromissos;
-        this.compromissosConflitantes = compromissosConflitantes;
-    }
-
-    public List<DTOSaidaCompromissos> getListaCompromissos() {
-        return listaCompromissos;
-    }
-
-    public void setListaCompromissos(List<DTOSaidaCompromissos> listaCompromissos) {
-        this.listaCompromissos = listaCompromissos;
-    }
-
-    public List<List<DTOSaidaCompromissos>> getCompromissosConflitantes() {
-        return compromissosConflitantes;
-    }
-
-    public void setCompromissosConflitantes(List<List<DTOSaidaCompromissos>> compromissosConflitantes) {
-        this.compromissosConflitantes = compromissosConflitantes;
-    }
+    List<List<DTOSaidaCompromissos>> compromissosConflitantes
+) {
 
     @Override
     public String toString() {
@@ -47,8 +20,8 @@ public class DTORespostaListasCompromissos {
             compromissosConflitantes=%s
         }
         """,
-                listaCompromissos != null ? listaCompromissos : "null",
-                compromissosConflitantes != null ? compromissosConflitantes : "null"
+        listaCompromissos != null ? listaCompromissos : "null",
+        compromissosConflitantes != null ? compromissosConflitantes : "null"
         );
     }
 }

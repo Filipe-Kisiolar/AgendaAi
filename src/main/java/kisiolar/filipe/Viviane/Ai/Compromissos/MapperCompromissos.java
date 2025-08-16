@@ -13,13 +13,13 @@ public interface MapperCompromissos {
      @Mapping(target = "id",ignore = true)
      @Mapping(target = "compromissoRecorrente", ignore = true)
      @Mapping(target = "usuario",ignore = true)
-     CompromissosModel map(DTOCreateCompromissos dto);
+     CompromissosModel mapToModel(DTOCreateCompromissos dto);
 
-     DTOSaidaCompromissos map(CompromissosModel compromissosModel);
+     DTOSaidaCompromissos mapToDTO(CompromissosModel compromissosModel);
 
      @Mapping(target = "compromissoRecorrente", ignore = true)
      @Mapping(target = "usuario",ignore = true)
-     CompromissosModel map(DTOSaidaCompromissos dto);
+     CompromissosModel mapSaidaToModel(DTOSaidaCompromissos dto);
 
      @Mapping(target = "id", ignore = true)
      @Mapping(target = "compromissoRecorrente", ignore = true)

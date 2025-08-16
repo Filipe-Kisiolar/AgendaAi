@@ -27,7 +27,7 @@ public interface MapperCompromissosRecorrentes {
     @Mapping(source = "compromissosGerados", target = "compromissosGerados")
     DTOSaidaCompromissosRecorrentes  mapToDto(CompromissosRecorrentesModel entity);
 
-    //mapToModel para gerar um compromisso a partir de um compromisso recorrente
+    //mapToDTO para gerar um compromisso a partir de um compromisso recorrente
     @Mapping(target = "inicio", source = "inicioGerado")
     @Mapping(target = "fim", source = "fimGerado")
     @Mapping(target = "compromissoRecorrenteId", source = "compromissosRecorrentesModel.id")

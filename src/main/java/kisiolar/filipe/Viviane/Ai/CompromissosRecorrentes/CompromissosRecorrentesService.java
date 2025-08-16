@@ -61,7 +61,7 @@ public class CompromissosRecorrentesService{
                 map(mapperCompromissosRecorrentes ::mapToDto).
                 collect(Collectors.toList());
 
-        return new DTORespostasListasCompromissoRecorrentes(listaDto);
+        return new DTORespostasListasCompromissoRecorrentes(listaDto,null);
     }
 
     @Transactional
@@ -82,9 +82,11 @@ public class CompromissosRecorrentesService{
                .toList();
 
        if (conflitos.isEmpty()){
-           return new DTORespostaCompromissoRecorrente(dtoCreateCompromissosRecorrentes);
+           return new DTORespostaCompromissoRecorrente
+                   (dtoCreateCompromissosRecorrentes,conflitos,null);
        }else{
-           return DTORespostaCompromissoRecorrente.comConflitosRecorrentes(dtoCreateCompromissosRecorrentes,conflitos);
+           return new DTORespostaCompromissoRecorrente
+                   (dtoCreateCompromissosRecorrentes,conflitos,null);
        }
     }
 
@@ -101,7 +103,7 @@ public class CompromissosRecorrentesService{
                 map(mapperCompromissosRecorrentes ::mapToDto).
                 collect(Collectors.toList());
 
-        return new DTORespostasListasCompromissoRecorrentes(listaDto);
+        return new DTORespostasListasCompromissoRecorrentes(listaDto,null);
     }
 
     public List<List<DTOSaidaCompromissosRecorrentes>> listarCompromissosConflitantes(long usuarioId){
@@ -112,9 +114,7 @@ public class CompromissosRecorrentesService{
         List<CompromissosRecorrentesModel> listaTodosCompromissos =
                 compromissosRecorrentesRepository.listAllByUserAfterDate(diaAtual,usuarioId);
 
-        List<List<DTOSaidaCompromissosRecorrentes>> gruposDeConflito = compromissosConflitantesLista(listaTodosCompromissos);
-
-        return gruposDeConflito;
+        return compromissosConflitantesLista(listaTodosCompromissos);
     }
 
     private boolean verificarConformidadeModoDeRecorrencia_Horario(
@@ -177,7 +177,7 @@ public class CompromissosRecorrentesService{
             List<DTORespostaCompromisso> compromissosGerados = horarioGerado.compromissosCriados;
 
             List<DTORespostaCompromisso> geradosComConflito = compromissosGerados.stream()
-                    .filter(DTORespostaCompromisso::getExisteConflito).toList();
+                    .filter(DTORespostaCompromisso::existeConflito).toList();
 
             compromissosGeradosComConflito.addAll(geradosComConflito);
         }
@@ -188,15 +188,8 @@ public class CompromissosRecorrentesService{
 
         DTOSaidaCompromissosRecorrentes saidaCompromissosRecorrentes = mapperCompromissosRecorrentes.mapToDto(compromissoSalvo);
 
-        if(conflitosRecorrentes.isEmpty() && compromissosGeradosComConflito.isEmpty()){
-            return new DTORespostaCompromissoRecorrente(saidaCompromissosRecorrentes);
-        } else if (conflitosRecorrentes.isEmpty()) {
-            return DTORespostaCompromissoRecorrente.comConflitosGerados(saidaCompromissosRecorrentes, compromissosGeradosComConflito);
-        } else if (compromissosGeradosComConflito.isEmpty()) {
-            return DTORespostaCompromissoRecorrente.comConflitosRecorrentes(saidaCompromissosRecorrentes, conflitosRecorrentes);
-        } else {
-            return new DTORespostaCompromissoRecorrente(saidaCompromissosRecorrentes, conflitosRecorrentes, compromissosGeradosComConflito);
-        }
+        return new DTORespostaCompromissoRecorrente
+                (saidaCompromissosRecorrentes,conflitosRecorrentes,compromissosGeradosComConflito);
     }
 
     @Transactional
@@ -211,7 +204,7 @@ public class CompromissosRecorrentesService{
                 compromissosRecorrentesRepository.findByIdByUser(compromissoId,usuarioId)
                 .orElseThrow(() -> new ResourceNotFindException("compromisso recorrente não encontrado"));
 
-        Integer intervaloDto = dtoUpdateCompromissosRecorrentes.getIntervalo();
+        Integer intervaloDto = dtoUpdateCompromissosRecorrentes.intervalo();
 
         boolean atualizouIntervalo =
                 !intervaloDto.equals(compromissosRecorrente.getIntervalo());
@@ -238,7 +231,8 @@ public class CompromissosRecorrentesService{
 
         DTOSaidaCompromissosRecorrentes dtoSaidaCompromissosRecorrentes =  mapperCompromissosRecorrentes.mapToDto(compromissosRecorrente);
 
-        return new DTORespostaCompromissoRecorrente(dtoSaidaCompromissosRecorrentes);
+        return new DTORespostaCompromissoRecorrente
+                (dtoSaidaCompromissosRecorrentes,null,null);
     }
 
     public void deletarCompromissoPorId(long compromissoid,long usuarioId){
@@ -389,9 +383,9 @@ public class CompromissosRecorrentesService{
         }
 
         gruposDeConflito.sort(Comparator.comparing(
-                        (List<DTOSaidaCompromissosRecorrentes> grupo) -> grupo.getFirst().getDataInicioRecorrencia())
-                .thenComparing(grupo -> grupo.getFirst().getHorariosPorDia().getFirst().getHoraInicio())
-                .thenComparing(grupo -> grupo.getFirst().getHorariosPorDia().getFirst().getHoraFim())
+                        (List<DTOSaidaCompromissosRecorrentes> grupo) -> grupo.getFirst().dataInicioRecorrencia())
+                .thenComparing(grupo -> grupo.getFirst().horariosPorDia().getFirst().getHoraInicio())
+                .thenComparing(grupo -> grupo.getFirst().horariosPorDia().getFirst().getHoraFim())
         );
 
         return gruposDeConflito;

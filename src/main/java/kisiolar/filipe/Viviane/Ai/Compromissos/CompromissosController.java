@@ -1,12 +1,16 @@
 package kisiolar.filipe.Viviane.Ai.Compromissos;
 
 
+import jakarta.validation.Valid;
 import kisiolar.filipe.Viviane.Ai.Compromissos.DTOs.*;
+import kisiolar.filipe.Viviane.Ai.Exceptions.BadRequestException;
 import kisiolar.filipe.Viviane.Ai.Seguranca.AuthUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.DayOfWeek;
@@ -14,6 +18,7 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/compromissos")
@@ -30,7 +35,7 @@ public class CompromissosController {
         DTORespostaListasCompromissos listarcompromissos =
                 compromissosService.listarCompromissos(usuarioId);
 
-        if (listarcompromissos.getListaCompromissos().isEmpty()){
+        if (listarcompromissos.listaCompromissos().isEmpty()){
             Map<String,Object> resposta = new HashMap<>();
             resposta.put("mensagem","ainda nao a compromissos registrados, para criar um copromisso recorrente entre no link:");
             resposta.put("link","/compromissos/criarcompromisso ");
@@ -98,9 +103,17 @@ public class CompromissosController {
 
     @PostMapping("/criarcompromisso")
     public ResponseEntity<DTORespostaCompromisso> criarCompromisso(
-            @RequestBody DTOCreateCompromissos dtoCompromissos
+            @Valid @RequestBody DTOCreateCompromissos dtoCompromissos,
+            BindingResult resultado
     ){
         long usuarioId = AuthUtils.getIdUsuarioLogado();
+
+        if (resultado.hasErrors()){
+            String erros = resultado.getAllErrors().stream()
+                    .map(ObjectError::getDefaultMessage)
+                    .collect(Collectors.joining("; "));
+            throw new BadRequestException("Erros na requisição: " + erros);
+        }
 
         DTORespostaCompromisso compromissos = compromissosService.criarCompromisso(dtoCompromissos,usuarioId);
 

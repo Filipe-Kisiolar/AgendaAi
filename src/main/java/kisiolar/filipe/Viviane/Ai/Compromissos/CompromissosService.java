@@ -42,10 +42,10 @@ public class CompromissosService {
         List<CompromissosModel> lista = compromissosRepository.listAllByUserAfterDate(diaAtual,usuarioId);
 
         List<DTOSaidaCompromissos> listaDto =ordenarListaPorHorario(lista).stream()
-                .map(mapperCompromissos::map)
+                .map(mapperCompromissos::mapToDTO)
                 .toList();
 
-        return new DTORespostaListasCompromissos(listaDto);
+        return new DTORespostaListasCompromissos(listaDto,null);
     }
 
     @Transactional
@@ -56,16 +56,16 @@ public class CompromissosService {
                 .orElseThrow(() -> new ResourceNotFindException("compromisso não encontrado" +
                         "para esse usuário"));
 
-        DTOSaidaCompromissos dtoSaidaCompromissos = mapperCompromissos.map(compromissosModel);
+        DTOSaidaCompromissos dtoSaidaCompromissos = mapperCompromissos.mapToDTO(compromissosModel);
 
         List<DTOSaidaCompromissos> conflitos = verificarConflitos(compromissosModel).stream()
-                .map(mapperCompromissos::map)
+                .map(mapperCompromissos::mapToDTO)
                 .toList();
 
         if(conflitos.isEmpty()){
-            return new DTORespostaCompromisso(dtoSaidaCompromissos);
+            return new DTORespostaCompromisso(dtoSaidaCompromissos,false,conflitos);
         }else {
-            return new DTORespostaCompromisso(dtoSaidaCompromissos,conflitos);
+            return new DTORespostaCompromisso(dtoSaidaCompromissos,false,conflitos);
         }
     }
 
@@ -78,16 +78,12 @@ public class CompromissosService {
         List<CompromissosModel> lista = compromissosRepository.findByNomeByUser(nome,usuarioId,diaAtual);
 
         List<DTOSaidaCompromissos> listaDto =ordenarListaPorHorario(lista).stream()
-                .map(mapperCompromissos::map)
+                .map(mapperCompromissos::mapToDTO)
                 .toList();
 
         List<List<DTOSaidaCompromissos>> conflitos = compromissosConflitantesDaLista(lista);
 
-        if(conflitos.isEmpty()){
-            return new DTORespostaListasCompromissos(listaDto);
-        }else {
-            return new DTORespostaListasCompromissos(listaDto,conflitos);
-        }
+        return new DTORespostaListasCompromissos(listaDto,conflitos);
     }
 
     @Transactional
@@ -96,16 +92,12 @@ public class CompromissosService {
         LocalDateTime finalDoDia = dia.plusDays(1).atStartOfDay();
         List<CompromissosModel> lista = compromissosRepository.findCompromissoByInicioBetwenn(comecoDoDia,finalDoDia,usuarioId);
         List<DTOSaidaCompromissos> listaDto =ordenarListaPorHorario(lista).stream()
-                .map(mapperCompromissos::map)
+                .map(mapperCompromissos::mapToDTO)
                 .toList();
 
         List<List<DTOSaidaCompromissos>> conflitos = compromissosConflitantesDaLista(lista);
 
-        if(conflitos.isEmpty()){
-            return new DTORespostaListasCompromissos(listaDto);
-        }else {
-            return new DTORespostaListasCompromissos(listaDto,conflitos);
-        }
+        return new DTORespostaListasCompromissos(listaDto,conflitos);
     }
 
     //gera uma lista de compromissos da semana a partir do dia que a requisicao foi feita
@@ -124,13 +116,13 @@ public class CompromissosService {
                 .mapToObj(i -> diaAtual.plusDays(i).getDayOfWeek())
                 .toList();
 
-        //Inicializa o mapToModel com todos os dias da semana vazios, mantendo a ordem
+        //Inicializa o mapToDTO com todos os dias da semana vazios, mantendo a ordem
         Map<DayOfWeek, List<CompromissosModel>> compromissosPorDia = new LinkedHashMap<>();
         for (DayOfWeek dia : ordemDosDias) {
             compromissosPorDia.put(dia, new ArrayList<>());
         }
 
-        //Preenche o mapToModel com os compromissos encontrados
+        //Preenche o mapToDTO com os compromissos encontrados
         for (CompromissosModel compromisso : compromissosDaSemana) {
             DayOfWeek dia = compromisso.getInicio().getDayOfWeek();
             compromissosPorDia.get(dia).add(compromisso);
@@ -140,21 +132,19 @@ public class CompromissosService {
         compromissosPorDia.values().forEach(lista ->
                 lista.sort(Comparator.comparing(CompromissosModel::getInicio)));
 
-        //Monta o mapToModel de resposta com os conflitos
+        //Monta o mapToDTO de resposta com os conflitos
         Map<DayOfWeek, DTORespostaListasCompromissos> respostaPorDia = new LinkedHashMap<>();
 
         for (DayOfWeek dia : ordemDosDias) {
             List<CompromissosModel> listaCompromissos = compromissosPorDia.get(dia);
 
             List<DTOSaidaCompromissos> listaDto = listaCompromissos.stream()
-                    .map(mapperCompromissos::map)
+                    .map(mapperCompromissos::mapToDTO)
                     .toList();
 
             List<List<DTOSaidaCompromissos>> conflitos = compromissosConflitantesDaLista(listaCompromissos);
 
-            DTORespostaListasCompromissos resposta = new DTORespostaListasCompromissos();
-            resposta.setListaCompromissos(listaDto);
-            resposta.setCompromissosConflitantes(conflitos);
+            DTORespostaListasCompromissos resposta = new DTORespostaListasCompromissos(listaDto,conflitos);
 
             respostaPorDia.put(dia, resposta);
         }
@@ -176,15 +166,15 @@ public class CompromissosService {
 
     @Transactional
     public DTORespostaCompromisso criarCompromisso(DTOCreateCompromissos dtoCreateCompromissos,long usuarioId) {
-        CompromissosModel compromissosModel = mapperCompromissos.map(dtoCreateCompromissos);
+        CompromissosModel compromissosModel = mapperCompromissos.mapToModel(dtoCreateCompromissos);
 
         UsuariosModel usuarioDoCompromisso = usuariosService.findUsuarioById(usuarioId);
 
         compromissosModel.setUsuario(usuarioDoCompromisso);
 
-        if  (dtoCreateCompromissos.getCompromissoRecorrenteId() != null) {
+        if  (dtoCreateCompromissos.compromissoRecorrenteId() != null) {
             CompromissosRecorrentesModel compromissosRecorrentesModel = compromissosRecorrentesRepository
-                    .findById(dtoCreateCompromissos.getCompromissoRecorrenteId())
+                    .findById(dtoCreateCompromissos.compromissoRecorrenteId())
                     .orElseThrow(() -> new ResourceNotFindException("Compromisso recorrente não encontrado"));
 
             compromissosModel.setCompromissoRecorrente(compromissosRecorrentesModel);
@@ -199,13 +189,15 @@ public class CompromissosService {
         compromissosRepository.save(compromissosModel);
 
         List<DTOSaidaCompromissos> conflitos = verificarConflitos(compromissosModel).stream()
-                .map(mapperCompromissos::map)
+                .map(mapperCompromissos::mapToDTO)
                 .collect(Collectors.toList());
 
         if(conflitos.isEmpty()){
-            return new DTORespostaCompromisso(mapperCompromissos.map(compromissosModel));
+            return new DTORespostaCompromisso
+                    (mapperCompromissos.mapToDTO(compromissosModel),false,conflitos);
         }else{
-            return new DTORespostaCompromisso(mapperCompromissos.map(compromissosModel),conflitos);
+            return new DTORespostaCompromisso
+                    (mapperCompromissos.mapToDTO(compromissosModel),true,conflitos);
         }
     }
 
@@ -230,13 +222,15 @@ public class CompromissosService {
         compromissosRepository.save(compromissosModel);
 
         List<DTOSaidaCompromissos> conflitos = verificarConflitos(compromissosModel).stream()
-                .map(mapperCompromissos::map)
+                .map(mapperCompromissos::mapToDTO)
                 .collect(Collectors.toList());
 
         if(conflitos.isEmpty()){
-            return new DTORespostaCompromisso(mapperCompromissos.map(compromissosModel));
+            return new DTORespostaCompromisso
+                    (mapperCompromissos.mapToDTO(compromissosModel),false,conflitos);
         }else{
-            return new DTORespostaCompromisso(mapperCompromissos.map(compromissosModel),conflitos);
+            return new DTORespostaCompromisso
+                    (mapperCompromissos.mapToDTO(compromissosModel),false,conflitos);
         }
     }
 
@@ -335,15 +329,15 @@ public class CompromissosService {
                 }
 
                 List<DTOSaidaCompromissos> grupoDTO = grupo.stream()
-                        .map(mapperCompromissos::map)
+                        .map(mapperCompromissos::mapToDTO)
                         .collect(Collectors.toList());
                 gruposDeConflito.add(grupoDTO);
             }
         }
 
         gruposDeConflito.sort(
-                Comparator.comparing((List<DTOSaidaCompromissos> grupo) -> grupo.getFirst().getInicio())
-                        .thenComparing(grupo -> grupo.getFirst().getFim())
+                Comparator.comparing((List<DTOSaidaCompromissos> grupo) -> grupo.getFirst().inicio())
+                        .thenComparing(grupo -> grupo.getFirst().fim())
         );
 
         return gruposDeConflito;

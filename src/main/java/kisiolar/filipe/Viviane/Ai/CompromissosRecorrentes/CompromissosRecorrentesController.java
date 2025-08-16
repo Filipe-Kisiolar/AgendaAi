@@ -38,7 +38,7 @@ public class CompromissosRecorrentesController {
         DTORespostasListasCompromissoRecorrentes listarcompromissos =
                 compromissosRecorrentesService.listarCompromissos(usuarioId);
 
-        if (listarcompromissos.getListaCompromissosRecorrentes().isEmpty()){
+        if (listarcompromissos.listaCompromissosRecorrentes().isEmpty()){
             Map<String,Object> resposta = new HashMap<>();
             resposta.put("mensagem","ainda nao a compromissos recorrentes para criar um copromisso recorrente entre no link:");
             resposta.put("link","/compromissosrecorrentes/criarcompromisso ");
