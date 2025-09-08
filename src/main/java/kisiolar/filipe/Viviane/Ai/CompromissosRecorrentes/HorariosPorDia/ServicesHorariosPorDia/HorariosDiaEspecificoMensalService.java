@@ -219,15 +219,15 @@ public class HorariosDiaEspecificoMensalService extends HorariosServiceBase{
 
         List<String> errosIdentificados = new ArrayList<>();
 
-        boolean inconformidadeDiaDeInicio = horario.getInicioDiaEspecificoMes() > 0
-                || horario.getInicioDiaEspecificoMes() <= 31;
+        boolean inconformidadeDiaDeInicio = horario.getInicioDiaEspecificoMes() < 0
+                || horario.getInicioDiaEspecificoMes() > 31;
 
         if (inconformidadeDiaDeInicio){
             errosIdentificados.add("O Dia Do Mes De Inicio Deve Ser Maior Que 0 E Menor Ou Igual ADMIN 31");
         }
 
-        boolean inconformidadeDiaDeFim = horario.getFimDiaEspecificoMes() > 0
-                || horario.getFimDiaEspecificoMes() <= 31;
+        boolean inconformidadeDiaDeFim = horario.getFimDiaEspecificoMes() < 0
+                || horario.getFimDiaEspecificoMes() > 31;
 
         if (inconformidadeDiaDeFim){
             errosIdentificados.add("O Dia Do Mes De Fim Deve Ser Maior Que 0 E Menor Ou Igual ADMIN 31");
