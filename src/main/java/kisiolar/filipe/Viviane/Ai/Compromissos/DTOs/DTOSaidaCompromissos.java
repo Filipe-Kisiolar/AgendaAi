@@ -10,6 +10,8 @@ public record DTOSaidaCompromissos(
 
         String descricao,
 
+        String observacoes,
+
         String local,
 
         LocalDateTime inicio,
@@ -23,6 +25,7 @@ public record DTOSaidaCompromissos(
             id=%s,
             nome='%s',
             descricao='%s',
+            observacoes='%s',
             local='%s',
             inicio=%s,
             fim=%s
@@ -31,6 +34,7 @@ public record DTOSaidaCompromissos(
         id != null ? id : "null",
         nome != null ? nome : "",
         descricao != null ? descricao : "",
+        observacoes != null ? observacoes : "",
         local != null ? local : "",
         inicio != null ? inicio : "null",
         fim != null ? fim : "null"

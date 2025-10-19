@@ -30,6 +30,7 @@ public interface MapperCompromissosRecorrentes {
     //mapToDTO para gerar um compromisso a partir de um compromisso recorrente
     @Mapping(target = "inicio", source = "inicioGerado")
     @Mapping(target = "fim", source = "fimGerado")
+    @Mapping(target = "observacoes" , ignore = true)
     @Mapping(target = "compromissoRecorrenteId", source = "compromissosRecorrentesModel.id")
     DTOCreateCompromissos mapGerarCompromisso(CompromissosRecorrentesModel compromissosRecorrentesModel, LocalDateTime inicioGerado
                                                 ,LocalDateTime fimGerado);

@@ -11,6 +11,8 @@ public record DTOCreateCompromissos (
         @NotBlank(message = "O nome é obrigatório")
         String descricao,
 
+        String observacoes,
+
         String local,
 
         @NotNull(message = "Data de início é obrigatória")

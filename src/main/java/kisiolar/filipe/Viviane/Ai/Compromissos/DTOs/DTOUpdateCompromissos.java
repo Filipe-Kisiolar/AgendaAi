@@ -10,6 +10,8 @@ public record DTOUpdateCompromissos(
 
         String descricao,
 
+        String observacoes,
+
         String local,
 
         @FutureOrPresent(message = "Data de início não pode ser no passado")

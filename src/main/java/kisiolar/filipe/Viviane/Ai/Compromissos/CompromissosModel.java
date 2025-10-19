@@ -23,6 +23,9 @@ public class CompromissosModel {
     @Column(name = "descricao")
     private String descricao;
 
+    @Column(name = "observacoes")
+    private String observacoes;
+
     @Column(name = "local")
     private String local;
 
@@ -77,6 +80,14 @@ public class CompromissosModel {
 
     public void setDescricao(String descricao) {
         this.descricao = descricao;
+    }
+
+    public String getObservacoes() {
+        return observacoes;
+    }
+
+    public void setObservacoes(String observacoes) {
+        this.observacoes = observacoes;
     }
 
     public String getLocal() {
