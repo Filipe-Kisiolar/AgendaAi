@@ -38,6 +38,11 @@ public class GlobalExceptionHandler {
         body.put("erro", exception.getMessage());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
     }
+
+    @ExceptionHandler(TooLargeException.class)
+    public ResponseEntity<String> handleTooLarge(Exception ex) {
+        return ResponseEntity.status(413).body("Arquivo maior que o permitido (máx. 5MB).");
+    }
 }
 
 

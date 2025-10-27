@@ -1,17 +1,32 @@
 package kisiolar.filipe.Viviane.Ai.Usuarios;
 
+import jakarta.transaction.Transactional;
 import kisiolar.filipe.Viviane.Ai.Exceptions.BadRequestException;
 import kisiolar.filipe.Viviane.Ai.Exceptions.ResourceNotFindException;
 import kisiolar.filipe.Viviane.Ai.Usuarios.DTOs.DTOCreateUsuario;
+import org.apache.coyote.Request;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.multipart.MultipartFile;
 import kisiolar.filipe.Viviane.Ai.Usuarios.DTOs.DTOUpdateUsuario;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.stringtemplate.v4.ST;
+import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
+import software.amazon.awssdk.services.s3.model.GetUrlRequest;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class UsuariosService {
+
+    @Value("${storage.bucket}")
+    private String bucketName;
 
     private final UsuariosRepository usuariosRepository;
 
@@ -19,10 +34,13 @@ public class UsuariosService {
 
     private final PasswordEncoder passwordEncoder;
 
-    public UsuariosService(UsuariosRepository usuariosRepository, MapperUsuarios mapperUsuarios,PasswordEncoder passwordEncoder) {
+    private final S3Client s3Client;
+
+    public UsuariosService(UsuariosRepository usuariosRepository, MapperUsuarios mapperUsuarios, PasswordEncoder passwordEncoder, S3Client s3Client) {
         this.usuariosRepository = usuariosRepository;
         this.mapperUsuarios = mapperUsuarios;
         this.passwordEncoder = passwordEncoder;
+        this.s3Client = s3Client;
     }
 
     public UsuariosModel findUsuarioById(long usuarioId){
@@ -46,6 +64,74 @@ public class UsuariosService {
         usuario.setRole(RoleTypeEnum.ROLE_USUARIO);
 
         usuariosRepository.save(usuario);
+    }
+
+    @Transactional
+    public void updateProfileImg(Long userId,MultipartFile imgFile){
+        UsuariosModel user = usuariosRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFindException("Usuário Não Encontrado"));
+
+        String fileName = UUID.randomUUID() + "-" + imgFile.getOriginalFilename();
+
+        try{
+            //if it returns null no problem
+            String oldImageKey = user.getImageKey();
+
+            PutObjectRequest objectRequest = PutObjectRequest.builder()
+                    .bucket(bucketName)
+                    .key(fileName)
+                    .build();
+
+            s3Client.putObject(objectRequest,
+                    RequestBody.fromByteBuffer(ByteBuffer.wrap(imgFile.getBytes())));
+
+            GetUrlRequest request = GetUrlRequest.builder()
+                    .bucket(bucketName)
+                    .key(fileName)
+                    .build();
+
+            String imgUrl = s3Client.utilities().getUrl(request).toString();
+
+            user.setProfileImage(imgUrl);
+            user.setImageKey(fileName);
+
+            if(oldImageKey != null && !oldImageKey.isBlank()){
+                DeleteObjectRequest deleteRequest = DeleteObjectRequest.builder()
+                        .bucket(bucketName)
+                        .key(oldImageKey)
+                        .build();
+
+                s3Client.deleteObject(deleteRequest);
+            }
+        }
+        catch (Exception e){
+            throw new RuntimeException("Imagem não foi criada",e);
+        }
+    }
+
+    @Transactional
+    public void deleteProfileImage(Long userId){
+        UsuariosModel user = usuariosRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFindException("Usuário Não Encontrado"));
+
+        String userImg = user.getProfileImage();
+
+        try{
+            if(user.getProfileImage() != null && !user.getProfileImage().isBlank()){
+
+                DeleteObjectRequest deleteRequest = DeleteObjectRequest.builder()
+                        .bucket(bucketName)
+                        .key(user.getImageKey())
+                        .build();
+
+                s3Client.deleteObject(deleteRequest);
+            }
+        }catch (Exception e){
+            throw new RuntimeException("Não foi possivel deletar a imagem",e);
+        }
+
+        user.setProfileImage(null);
+        user.setImageKey(null);
     }
 
     public void alterarUsuario(long id,DTOUpdateUsuario dtoUpdate){
