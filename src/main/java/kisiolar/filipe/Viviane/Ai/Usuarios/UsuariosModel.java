@@ -19,6 +19,12 @@ public class UsuariosModel implements UserDetails {
     @Column(name = "id")
     private Long id;
 
+    @Column(name="profile_img_url")
+    private String profileImage;
+
+    @Column(name="image_key")
+    private String imageKey;
+
     @Column(name = "nome")
     private String nome;
 
@@ -41,8 +47,10 @@ public class UsuariosModel implements UserDetails {
     public UsuariosModel() {
     }
 
-    public UsuariosModel(Long id, String nome, String email, String senha, RoleTypeEnum role, List<CompromissosModel> compromissos, List<CompromissosRecorrentesModel> compromissosRecorrentes) {
+    public UsuariosModel(Long id, String profileImage, String imageKey, String nome, String email, String senha, RoleTypeEnum role, List<CompromissosModel> compromissos, List<CompromissosRecorrentesModel> compromissosRecorrentes) {
         this.id = id;
+        this.profileImage = profileImage;
+        this.imageKey = imageKey;
         this.nome = nome;
         this.email = email;
         this.senha = senha;
@@ -57,6 +65,22 @@ public class UsuariosModel implements UserDetails {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getProfileImage() {
+        return profileImage;
+    }
+
+    public void setProfileImage(String profileImage) {
+        this.profileImage = profileImage;
+    }
+
+    public String getImageKey() {
+        return imageKey;
+    }
+
+    public void setImageKey(String imageKey) {
+        this.imageKey = imageKey;
     }
 
     public String getNome() {

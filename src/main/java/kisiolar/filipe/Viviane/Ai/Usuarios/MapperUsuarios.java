@@ -9,6 +9,8 @@ public interface MapperUsuarios {
 
     @Mapping(target = "id",ignore = true)
     @Mapping(target = "role",ignore = true)
+    @Mapping(target = "profileImage",ignore = true)
+    @Mapping(target = "imageKey",ignore = true)
     @Mapping(target = "authorities",ignore = true)
     @Mapping(target = "compromissos",ignore = true)
     @Mapping(target = "compromissosRecorrentes",ignore = true)
@@ -16,6 +18,8 @@ public interface MapperUsuarios {
 
     @Mapping(target = "id",ignore = true)
     @Mapping(target = "role",ignore = true)
+    @Mapping(target = "profileImage",ignore = true)
+    @Mapping(target = "imageKey",ignore = true)
     @Mapping(target = "authorities",ignore = true)
     @Mapping(target = "compromissos",ignore = true)
     @Mapping(target = "compromissosRecorrentes",ignore = true)
