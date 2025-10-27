@@ -1,16 +1,17 @@
 package kisiolar.filipe.Viviane.Ai.Usuarios;
 
+import com.google.i18n.phonenumbers.PhoneNumberUtil;
+import com.google.i18n.phonenumbers.Phonenumber;
 import jakarta.transaction.Transactional;
 import kisiolar.filipe.Viviane.Ai.Exceptions.BadRequestException;
 import kisiolar.filipe.Viviane.Ai.Exceptions.ResourceNotFindException;
 import kisiolar.filipe.Viviane.Ai.Usuarios.DTOs.DTOCreateUsuario;
-import org.apache.coyote.Request;
+import kisiolar.filipe.Viviane.Ai.Usuarios.DTOs.DTOUserResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.multipart.MultipartFile;
 import kisiolar.filipe.Viviane.Ai.Usuarios.DTOs.DTOUpdateUsuario;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.stringtemplate.v4.ST;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
@@ -48,7 +49,14 @@ public class UsuariosService {
                .orElseThrow(() -> new ResourceNotFindException("Usuário Não Encontrado"));
     }
 
-    public void criarUsuario(DTOCreateUsuario dtoCreate){
+    public DTOUserResponse findUserInformations(long userId){
+        UsuariosModel user = usuariosRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFindException("Usuário Não Encontrado"));
+
+        return mapperUsuarios.mapToDto(user);
+    }
+
+    public void criarUsuario(DTOCreateUsuario dtoCreate) {
         List<String> errosIdentificados = verificarInformacoesCriacao(dtoCreate);
 
         if (!errosIdentificados.isEmpty()){
@@ -59,7 +67,11 @@ public class UsuariosService {
 
         String senhaEncriptada = passwordEncoder.encode(usuario.getSenha());
 
+        String phoneNumberE164 = phoneParsing(usuario.getPhoneNumber());
+
         usuario.setSenha(senhaEncriptada);
+
+        usuario.setPhoneNumber(phoneNumberE164);
 
         usuario.setRole(RoleTypeEnum.ROLE_USUARIO);
 
@@ -145,8 +157,13 @@ public class UsuariosService {
             throw new BadRequestException("erros na alteracao de usuario:\n" + errosIdentificados);
         }
 
+        String phoneNumberE164 = phoneParsing(dtoUpdate.getPhoneNumber());
+
         mapperUsuarios.atualizacao(dtoUpdate,usuarioParaAtualizar);
 
+        if(phoneNumberE164 != null && !phoneNumberE164.isBlank()){
+            usuarioParaAtualizar.setPhoneNumber(phoneNumberE164);
+        }
 
         usuariosRepository.save(usuarioParaAtualizar);
     }
@@ -229,5 +246,31 @@ public class UsuariosService {
         }
 
         return errosIdentificados;
+    }
+
+    private String phoneParsing(String phoneNumber){
+        //the user can choose if deliver his number
+        if (phoneNumber == null || phoneNumber.isBlank()){
+            return null;
+        }
+
+        try {
+            PhoneNumberUtil pnu = PhoneNumberUtil.getInstance();
+            Phonenumber.PhoneNumber formatedPhone = pnu.parse(phoneNumber,"zz");
+
+            if (!pnu.isValidNumber(formatedPhone)){
+                throw new BadRequestException("Número de celular errado ou mal formatado");
+            }
+
+            String phoneNumberE164 = pnu.format(formatedPhone, PhoneNumberUtil.PhoneNumberFormat.E164);
+
+            if(usuariosRepository.existsByPhoneNumber(phoneNumberE164)){
+                throw new BadRequestException("Já existe usuário com esse número de celular");
+            }
+
+            return phoneNumberE164;
+        }catch (Exception e){
+            throw new BadRequestException("Número de celular inválido");
+        }
     }
 }

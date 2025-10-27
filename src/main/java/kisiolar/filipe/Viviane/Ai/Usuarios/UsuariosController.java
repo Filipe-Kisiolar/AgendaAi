@@ -4,6 +4,7 @@ import kisiolar.filipe.Viviane.Ai.Exceptions.BadRequestException;
 import kisiolar.filipe.Viviane.Ai.Exceptions.TooLargeException;
 import kisiolar.filipe.Viviane.Ai.Seguranca.AuthUtils;
 import kisiolar.filipe.Viviane.Ai.Usuarios.DTOs.DTOUpdateUsuario;
+import kisiolar.filipe.Viviane.Ai.Usuarios.DTOs.DTOUserResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,6 +18,13 @@ public class UsuariosController {
 
     public UsuariosController(UsuariosService usuariosService) {
         this.usuariosService = usuariosService;
+    }
+
+    @GetMapping("/dadosdousuario")
+    public ResponseEntity<DTOUserResponse> findUserInformations(){
+        long userId = AuthUtils.getIdUsuarioLogado();
+
+        return ResponseEntity.ok(usuariosService.findUserInformations(userId));
     }
 
     @PatchMapping("/alterardados")

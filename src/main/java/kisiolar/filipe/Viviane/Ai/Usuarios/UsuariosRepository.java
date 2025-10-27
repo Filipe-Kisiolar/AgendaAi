@@ -11,6 +11,8 @@ public interface UsuariosRepository extends JpaRepository<UsuariosModel,Long> {
 
     boolean existsByEmail(String email);
 
+    boolean existsByPhoneNumber(String phoneNumber);
+
     @Query("""
         SELECT CASE WHEN COUNT(u) > 0 THEN true ELSE false END
         FROM UsuariosModel u

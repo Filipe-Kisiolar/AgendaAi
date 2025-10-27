@@ -10,6 +10,8 @@ public class DTOCreateUsuario {
     @NotBlank(message = "O email é obrigatório")
     private String email;
 
+    private String phoneNumber;
+
     @NotBlank(message = "A Senha é obrigatório")
     private String senha;
 
@@ -33,6 +35,14 @@ public class DTOCreateUsuario {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 
     public String getSenha() {

@@ -6,14 +6,17 @@ public class DTOUpdateUsuario {
 
     private String email;
 
+    private String phoneNumber;
+
     private String senha;
 
     public DTOUpdateUsuario() {
     }
 
-    public DTOUpdateUsuario(String nome, String email, String senha) {
+    public DTOUpdateUsuario(String nome, String email, String phoneNumber, String senha) {
         this.nome = nome;
         this.email = email;
+        this.phoneNumber = phoneNumber;
         this.senha = senha;
     }
 
@@ -31,6 +34,14 @@ public class DTOUpdateUsuario {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 
     public String getSenha() {

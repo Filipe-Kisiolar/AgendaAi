@@ -31,6 +31,9 @@ public class UsuariosModel implements UserDetails {
     @Column(name = "email",unique = true,nullable = false)
     private String email;
 
+    @Column(name = "celular",unique = true)
+    private String phoneNumber;
+
     @Column(name = "senha")
     private String senha;
 
@@ -47,12 +50,13 @@ public class UsuariosModel implements UserDetails {
     public UsuariosModel() {
     }
 
-    public UsuariosModel(Long id, String profileImage, String imageKey, String nome, String email, String senha, RoleTypeEnum role, List<CompromissosModel> compromissos, List<CompromissosRecorrentesModel> compromissosRecorrentes) {
+    public UsuariosModel(Long id, String profileImage, String imageKey, String nome, String email, String phoneNumber, String senha, RoleTypeEnum role, List<CompromissosModel> compromissos, List<CompromissosRecorrentesModel> compromissosRecorrentes) {
         this.id = id;
         this.profileImage = profileImage;
         this.imageKey = imageKey;
         this.nome = nome;
         this.email = email;
+        this.phoneNumber = phoneNumber;
         this.senha = senha;
         this.role = role;
         this.compromissos = compromissos;
@@ -97,6 +101,14 @@ public class UsuariosModel implements UserDetails {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 
     public String getSenha() {
