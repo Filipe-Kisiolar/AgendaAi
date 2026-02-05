@@ -118,7 +118,7 @@ public class CompromissosRecorrentesController {
 
         DTORespostaCompromissoRecorrente compromissoAlterado =
                 compromissosRecorrentesService
-                        .alterarCompromissoRecorrente(compromissoId,usuarioId,updateCompromissosRecorrentes);
+                        .alterarCompromissoRecorrente(usuarioId,compromissoId,updateCompromissosRecorrentes);
 
         return ResponseEntity.ok(compromissoAlterado);
     }
