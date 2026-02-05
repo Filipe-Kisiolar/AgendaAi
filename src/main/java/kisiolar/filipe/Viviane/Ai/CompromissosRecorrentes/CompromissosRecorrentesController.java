@@ -126,10 +126,18 @@ public class CompromissosRecorrentesController {
     @PatchMapping("/adicionarhorarionocompromisso/{compromissoRecorrenteId}")
     public ResponseEntity<DTORespostaHorariosPorDia> adicionarHorario(
             @PathVariable Long compromissoRecorrenteId,
-            @RequestBody DTOCreateHorariosPorDiaBase horariosPorDia
+            @RequestBody DTOCreateHorariosPorDiaBase horariosPorDia,
+            BindingResult result
     ){
 
         long usuarioId = AuthUtils.getIdUsuarioLogado();
+
+        if (result.hasErrors()){
+            String erros = result.getAllErrors().stream()
+                    .map(ObjectError::getDefaultMessage)
+                    .collect(Collectors.joining("; "));
+            throw new BadRequestException("Erros na requisição: " + erros);
+        }
 
         DTORespostaHorariosPorDia saidaHorariosPorDia =
                 horariosPorDiaService.adicionarHorario(compromissoRecorrenteId,usuarioId,horariosPorDia);
@@ -141,10 +149,18 @@ public class CompromissosRecorrentesController {
     public ResponseEntity<DTORespostaHorariosPorDia> alterarHorario(
             @PathVariable Long compromissoRecorrenteId,
             @PathVariable Long horarioId,
-            @RequestBody DTOUpdateHorariosPorDiaBase updateHorariosPorDia
+            @RequestBody DTOUpdateHorariosPorDiaBase updateHorariosPorDia,
+            BindingResult result
     ) {
 
         long usuarioId = AuthUtils.getIdUsuarioLogado();
+
+        if (result.hasErrors()){
+            String erros = result.getAllErrors().stream()
+                    .map(ObjectError::getDefaultMessage)
+                    .collect(Collectors.joining("; "));
+            throw new BadRequestException("Erros na requisição: " + erros);
+        }
 
         DTORespostaHorariosPorDia saidaHorariosPorDia =
                 horariosPorDiaService.alterarHorario(
