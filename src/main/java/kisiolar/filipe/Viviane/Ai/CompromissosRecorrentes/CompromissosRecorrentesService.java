@@ -204,11 +204,6 @@ public class CompromissosRecorrentesService{
                 compromissosRecorrentesRepository.findByIdByUser(compromissoId,usuarioId)
                 .orElseThrow(() -> new ResourceNotFindException("compromisso recorrente não encontrado"));
 
-        Integer intervaloDto = dtoUpdateCompromissosRecorrentes.intervalo();
-
-        boolean atualizouIntervalo =
-                !intervaloDto.equals(compromissosRecorrente.getIntervalo());
-
         mapperCompromissosRecorrentes.atualizacao(dtoUpdateCompromissosRecorrentes, compromissosRecorrente);
 
         //criada para nao gerar erro na requisicao
@@ -223,11 +218,9 @@ public class CompromissosRecorrentesService{
 
         compromissosRecorrentesRepository.save(compromissosRecorrente);
 
-        if(atualizouIntervalo){
-            compromissosRecorrente.getCompromissosGerados().clear();
+        compromissosRecorrente.getCompromissosGerados().clear();
 
-            criarCompromissosPorRecorrencia(compromissosRecorrente);
-        }
+        criarCompromissosPorRecorrencia(compromissosRecorrente);
 
         DTOSaidaCompromissosRecorrentes dtoSaidaCompromissosRecorrentes =  mapperCompromissosRecorrentes.mapToDto(compromissosRecorrente);
 
