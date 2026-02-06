@@ -14,6 +14,14 @@ public interface UsuariosRepository extends JpaRepository<UsuariosModel,Long> {
     boolean existsByPhoneNumber(String phoneNumber);
 
     @Query("""
+        SELECT u
+        FROM UsuariosModel u
+        WHERE u.phoneNumber = :phoneNumber
+    """)
+    Optional<UsuariosModel> findByPhoneNumber(String phoneNumber);
+
+
+    @Query("""
         SELECT CASE WHEN COUNT(u) > 0 THEN true ELSE false END
         FROM UsuariosModel u
         WHERE u.email   = :email

@@ -21,6 +21,7 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -67,7 +68,7 @@ public class UsuariosService {
 
         String senhaEncriptada = passwordEncoder.encode(usuario.getSenha());
 
-        String phoneNumberE164 = phoneParsing(usuario.getPhoneNumber());
+        String phoneNumberE164 = phoneParsing(usuario,usuario.getPhoneNumber());
 
         usuario.setSenha(senhaEncriptada);
 
@@ -157,7 +158,7 @@ public class UsuariosService {
             throw new BadRequestException("erros na alteracao de usuario:\n" + errosIdentificados);
         }
 
-        String phoneNumberE164 = phoneParsing(dtoUpdate.getPhoneNumber());
+        String phoneNumberE164 = phoneParsing(usuarioParaAtualizar,dtoUpdate.getPhoneNumber());
 
         mapperUsuarios.atualizacao(dtoUpdate,usuarioParaAtualizar);
 
@@ -248,7 +249,7 @@ public class UsuariosService {
         return errosIdentificados;
     }
 
-    private String phoneParsing(String phoneNumber){
+    private String phoneParsing(UsuariosModel user,String phoneNumber){
         //the user can choose if deliver his number
         if (phoneNumber == null || phoneNumber.isBlank()){
             return null;
@@ -264,7 +265,12 @@ public class UsuariosService {
 
             String phoneNumberE164 = pnu.format(formatedPhone, PhoneNumberUtil.PhoneNumberFormat.E164);
 
-            if(usuariosRepository.existsByPhoneNumber(phoneNumberE164)){
+            boolean sameNumber = usuariosRepository
+                    .findByPhoneNumber(phoneNumberE164)
+                    .map(u -> !u.getId().equals(user.getId()))
+                    .orElse(false);
+
+            if(sameNumber){
                 throw new BadRequestException("Já existe usuário com esse número de celular");
             }
 
