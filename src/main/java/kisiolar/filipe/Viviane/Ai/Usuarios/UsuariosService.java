@@ -5,6 +5,8 @@ import com.google.i18n.phonenumbers.Phonenumber;
 import jakarta.transaction.Transactional;
 import kisiolar.filipe.Viviane.Ai.Exceptions.BadRequestException;
 import kisiolar.filipe.Viviane.Ai.Exceptions.ResourceNotFindException;
+import kisiolar.filipe.Viviane.Ai.Messaging.EmailDto;
+import kisiolar.filipe.Viviane.Ai.Messaging.Producer.RabbitSender;
 import kisiolar.filipe.Viviane.Ai.Usuarios.DTOs.DTOCreateUsuario;
 import kisiolar.filipe.Viviane.Ai.Usuarios.DTOs.DTOUserResponse;
 import org.springframework.beans.factory.annotation.Value;
@@ -38,11 +40,14 @@ public class UsuariosService {
 
     private final S3Client s3Client;
 
-    public UsuariosService(UsuariosRepository usuariosRepository, MapperUsuarios mapperUsuarios, PasswordEncoder passwordEncoder, S3Client s3Client) {
+    private final RabbitSender rabbitSender;
+
+    public UsuariosService(UsuariosRepository usuariosRepository, MapperUsuarios mapperUsuarios, PasswordEncoder passwordEncoder, S3Client s3Client, RabbitSender rabbitSender) {
         this.usuariosRepository = usuariosRepository;
         this.mapperUsuarios = mapperUsuarios;
         this.passwordEncoder = passwordEncoder;
         this.s3Client = s3Client;
+        this.rabbitSender = rabbitSender;
     }
 
     public UsuariosModel findUsuarioById(long usuarioId){
@@ -57,6 +62,7 @@ public class UsuariosService {
         return mapperUsuarios.mapToDto(user);
     }
 
+    @Transactional
     public void criarUsuario(DTOCreateUsuario dtoCreate) {
         List<String> errosIdentificados = verificarInformacoesCriacao(dtoCreate);
 
@@ -76,7 +82,9 @@ public class UsuariosService {
 
         usuario.setRole(RoleTypeEnum.ROLE_USUARIO);
 
-        usuariosRepository.save(usuario);
+        UsuariosModel user = usuariosRepository.save(usuario);
+
+        rabbitSender.sendAccountConfirmation(user);
     }
 
     @Transactional
@@ -147,6 +155,7 @@ public class UsuariosService {
         user.setImageKey(null);
     }
 
+    @Transactional
     public void alterarUsuario(long id,DTOUpdateUsuario dtoUpdate){
 
         UsuariosModel usuarioParaAtualizar = usuariosRepository.findById(id)
@@ -169,6 +178,7 @@ public class UsuariosService {
         usuariosRepository.save(usuarioParaAtualizar);
     }
 
+    @Transactional
     public void deletarUsuario(long id){
         if (!usuariosRepository.existsById(id)){
             throw new ResourceNotFindException("usuario nao encontrado");
