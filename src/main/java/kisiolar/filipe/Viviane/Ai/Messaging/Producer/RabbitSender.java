@@ -27,8 +27,7 @@ public class RabbitSender {
 
         email.setUserId(user.getId());
         email.setEmailTo(user.getEmail());
-        email.setEmailSubject("teste criacao");
-        email.setBody("sallat maleicun");
+        email.setUserName(user.getUsername());
 
         template.convertAndSend(exchange.getName(),routing.emailAccountCreated(),email);
     }

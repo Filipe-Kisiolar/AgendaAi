@@ -5,9 +5,7 @@ public class EmailDto {
 
     private String emailTo;
 
-    private String emailSubject;
-
-    private String body;
+    private String userName;
 
     public EmailDto() {
     }
@@ -28,19 +26,11 @@ public class EmailDto {
         this.emailTo = emailTo;
     }
 
-    public String getEmailSubject() {
-        return emailSubject;
+    public String getUserName() {
+        return userName;
     }
 
-    public void setEmailSubject(String emailSubject) {
-        this.emailSubject = emailSubject;
-    }
-
-    public String getBody() {
-        return body;
-    }
-
-    public void setBody(String body) {
-        this.body = body;
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 }
