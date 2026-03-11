@@ -15,7 +15,7 @@ public class AssistenteService {
     }
 
     public String responderPergunta(String pergunta) {
-        long usuarioId = AuthUtils.getIdUsuarioLogado();
+        String usuarioId = String.valueOf(AuthUtils.getIdUsuarioLogado());
 
         return chatClient.prompt()
                 .user(pergunta)
