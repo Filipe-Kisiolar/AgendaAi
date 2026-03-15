@@ -2,5 +2,36 @@ package kisiolar.filipe.Viviane.Ai.Messaging.DTOs;
 
 public class DTONewPasswordRequest {
 
-    String userEmail;
+    private Long userId;
+
+    private String emailTo;
+
+    private String token;
+
+    public DTONewPasswordRequest() {
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
+    public String getEmailTo() {
+        return emailTo;
+    }
+
+    public void setEmailTo(String emailTo) {
+        this.emailTo = emailTo;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
 }

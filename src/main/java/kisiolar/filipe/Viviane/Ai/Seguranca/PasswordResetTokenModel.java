@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "password_reset_token")
-public class PasswordResetToken {
+public class PasswordResetTokenModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -26,10 +26,10 @@ public class PasswordResetToken {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-    public PasswordResetToken() {
+    public PasswordResetTokenModel() {
     }
 
-    public PasswordResetToken(Long id, Long userId, String tokenHash, LocalDateTime expiresAt, boolean used, LocalDateTime createdAt) {
+    public PasswordResetTokenModel(Long id, Long userId, String tokenHash, LocalDateTime expiresAt, boolean used, LocalDateTime createdAt) {
         this.id = id;
         this.userId = userId;
         this.tokenHash = tokenHash;

@@ -1,11 +1,10 @@
 package kisiolar.filipe.Viviane.Ai.Seguranca;
 
 import kisiolar.filipe.Viviane.Ai.Exceptions.UsernameOrPasswordInvalidException;
-import kisiolar.filipe.Viviane.Ai.Messaging.DTOs.DTONewPasswordRequest;
 import kisiolar.filipe.Viviane.Ai.Messaging.Producer.RabbitSender;
+import kisiolar.filipe.Viviane.Ai.Usuarios.DTOs.DTOUserResponse;
 import kisiolar.filipe.Viviane.Ai.Usuarios.UsuariosModel;
-import kisiolar.filipe.Viviane.Ai.Usuarios.UsuariosRepository;
-import org.springframework.context.annotation.Lazy;
+import kisiolar.filipe.Viviane.Ai.Usuarios.UsuariosService;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -13,12 +12,20 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-@Service
-public class AuthService implements UserDetailsService {
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.time.LocalDateTime;
+import java.util.HexFormat;
+import java.util.UUID;
 
-    private final UsuariosRepository usuariosRepository;
+@Service
+public class AuthService {
+
+    private final UsuariosService usuariosService;
 
     private final AuthenticationManager authenticationManager;
 
@@ -26,17 +33,14 @@ public class AuthService implements UserDetailsService {
 
     private final RabbitSender rabbitSender;
 
-    public AuthService(UsuariosRepository usuariosRepository, AuthenticationManager authenticationManager, TokenService tokenService, RabbitSender rabbitSender) {
-        this.usuariosRepository = usuariosRepository;
+    private final PasswordResetTokenRepository passwordResetTokenRepository;
+
+    public AuthService(UsuariosService usuariosService, AuthenticationManager authenticationManager, TokenService tokenService, RabbitSender rabbitSender, PasswordResetTokenRepository passwordResetTokenRepository) {
+        this.usuariosService = usuariosService;
         this.authenticationManager = authenticationManager;
         this.tokenService = tokenService;
         this.rabbitSender = rabbitSender;
-    }
-
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return usuariosRepository.findByEmail(username)
-                .orElseThrow(() -> new UsernameNotFoundException("usuário ou senha inválido"));
+        this.passwordResetTokenRepository = passwordResetTokenRepository;
     }
 
     public String Autenticacao(String email, String senha){
@@ -57,6 +61,32 @@ public class AuthService implements UserDetailsService {
 
     public void sendPasswordResetEmail(String userEmail){
 
-        rabbitSender.sendNewPasswordRequest(passwordRequest);
+        UsuariosModel user = usuariosService.findUserByEmail(userEmail);
+
+        String rawToken = UUID.randomUUID().toString();
+
+        LocalDateTime createdAt = LocalDateTime.now();
+
+        PasswordResetTokenModel passwordResetToken = new PasswordResetTokenModel();
+
+        passwordResetToken.setUserId(user.getId());
+        passwordResetToken.setTokenHash(hashToken(rawToken));
+        passwordResetToken.setCreatedAt(createdAt);
+        passwordResetToken.setExpiresAt(createdAt.plusMinutes(30));
+        passwordResetToken.setUsed(false);
+
+        passwordResetTokenRepository.save(passwordResetToken);
+
+        rabbitSender.sendNewPasswordRequest(rawToken,userEmail);
+    }
+
+    private String hashToken(String rawToken) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(rawToken.getBytes(StandardCharsets.UTF_8));
+            return HexFormat.of().formatHex(hash);
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException("Erro ao gerar hash do token", e);
+        }
     }
 }

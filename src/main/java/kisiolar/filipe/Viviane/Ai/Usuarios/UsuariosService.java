@@ -7,9 +7,10 @@ import kisiolar.filipe.Viviane.Ai.Exceptions.BadRequestException;
 import kisiolar.filipe.Viviane.Ai.Exceptions.ResourceNotFindException;
 import kisiolar.filipe.Viviane.Ai.Messaging.Producer.RabbitSender;
 import kisiolar.filipe.Viviane.Ai.Usuarios.DTOs.DTOCreateUsuario;
-import kisiolar.filipe.Viviane.Ai.Messaging.DTOs.DTONewPasswordRequest;
 import kisiolar.filipe.Viviane.Ai.Usuarios.DTOs.DTOUserResponse;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.multipart.MultipartFile;
 import kisiolar.filipe.Viviane.Ai.Usuarios.DTOs.DTOUpdateUsuario;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -52,6 +53,16 @@ public class UsuariosService {
     public UsuariosModel findUsuarioById(long usuarioId){
        return usuariosRepository.findById(usuarioId)
                .orElseThrow(() -> new ResourceNotFindException("Usuário Não Encontrado"));
+    }
+
+    public UserDetails loadUserByEmail(String userEmail) throws UsernameNotFoundException{
+        return usuariosRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new UsernameNotFoundException("usuário ou senha inválido"));
+    }
+
+    public UsuariosModel findUserByEmail(String userEmail) throws UsernameNotFoundException{
+        return usuariosRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new UsernameNotFoundException("usuário ou senha inválido"));
     }
 
     public DTOUserResponse findUserInformations(long userId){

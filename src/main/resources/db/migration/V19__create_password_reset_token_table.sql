@@ -15,5 +15,5 @@ CREATE TABLE password_reset_token (
 ALTER TABLE password_reset_token
 ADD CONSTRAINT fk_password_reset_token_user
 FOREIGN KEY (user_id)
-REFERENCES usuario(id)
+REFERENCES usuarios(id)
 ON DELETE CASCADE;

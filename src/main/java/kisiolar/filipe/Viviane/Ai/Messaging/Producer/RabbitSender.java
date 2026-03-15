@@ -4,6 +4,7 @@ import kisiolar.filipe.Viviane.Ai.Messaging.DTOs.AccountCreatedMessageEmailDto;
 import kisiolar.filipe.Viviane.Ai.Messaging.EmailMapper;
 import kisiolar.filipe.Viviane.Ai.Messaging.Routings;
 import kisiolar.filipe.Viviane.Ai.Messaging.DTOs.DTONewPasswordRequest;
+import kisiolar.filipe.Viviane.Ai.Seguranca.PasswordResetTokenModel;
 import kisiolar.filipe.Viviane.Ai.Usuarios.UsuariosModel;
 import org.springframework.amqp.core.TopicExchange;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -33,7 +34,9 @@ public class RabbitSender {
         template.convertAndSend(exchange.getName(),routing.emailAccountCreated(),email);
     }
 
-    public void sendNewPasswordRequest(DTONewPasswordRequest passwordRequest){
+    public void sendNewPasswordRequest(String token,String emailTo){
+        DTONewPasswordRequest passwordRequest = emailMapper.mapToNewPasswordRequest(token,emailTo);
+
         template.convertAndSend(exchange.getName(),routing.emailPasswordReset(),passwordRequest);
     }
 }

@@ -2,6 +2,7 @@ package kisiolar.filipe.Viviane.Ai.Seguranca;
 
 import jakarta.validation.Valid;
 import kisiolar.filipe.Viviane.Ai.Exceptions.BadRequestException;
+import kisiolar.filipe.Viviane.Ai.Messaging.DTOs.DTOEmailRequest;
 import kisiolar.filipe.Viviane.Ai.Usuarios.DTOs.DTOCreateUsuario;
 import kisiolar.filipe.Viviane.Ai.Usuarios.UsuariosService;
 import org.springframework.http.HttpStatus;
@@ -49,9 +50,9 @@ public class AuthController {
     }
 
     @PatchMapping("/recuperacaodesenha")
-    public ResponseEntity<String> newPasswordRequest(@RequestBody String userEmail){
+    public ResponseEntity<String> newPasswordRequest(@Valid @RequestBody DTOEmailRequest emailRequest){
 
-        authService.sendPasswordResetEmail(userEmail);
+        authService.sendPasswordResetEmail(emailRequest.email());
 
         return ResponseEntity.ok("\"Se o e-mail existir, enviaremos instruções para recuperação de senha.\"\n");
     }
