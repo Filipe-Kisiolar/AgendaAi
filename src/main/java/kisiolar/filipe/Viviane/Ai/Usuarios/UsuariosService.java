@@ -177,10 +177,6 @@ public class UsuariosService {
         usuariosRepository.save(usuarioParaAtualizar);
     }
 
-    public void sendPasswordResetEmail(DTONewPasswordRequest passwordRequest){
-        rabbitSender.sendNewPasswordRequest(passwordRequest);
-    }
-
     @Transactional
     public void deletarUsuario(long id){
         if (!usuariosRepository.existsById(id)){

@@ -1,4 +1,6 @@
 package kisiolar.filipe.Viviane.Ai.Messaging.DTOs;
 
-public record DTONewPasswordRequest(String email) {
+public class DTONewPasswordRequest {
+
+    String userEmail;
 }

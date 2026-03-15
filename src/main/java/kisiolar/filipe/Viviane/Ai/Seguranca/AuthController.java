@@ -8,10 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.stream.Collectors;
 
@@ -50,4 +47,13 @@ public class AuthController {
 
         return ResponseEntity.ok(respostaComToken);
     }
+
+    @PatchMapping("/recuperacaodesenha")
+    public ResponseEntity<String> newPasswordRequest(@RequestBody String userEmail){
+
+        authService.sendPasswordResetEmail(userEmail);
+
+        return ResponseEntity.ok("\"Se o e-mail existir, enviaremos instruções para recuperação de senha.\"\n");
+    }
+
 }

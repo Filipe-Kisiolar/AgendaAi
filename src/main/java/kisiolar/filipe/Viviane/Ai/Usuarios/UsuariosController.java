@@ -3,7 +3,6 @@ package kisiolar.filipe.Viviane.Ai.Usuarios;
 import kisiolar.filipe.Viviane.Ai.Exceptions.BadRequestException;
 import kisiolar.filipe.Viviane.Ai.Exceptions.TooLargeException;
 import kisiolar.filipe.Viviane.Ai.Seguranca.AuthUtils;
-import kisiolar.filipe.Viviane.Ai.Messaging.DTOs.DTONewPasswordRequest;
 import kisiolar.filipe.Viviane.Ai.Usuarios.DTOs.DTOUpdateUsuario;
 import kisiolar.filipe.Viviane.Ai.Usuarios.DTOs.DTOUserResponse;
 import org.springframework.http.ResponseEntity;
@@ -35,14 +34,6 @@ public class UsuariosController {
         usuariosService.alterarUsuario(userId,usuario);
 
         return ResponseEntity.ok("Usuário Alterado");
-    }
-
-    @PatchMapping("/recuperacaodesenha")
-    public ResponseEntity<String> newPasswordRequest(@RequestBody DTONewPasswordRequest passwordRequest){
-
-        usuariosService.sendPasswordResetEmail(passwordRequest);
-
-        return ResponseEntity.ok("\"Se o e-mail existir, enviaremos instruções para recuperação de senha.\"\n");
     }
 
     @PatchMapping(value ="/alterarfoto",consumes = "multipart/form-data")

@@ -1,6 +1,8 @@
 package kisiolar.filipe.Viviane.Ai.Seguranca;
 
 import kisiolar.filipe.Viviane.Ai.Exceptions.UsernameOrPasswordInvalidException;
+import kisiolar.filipe.Viviane.Ai.Messaging.DTOs.DTONewPasswordRequest;
+import kisiolar.filipe.Viviane.Ai.Messaging.Producer.RabbitSender;
 import kisiolar.filipe.Viviane.Ai.Usuarios.UsuariosModel;
 import kisiolar.filipe.Viviane.Ai.Usuarios.UsuariosRepository;
 import org.springframework.context.annotation.Lazy;
@@ -22,10 +24,13 @@ public class AuthService implements UserDetailsService {
 
     private final TokenService tokenService;
 
-    public AuthService(UsuariosRepository usuariosRepository, @Lazy AuthenticationManager authenticationManager, TokenService tokenService) {
+    private final RabbitSender rabbitSender;
+
+    public AuthService(UsuariosRepository usuariosRepository, AuthenticationManager authenticationManager, TokenService tokenService, RabbitSender rabbitSender) {
         this.usuariosRepository = usuariosRepository;
         this.authenticationManager = authenticationManager;
         this.tokenService = tokenService;
+        this.rabbitSender = rabbitSender;
     }
 
     @Override
@@ -48,5 +53,13 @@ public class AuthService implements UserDetailsService {
             throw new UsernameOrPasswordInvalidException("usuário ou senha inválido");
         }
 
+    }
+
+    public void sendPasswordResetEmail(String userEmail){
+
+        DTONewPasswordRequest passwordRequest = new DTONewPasswordRequest();
+
+
+        rabbitSender.sendNewPasswordRequest(passwordRequest);
     }
 }

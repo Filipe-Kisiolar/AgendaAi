@@ -1,7 +1,6 @@
 package kisiolar.filipe.Viviane.Ai.Messaging;
 
 import kisiolar.filipe.Viviane.Ai.Messaging.DTOs.AccountCreatedMessageEmailDto;
-import kisiolar.filipe.Viviane.Ai.Messaging.DTOs.DTONewPasswordRequest;
 import kisiolar.filipe.Viviane.Ai.Usuarios.UsuariosModel;
 
 public class EmailMapper {
