@@ -1,13 +1,13 @@
-package kisiolar.filipe.Viviane.Ai.Messaging;
+package kisiolar.filipe.Viviane.Ai.Messaging.DTOs;
 
-public class EmailDto {
+public class AccountCreatedMessageEmailDto {
     private Long userId;
 
     private String emailTo;
 
     private String userName;
 
-    public EmailDto() {
+    public AccountCreatedMessageEmailDto() {
     }
 
     public Long getUserId() {

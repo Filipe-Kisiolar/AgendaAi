@@ -5,9 +5,9 @@ import com.google.i18n.phonenumbers.Phonenumber;
 import jakarta.transaction.Transactional;
 import kisiolar.filipe.Viviane.Ai.Exceptions.BadRequestException;
 import kisiolar.filipe.Viviane.Ai.Exceptions.ResourceNotFindException;
-import kisiolar.filipe.Viviane.Ai.Messaging.EmailDto;
 import kisiolar.filipe.Viviane.Ai.Messaging.Producer.RabbitSender;
 import kisiolar.filipe.Viviane.Ai.Usuarios.DTOs.DTOCreateUsuario;
+import kisiolar.filipe.Viviane.Ai.Messaging.DTOs.DTONewPasswordRequest;
 import kisiolar.filipe.Viviane.Ai.Usuarios.DTOs.DTOUserResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,7 +23,6 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -84,7 +83,7 @@ public class UsuariosService {
 
         UsuariosModel user = usuariosRepository.save(usuario);
 
-        rabbitSender.sendAccountConfirmation(user);
+        rabbitSender.sendAccountCreatedMessage(user);
     }
 
     @Transactional
@@ -176,6 +175,10 @@ public class UsuariosService {
         }
 
         usuariosRepository.save(usuarioParaAtualizar);
+    }
+
+    public void sendPasswordResetEmail(DTONewPasswordRequest passwordRequest){
+        rabbitSender.sendNewPasswordRequest(passwordRequest);
     }
 
     @Transactional
