@@ -1,5 +1,6 @@
 package kisiolar.filipe.Viviane.Ai.Seguranca;
 
+import kisiolar.filipe.Viviane.Ai.Exceptions.ResourceNotFindException;
 import kisiolar.filipe.Viviane.Ai.Exceptions.UsernameOrPasswordInvalidException;
 import kisiolar.filipe.Viviane.Ai.Messaging.Producer.RabbitSender;
 import kisiolar.filipe.Viviane.Ai.Usuarios.DTOs.DTOUserResponse;
@@ -60,9 +61,8 @@ public class AuthService {
     }
 
     public void sendPasswordResetEmail(String userEmail){
-
+        try{
         UsuariosModel user = usuariosService.findUserByEmail(userEmail);
-
         String rawToken = UUID.randomUUID().toString();
 
         LocalDateTime createdAt = LocalDateTime.now();
@@ -78,6 +78,10 @@ public class AuthService {
         passwordResetTokenRepository.save(passwordResetToken);
 
         rabbitSender.sendNewPasswordRequest(rawToken,userEmail);
+
+        }catch (Exception e ){
+            throw new ResourceNotFindException("erro ao tentar enviar o email");
+        }
     }
 
     private String hashToken(String rawToken) {

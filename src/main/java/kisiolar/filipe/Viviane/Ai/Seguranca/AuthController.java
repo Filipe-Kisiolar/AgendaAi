@@ -49,7 +49,7 @@ public class AuthController {
         return ResponseEntity.ok(respostaComToken);
     }
 
-    @PatchMapping("/recuperacaodesenha")
+    @PostMapping("/recuperacaodesenha")
     public ResponseEntity<String> newPasswordRequest(@Valid @RequestBody DTOEmailRequest emailRequest){
 
         authService.sendPasswordResetEmail(emailRequest.email());
