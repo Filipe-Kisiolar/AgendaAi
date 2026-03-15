@@ -57,9 +57,6 @@ public class AuthService implements UserDetailsService {
 
     public void sendPasswordResetEmail(String userEmail){
 
-        DTONewPasswordRequest passwordRequest = new DTONewPasswordRequest();
-
-
         rabbitSender.sendNewPasswordRequest(passwordRequest);
     }
 }
