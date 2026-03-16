@@ -171,7 +171,7 @@ public class UsuariosService {
         UsuariosModel usuarioParaAtualizar = usuariosRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFindException("usuario não encontrado"));
 
-        List<String> errosIdentificados = verificarInformacoesUpdate(dtoUpdate,id);
+        List<String> errosIdentificados = validateEmailUpdate(dtoUpdate.getEmail(),id);
 
         if (!errosIdentificados.isEmpty()){
             throw new BadRequestException("erros na alteracao de usuario:\n" + errosIdentificados);
@@ -218,73 +218,39 @@ public class UsuariosService {
     private List<String> verificarInformacoesCriacao(DTOCreateUsuario usuario){
         List<String> errosIdentificados = new ArrayList<>();
 
-        if (usuariosRepository.existsByEmail(usuario.getEmail())){
-            errosIdentificados.add("Ja existe outra conta com esse email cadastrado" + usuario.getEmail());
-        }
+        errosIdentificados.addAll(validateEmailCreate(usuario.getEmail()));
 
-        String senha = usuario.getSenha();
-
-        if (senha.isBlank() || senha.length() < 6) {
-            errosIdentificados.add("A senha deve ter no mínimo 6 caracteres.");
-        }
-
-        if (!senha.matches(".*[A-Z].*")) {
-            errosIdentificados.add("A senha deve conter pelo menos uma letra maiúscula.");
-        }
-
-        if (!senha.matches(".*\\d.*")) {
-            errosIdentificados.add("A senha deve conter pelo menos um número.");
-        }
-
-        if (!senha.matches(".*[!@#$%^&*()_+=\\-{}\\[\\]:;\"'<>.,?/\\\\|~`].*")) {
-            errosIdentificados.add("A senha deve conter pelo menos um caractere especial.");
-        }
-
-        if (senha.matches(".*\\s.*")) {
-            errosIdentificados.add("A senha não pode conter espaços ou quebras de linha.");
-        }
+        errosIdentificados.addAll(validatePasswordStrength(usuario.getSenha()));
 
         return errosIdentificados;
     }
 
-    private List<String> verificarInformacoesUpdate(
-            DTOUpdateUsuario dtoUpdateUsuario,long id
+    private List<String> validateEmailCreate(
+            String email
     ) {
-        List<String> errosIdentificados = new ArrayList<>();
+        List<String> identifiedErrors = new ArrayList<>();
 
-        String emailUpdate = dtoUpdateUsuario.getEmail();
-
-        if (emailUpdate != null){
-            if (usuariosRepository.usuarioDiferenteTemEmail(emailUpdate, id)){
-                errosIdentificados.add("Ja existe outra conta com esse email cadastrado" + emailUpdate);
+        if (email != null){
+            if (usuariosRepository.existsByEmail(email)){
+                identifiedErrors.add("Ja existe outra conta com esse email cadastrado" + email);
             }
         }
 
-        String senhaAtualizada = dtoUpdateUsuario.getSenha();
+        return identifiedErrors;
+    }
 
-        if (senhaAtualizada != null){
-            if (senhaAtualizada.isBlank() || senhaAtualizada.length() < 6) {
-                errosIdentificados.add("A senhaAtualizada deve ter no mínimo 6 caracteres.");
-            }
+    private List<String> validateEmailUpdate(
+            String email,long id
+    ) {
+        List<String> identifiedErrors = new ArrayList<>();
 
-            if (!senhaAtualizada.matches(".*[A-Z].*")) {
-                errosIdentificados.add("A senhaAtualizada deve conter pelo menos uma letra maiúscula.");
-            }
-
-            if (!senhaAtualizada.matches(".*\\d.*")) {
-                errosIdentificados.add("A senhaAtualizada deve conter pelo menos um número.");
-            }
-
-            if (!senhaAtualizada.matches(".*[!@#$%^&*()_+=\\-{}\\[\\]:;\"'<>.,?/\\\\|~`].*")) {
-                errosIdentificados.add("A senhaAtualizada deve conter pelo menos um caractere especial.");
-            }
-
-            if (senhaAtualizada.matches(".*\\s.*")) {
-                errosIdentificados.add("A senhaAtualizada não pode conter espaços ou quebras de linha.");
+        if (email != null){
+            if (usuariosRepository.usuarioDiferenteTemEmail(email, id)){
+                identifiedErrors.add("Ja existe outra conta com esse email cadastrado" + email);
             }
         }
 
-        return errosIdentificados;
+        return identifiedErrors;
     }
 
     private List<String> validatePasswordStrength(String password){

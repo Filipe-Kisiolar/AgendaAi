@@ -8,16 +8,7 @@ public class DTOUpdateUsuario {
 
     private String phoneNumber;
 
-    private String senha;
-
     public DTOUpdateUsuario() {
-    }
-
-    public DTOUpdateUsuario(String nome, String email, String phoneNumber, String senha) {
-        this.nome = nome;
-        this.email = email;
-        this.phoneNumber = phoneNumber;
-        this.senha = senha;
     }
 
     public String getNome() {
@@ -42,13 +33,5 @@ public class DTOUpdateUsuario {
 
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
-    }
-
-    public String getSenha() {
-        return senha;
-    }
-
-    public void setSenha(String senha) {
-        this.senha = senha;
     }
 }
