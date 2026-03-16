@@ -31,7 +31,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
                         .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
-                        .requestMatchers(HttpMethod.POST,"/auth/cadastro").permitAll()
+                        .requestMatchers(HttpMethod.POST,"/usuarios/cadastro").permitAll()
                         .requestMatchers(HttpMethod.POST,"/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST,"/auth/recuperacaodesenha").permitAll()
                         .requestMatchers(HttpMethod.PATCH,"/auth/novasenha").permitAll()

@@ -56,7 +56,7 @@ public class TokenService {
     public Long validatePasswordResetToken(String token){
         String hashToken = hashPasswordToken(token);
 
-        PasswordResetTokenModel passwordResetModel = passwordResetTokenRepository.findByToken(hashToken)
+        PasswordResetTokenModel passwordResetModel = passwordResetTokenRepository.findByTokenHash(hashToken)
                 .orElseThrow(() -> new ResourceNotFindException("Token não encontrado"));
 
         if (passwordResetModel.getExpiresAt().isBefore(LocalDateTime.now())){
