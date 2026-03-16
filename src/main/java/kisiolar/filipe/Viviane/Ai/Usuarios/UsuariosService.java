@@ -188,6 +188,24 @@ public class UsuariosService {
         usuariosRepository.save(usuarioParaAtualizar);
     }
 
+    public void resetPassword(Long userId,String newPassword){
+        UsuariosModel user = findUsuarioById(userId);
+
+        if (passwordEncoder.matches(newPassword,user.getPassword())){
+            throw new BadRequestException("a nova senha não pode ser igual a anterior");
+        }
+
+        List<String> identifiedErrors = validatePasswordStrength(newPassword);
+
+        if (!identifiedErrors.isEmpty()){
+            throw new BadRequestException("erros na criação de usuario:\n" + identifiedErrors);
+        }
+
+        user.setSenha(passwordEncoder.encode(newPassword));
+
+        usuariosRepository.save(user);
+    }
+
     @Transactional
     public void deletarUsuario(long id){
         if (!usuariosRepository.existsById(id)){
@@ -267,6 +285,32 @@ public class UsuariosService {
         }
 
         return errosIdentificados;
+    }
+
+    private List<String> validatePasswordStrength(String password){
+        List<String> identifiedErrors = new ArrayList<>();
+
+        if (password.isBlank() || password.length() < 6) {
+            identifiedErrors.add("A senhaAtualizada deve ter no mínimo 6 caracteres.");
+        }
+
+        if (!password.matches(".*[A-Z].*")) {
+            identifiedErrors.add("A senhaAtualizada deve conter pelo menos uma letra maiúscula.");
+        }
+
+        if (!password.matches(".*\\d.*")) {
+            identifiedErrors.add("A senhaAtualizada deve conter pelo menos um número.");
+        }
+
+        if (!password.matches(".*[!@#$%^&*()_+=\\-{}\\[\\]:;\"'<>.,?/\\\\|~`].*")) {
+            identifiedErrors.add("A senhaAtualizada deve conter pelo menos um caractere especial.");
+        }
+
+        if (password.matches(".*\\s.*")) {
+            identifiedErrors.add("A senhaAtualizada não pode conter espaços ou quebras de linha.");
+        }
+
+        return identifiedErrors;
     }
 
     private String phoneParsing(UsuariosModel user,String phoneNumber){

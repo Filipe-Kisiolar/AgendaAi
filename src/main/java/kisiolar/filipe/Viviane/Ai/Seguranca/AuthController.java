@@ -61,6 +61,7 @@ public class AuthController {
     public ResponseEntity<String> setNewPassword(
             @Valid @RequestBody PasswordDto newPassword,@RequestParam("token")String token
     ){
+        authService.resetPassword(newPassword,token);
         return ResponseEntity.ok("Senha Alterada,por favor faça o login novamente");
     }
 }

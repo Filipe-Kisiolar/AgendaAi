@@ -4,12 +4,20 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import jakarta.transaction.Transactional;
+import kisiolar.filipe.Viviane.Ai.Exceptions.ExpiredTokenException;
+import kisiolar.filipe.Viviane.Ai.Exceptions.ResourceNotFindException;
 import kisiolar.filipe.Viviane.Ai.Usuarios.RoleTypeEnum;
 import kisiolar.filipe.Viviane.Ai.Usuarios.UsuariosModel;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.util.HexFormat;
 import java.util.Optional;
 
 @Component
@@ -17,6 +25,33 @@ import java.util.Optional;
 public class TokenService {
 
     private String segredo;
+
+    private final PasswordResetTokenRepository passwordResetTokenRepository;
+
+    public TokenService(PasswordResetTokenRepository passwordResetTokenRepository) {
+        this.passwordResetTokenRepository = passwordResetTokenRepository;
+    }
+
+    @Transactional
+    public Long validatePasswordResetToken(String token){
+        String hashToken = hashPasswordToken(token);
+
+        PasswordResetTokenModel passwordResetModel = passwordResetTokenRepository.findByToken(hashToken)
+                .orElseThrow(() -> new ResourceNotFindException("Token não encontrado"));
+
+        if (passwordResetModel.getExpiresAt().isBefore(LocalDateTime.now())){
+            throw new ExpiredTokenException("O token expirou");
+        }
+
+        if (passwordResetModel.isUsed()){
+            throw new ExpiredTokenException("Token já usado");
+        }
+
+        //It isn't necessary to save because the class is annotated with @Transactional
+        passwordResetModel.setUsed(true);
+
+        return passwordResetModel.getUserId();
+    }
 
     public String generateToken(UsuariosModel usuario){
         Algorithm algoritimo = Algorithm.HMAC256(segredo);
@@ -54,6 +89,16 @@ public class TokenService {
 
             return Optional.empty();
 
+        }
+    }
+
+    private String hashPasswordToken(String rawToken) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(rawToken.getBytes(StandardCharsets.UTF_8));
+            return HexFormat.of().formatHex(hash);
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException("Erro ao gerar hash do token", e);
         }
     }
 

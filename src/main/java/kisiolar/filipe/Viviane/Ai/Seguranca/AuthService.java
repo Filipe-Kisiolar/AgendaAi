@@ -1,5 +1,6 @@
 package kisiolar.filipe.Viviane.Ai.Seguranca;
 
+import jakarta.transaction.Transactional;
 import kisiolar.filipe.Viviane.Ai.Exceptions.ResourceNotFindException;
 import kisiolar.filipe.Viviane.Ai.Exceptions.UsernameOrPasswordInvalidException;
 import kisiolar.filipe.Viviane.Ai.Messaging.Producer.RabbitSender;
@@ -79,6 +80,13 @@ public class AuthService {
         }catch (Exception e ){
             throw new ResourceNotFindException("erro ao tentar enviar o email");
         }
+    }
+
+    @Transactional
+    public void resetPassword(PasswordDto passwordDto,String token){
+        Long userId = tokenService.validatePasswordResetToken(token);
+
+        usuariosService.resetPassword(userId,passwordDto.password());
     }
 
     private String hashToken(String rawToken) {
