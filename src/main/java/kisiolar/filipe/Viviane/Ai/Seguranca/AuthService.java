@@ -30,14 +30,11 @@ public class AuthService {
 
     private final RabbitSender rabbitSender;
 
-    private final PasswordResetTokenRepository passwordResetTokenRepository;
-
-    public AuthService(UsuariosService usuariosService, AuthenticationManager authenticationManager, TokenService tokenService, RabbitSender rabbitSender, PasswordResetTokenRepository passwordResetTokenRepository) {
+    public AuthService(UsuariosService usuariosService, AuthenticationManager authenticationManager, TokenService tokenService, RabbitSender rabbitSender) {
         this.usuariosService = usuariosService;
         this.authenticationManager = authenticationManager;
         this.tokenService = tokenService;
         this.rabbitSender = rabbitSender;
-        this.passwordResetTokenRepository = passwordResetTokenRepository;
     }
 
     public String Autenticacao(String email, String senha){
@@ -56,22 +53,12 @@ public class AuthService {
 
     }
 
+    @Transactional
     public void sendPasswordResetEmail(String userEmail){
         try{
         UsuariosModel user = usuariosService.findUserByEmail(userEmail);
-        String rawToken = UUID.randomUUID().toString();
 
-        LocalDateTime createdAt = LocalDateTime.now();
-
-        PasswordResetTokenModel passwordResetToken = new PasswordResetTokenModel();
-
-        passwordResetToken.setUserId(user.getId());
-        passwordResetToken.setTokenHash(hashToken(rawToken));
-        passwordResetToken.setCreatedAt(createdAt);
-        passwordResetToken.setExpiresAt(createdAt.plusMinutes(30));
-        passwordResetToken.setUsed(false);
-
-        passwordResetTokenRepository.save(passwordResetToken);
+        String rawToken = tokenService.createPasswordResetToken(user.getId());
 
         String passwordResetpath = "/auth/novasenha";
 
@@ -87,15 +74,5 @@ public class AuthService {
         Long userId = tokenService.validatePasswordResetToken(token);
 
         usuariosService.resetPassword(userId,passwordDto.password());
-    }
-
-    private String hashToken(String rawToken) {
-        try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            byte[] hash = digest.digest(rawToken.getBytes(StandardCharsets.UTF_8));
-            return HexFormat.of().formatHex(hash);
-        } catch (NoSuchAlgorithmException e) {
-            throw new IllegalStateException("Erro ao gerar hash do token", e);
-        }
     }
 }

@@ -1,13 +1,20 @@
 package kisiolar.filipe.Viviane.Ai.Usuarios;
 
+import jakarta.validation.Valid;
 import kisiolar.filipe.Viviane.Ai.Exceptions.BadRequestException;
 import kisiolar.filipe.Viviane.Ai.Exceptions.TooLargeException;
 import kisiolar.filipe.Viviane.Ai.Seguranca.AuthUtils;
+import kisiolar.filipe.Viviane.Ai.Usuarios.DTOs.DTOCreateUsuario;
 import kisiolar.filipe.Viviane.Ai.Usuarios.DTOs.DTOUpdateUsuario;
 import kisiolar.filipe.Viviane.Ai.Usuarios.DTOs.DTOUserResponse;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.stream.Collectors;
 
 
 @RestController
@@ -18,6 +25,22 @@ public class UsuariosController {
 
     public UsuariosController(UsuariosService usuariosService) {
         this.usuariosService = usuariosService;
+    }
+
+    @PostMapping("/cadastro")
+    public ResponseEntity<String> cadastrarUsuario(@Valid @RequestBody DTOCreateUsuario usuarioDto,
+                                                   BindingResult resultado){
+
+        if (resultado.hasErrors()) {
+            String erros = resultado.getAllErrors().stream()
+                    .map(ObjectError::getDefaultMessage)
+                    .collect(Collectors.joining("; "));
+            throw new BadRequestException("Erros na requisição: " + erros);
+        }
+
+        usuariosService.criarUsuario(usuarioDto);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body("Usuário Salvo");
     }
 
     @GetMapping("/dadosdousuario")

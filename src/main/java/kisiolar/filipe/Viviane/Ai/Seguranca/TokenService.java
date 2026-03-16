@@ -19,6 +19,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.HexFormat;
 import java.util.Optional;
+import java.util.UUID;
 
 @Component
 @ConfigurationProperties(prefix = "jwt")
@@ -30,6 +31,25 @@ public class TokenService {
 
     public TokenService(PasswordResetTokenRepository passwordResetTokenRepository) {
         this.passwordResetTokenRepository = passwordResetTokenRepository;
+    }
+
+    @Transactional
+    public String createPasswordResetToken(Long userId){
+        String rawToken = UUID.randomUUID().toString();
+
+        LocalDateTime createdAt = LocalDateTime.now();
+
+        PasswordResetTokenModel passwordResetToken = new PasswordResetTokenModel();
+
+        passwordResetToken.setUserId(userId);
+        passwordResetToken.setTokenHash(hashPasswordToken(rawToken));
+        passwordResetToken.setCreatedAt(createdAt);
+        passwordResetToken.setExpiresAt(createdAt.plusMinutes(30));
+        passwordResetToken.setUsed(false);
+
+        passwordResetTokenRepository.save(passwordResetToken);
+
+        return rawToken;
     }
 
     @Transactional
