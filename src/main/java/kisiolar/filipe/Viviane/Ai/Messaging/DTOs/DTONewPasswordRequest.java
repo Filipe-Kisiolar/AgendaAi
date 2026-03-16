@@ -8,6 +8,8 @@ public class DTONewPasswordRequest {
 
     private String token;
 
+    private String passwordResetPath;
+
     public DTONewPasswordRequest() {
     }
 
@@ -33,5 +35,13 @@ public class DTONewPasswordRequest {
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public String getPasswordResetPath() {
+        return passwordResetPath;
+    }
+
+    public void setPasswordResetPath(String passwordResetPath) {
+        this.passwordResetPath = passwordResetPath;
     }
 }

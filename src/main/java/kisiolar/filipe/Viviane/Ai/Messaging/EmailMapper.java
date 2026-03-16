@@ -17,11 +17,12 @@ public class EmailMapper {
         return email;
     }
 
-    public DTONewPasswordRequest mapToNewPasswordRequest(String token,String emailTo){
+    public DTONewPasswordRequest mapToNewPasswordRequest(String token,String emailTo,String passwordResetPath){
         DTONewPasswordRequest passwordRequest = new DTONewPasswordRequest();
 
         passwordRequest.setEmailTo(emailTo);
         passwordRequest.setToken(token);
+        passwordRequest.setPasswordResetPath(passwordResetPath);
 
         return passwordRequest;
     }

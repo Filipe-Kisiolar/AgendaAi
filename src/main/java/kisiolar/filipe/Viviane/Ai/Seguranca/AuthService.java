@@ -3,17 +3,12 @@ package kisiolar.filipe.Viviane.Ai.Seguranca;
 import kisiolar.filipe.Viviane.Ai.Exceptions.ResourceNotFindException;
 import kisiolar.filipe.Viviane.Ai.Exceptions.UsernameOrPasswordInvalidException;
 import kisiolar.filipe.Viviane.Ai.Messaging.Producer.RabbitSender;
-import kisiolar.filipe.Viviane.Ai.Usuarios.DTOs.DTOUserResponse;
 import kisiolar.filipe.Viviane.Ai.Usuarios.UsuariosModel;
 import kisiolar.filipe.Viviane.Ai.Usuarios.UsuariosService;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
@@ -77,7 +72,9 @@ public class AuthService {
 
         passwordResetTokenRepository.save(passwordResetToken);
 
-        rabbitSender.sendNewPasswordRequest(rawToken,userEmail);
+        String passwordResetpath = "/auth/novasenha";
+
+        rabbitSender.sendNewPasswordRequest(rawToken,userEmail, passwordResetpath);
 
         }catch (Exception e ){
             throw new ResourceNotFindException("erro ao tentar enviar o email");
