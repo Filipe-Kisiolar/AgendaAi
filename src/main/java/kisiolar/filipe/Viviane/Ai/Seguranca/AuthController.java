@@ -57,4 +57,10 @@ public class AuthController {
         return ResponseEntity.ok("\"Se o e-mail existir, enviaremos instruções para recuperação de senha.\"\n");
     }
 
+    @PatchMapping("/novasenha")
+    public ResponseEntity<String> setNewPassword(
+            @Valid @RequestBody PasswordDto newPassword,@RequestParam("token")String token
+    ){
+        return ResponseEntity.ok("Senha Alterada,por favor faça o login novamente");
+    }
 }
