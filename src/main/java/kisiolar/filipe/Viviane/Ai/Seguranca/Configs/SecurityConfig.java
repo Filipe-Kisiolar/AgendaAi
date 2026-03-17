@@ -1,4 +1,4 @@
-package kisiolar.filipe.Viviane.Ai.Seguranca;
+package kisiolar.filipe.Viviane.Ai.Seguranca.Configs;
 
 import jakarta.servlet.DispatcherType;
 import org.springframework.context.annotation.Bean;

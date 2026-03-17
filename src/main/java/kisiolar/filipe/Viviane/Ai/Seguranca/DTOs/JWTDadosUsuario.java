@@ -1,4 +1,4 @@
-package kisiolar.filipe.Viviane.Ai.Seguranca;
+package kisiolar.filipe.Viviane.Ai.Seguranca.DTOs;
 
 import kisiolar.filipe.Viviane.Ai.Usuarios.RoleTypeEnum;
 

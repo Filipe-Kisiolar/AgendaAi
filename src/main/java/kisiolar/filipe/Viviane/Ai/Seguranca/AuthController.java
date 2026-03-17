@@ -1,7 +1,9 @@
 package kisiolar.filipe.Viviane.Ai.Seguranca;
 
 import jakarta.validation.Valid;
-import kisiolar.filipe.Viviane.Ai.Messaging.DTOs.DTOEmailRequest;
+import kisiolar.filipe.Viviane.Ai.Seguranca.DTOs.DTOEmailRequest;
+import kisiolar.filipe.Viviane.Ai.Seguranca.DTOs.DTOLogin;
+import kisiolar.filipe.Viviane.Ai.Seguranca.DTOs.PasswordDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,7 +34,7 @@ public class AuthController {
 
     @PatchMapping("/novasenha")
     public ResponseEntity<String> setNewPassword(
-            @Valid @RequestBody PasswordDto newPassword,@RequestParam("token")String token
+            @Valid @RequestBody PasswordDto newPassword, @RequestParam("token")String token
     ){
         authService.resetPassword(newPassword,token);
         return ResponseEntity.ok("Senha Alterada,por favor faça o login novamente");

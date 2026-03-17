@@ -1,4 +1,4 @@
-package kisiolar.filipe.Viviane.Ai.Seguranca;
+package kisiolar.filipe.Viviane.Ai.Seguranca.Token;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -7,6 +7,7 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import jakarta.transaction.Transactional;
 import kisiolar.filipe.Viviane.Ai.Exceptions.ExpiredTokenException;
 import kisiolar.filipe.Viviane.Ai.Exceptions.ResourceNotFindException;
+import kisiolar.filipe.Viviane.Ai.Seguranca.DTOs.JWTDadosUsuario;
 import kisiolar.filipe.Viviane.Ai.Usuarios.RoleTypeEnum;
 import kisiolar.filipe.Viviane.Ai.Usuarios.UsuariosModel;
 import org.springframework.boot.context.properties.ConfigurationProperties;

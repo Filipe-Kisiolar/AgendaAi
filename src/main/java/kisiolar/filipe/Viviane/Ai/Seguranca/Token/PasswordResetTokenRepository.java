@@ -1,4 +1,4 @@
-package kisiolar.filipe.Viviane.Ai.Seguranca;
+package kisiolar.filipe.Viviane.Ai.Seguranca.Token;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

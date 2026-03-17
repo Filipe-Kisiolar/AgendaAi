@@ -1,6 +1,7 @@
 package kisiolar.filipe.Viviane.Ai.Seguranca;
 
 import kisiolar.filipe.Viviane.Ai.Exceptions.ResourceNotFindException;
+import kisiolar.filipe.Viviane.Ai.Seguranca.DTOs.JWTDadosUsuario;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 

@@ -1,4 +1,4 @@
-package kisiolar.filipe.Viviane.Ai.Seguranca;
+package kisiolar.filipe.Viviane.Ai.Seguranca.DTOs;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;

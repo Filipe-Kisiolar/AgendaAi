@@ -1,9 +1,11 @@
-package kisiolar.filipe.Viviane.Ai.Seguranca;
+package kisiolar.filipe.Viviane.Ai.Seguranca.Configs;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import kisiolar.filipe.Viviane.Ai.Seguranca.DTOs.JWTDadosUsuario;
+import kisiolar.filipe.Viviane.Ai.Seguranca.Token.TokenService;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

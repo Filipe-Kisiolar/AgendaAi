@@ -4,6 +4,8 @@ import jakarta.transaction.Transactional;
 import kisiolar.filipe.Viviane.Ai.Exceptions.ResourceNotFindException;
 import kisiolar.filipe.Viviane.Ai.Exceptions.UsernameOrPasswordInvalidException;
 import kisiolar.filipe.Viviane.Ai.Messaging.Producer.RabbitSender;
+import kisiolar.filipe.Viviane.Ai.Seguranca.DTOs.PasswordDto;
+import kisiolar.filipe.Viviane.Ai.Seguranca.Token.TokenService;
 import kisiolar.filipe.Viviane.Ai.Usuarios.UsuariosModel;
 import kisiolar.filipe.Viviane.Ai.Usuarios.UsuariosService;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -11,13 +13,6 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
-
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.time.LocalDateTime;
-import java.util.HexFormat;
-import java.util.UUID;
 
 @Service
 public class AuthService {
@@ -70,7 +65,7 @@ public class AuthService {
     }
 
     @Transactional
-    public void resetPassword(PasswordDto passwordDto,String token){
+    public void resetPassword(PasswordDto passwordDto, String token){
         Long userId = tokenService.validatePasswordResetToken(token);
 
         usuariosService.resetPassword(userId,passwordDto.password());
