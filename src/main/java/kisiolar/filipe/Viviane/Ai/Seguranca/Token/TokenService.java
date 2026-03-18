@@ -43,7 +43,7 @@ public class TokenService {
         PasswordResetTokenModel passwordResetToken = new PasswordResetTokenModel();
 
         passwordResetToken.setUserId(userId);
-        passwordResetToken.setTokenHash(hashPasswordToken(rawToken));
+        passwordResetToken.setTokenHash(PasswordTokenUtils.hashPasswordToken(rawToken));
         passwordResetToken.setCreatedAt(createdAt);
         passwordResetToken.setExpiresAt(createdAt.plusMinutes(30));
         passwordResetToken.setUsed(false);
@@ -55,7 +55,7 @@ public class TokenService {
 
     @Transactional
     public Long validatePasswordResetToken(String token){
-        String hashToken = hashPasswordToken(token);
+        String hashToken = PasswordTokenUtils.hashPasswordToken(token);
 
         PasswordResetTokenModel passwordResetModel = passwordResetTokenRepository.findByTokenHash(hashToken)
                 .orElseThrow(() -> new ResourceNotFindException("Token não encontrado"));
@@ -110,16 +110,6 @@ public class TokenService {
 
             return Optional.empty();
 
-        }
-    }
-
-    private String hashPasswordToken(String rawToken) {
-        try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            byte[] hash = digest.digest(rawToken.getBytes(StandardCharsets.UTF_8));
-            return HexFormat.of().formatHex(hash);
-        } catch (NoSuchAlgorithmException e) {
-            throw new IllegalStateException("Erro ao gerar hash do token", e);
         }
     }
 
