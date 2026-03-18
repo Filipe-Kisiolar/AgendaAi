@@ -43,6 +43,19 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleTooLarge(Exception ex) {
         return ResponseEntity.status(413).body("Arquivo maior que o permitido (máx. 5MB).");
     }
+    @ExceptionHandler(ExpiredTokenException.class)
+    public ResponseEntity<Map<String, String>> handleExpiredTokenException(Exception ex){
+        Map<String, String> body = new HashMap<>();
+        body.put("erro", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(body);
+    }
+
+    @ExceptionHandler(MessageSendingException.class)
+    public ResponseEntity<Map<String, String>> handleEmailSendingException(Exception ex){
+        Map<String, String> body = new HashMap<>();
+        body.put("erro", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(body);
+    }
 }
 
 

@@ -1,13 +1,13 @@
 package kisiolar.filipe.Viviane.Ai.Seguranca;
 
 import jakarta.transaction.Transactional;
-import kisiolar.filipe.Viviane.Ai.Exceptions.ResourceNotFindException;
 import kisiolar.filipe.Viviane.Ai.Exceptions.UsernameOrPasswordInvalidException;
 import kisiolar.filipe.Viviane.Ai.Messaging.Producer.RabbitSender;
 import kisiolar.filipe.Viviane.Ai.Seguranca.DTOs.PasswordDto;
 import kisiolar.filipe.Viviane.Ai.Seguranca.Token.TokenService;
 import kisiolar.filipe.Viviane.Ai.Usuarios.UsuariosModel;
 import kisiolar.filipe.Viviane.Ai.Usuarios.UsuariosService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -50,18 +50,12 @@ public class AuthService {
 
     @Transactional
     public void sendPasswordResetEmail(String userEmail){
-        try{
+
         UsuariosModel user = usuariosService.findUserByEmail(userEmail);
 
         String rawToken = tokenService.createPasswordResetToken(user.getId());
 
-        String passwordResetPath = "/auth/novasenha";
-
-        rabbitSender.sendNewPasswordRequest(user,rawToken,passwordResetPath);
-
-        }catch (Exception e ){
-            throw new ResourceNotFindException("erro ao tentar enviar o email");
-        }
+        rabbitSender.sendNewPasswordRequest(user,rawToken);
     }
 
     @Transactional

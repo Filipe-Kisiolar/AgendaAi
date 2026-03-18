@@ -50,6 +50,8 @@ app:
     routing:
       emailAccountCreated: email.account.created
       emailPasswordReset: email.password.reset
+    password-reset:
+      path: http://localhost:4200/user/change-password
 
 server:
   address: 0.0.0.0
