@@ -155,11 +155,11 @@
 					<source>${java.version}</source>
 					<target>${java.version}</target>
 					<annotationProcessorPaths>
-						<passwordResetPath>
+						<path>
 							<groupId>org.mapstruct</groupId>
 							<artifactId>mapstruct-processor</artifactId>
 							<version>${mapstruct.version}</version>
-						</passwordResetPath>
+						</path>
 					</annotationProcessorPaths>
 				</configuration>
 			</plugin>
