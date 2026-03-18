@@ -12,15 +12,17 @@ public class EmailMapper {
 
         email.setUserId(user.getId());
         email.setEmailTo(user.getEmail());
-        email.setUserName(user.getUsername());
+        email.setUserName(user.getNome());
 
         return email;
     }
 
-    public DTONewPasswordRequest mapToNewPasswordRequest(String token,String emailTo,String passwordResetPath){
+    public DTONewPasswordRequest mapToNewPasswordRequest(UsuariosModel user,String token,String passwordResetPath){
         DTONewPasswordRequest passwordRequest = new DTONewPasswordRequest();
 
-        passwordRequest.setEmailTo(emailTo);
+        passwordRequest.setUserId(user.getId());
+        passwordRequest.setUserName(user.getNome());
+        passwordRequest.setEmailTo(user.getEmail());
         passwordRequest.setToken(token);
         passwordRequest.setPasswordResetPath(passwordResetPath);
 

@@ -33,8 +33,8 @@ public class RabbitSender {
         template.convertAndSend(exchange.getName(),routing.emailAccountCreated(),email);
     }
 
-    public void sendNewPasswordRequest(String token,String emailTo,String passwordResetPath){
-        DTONewPasswordRequest passwordRequest = emailMapper.mapToNewPasswordRequest(token,emailTo, passwordResetPath);
+    public void sendNewPasswordRequest(UsuariosModel user,String token,String passwordResetPath){
+        DTONewPasswordRequest passwordRequest = emailMapper.mapToNewPasswordRequest(user,token, passwordResetPath);
 
         template.convertAndSend(exchange.getName(),routing.emailPasswordReset(),passwordRequest);
     }

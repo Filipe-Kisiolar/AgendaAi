@@ -55,9 +55,9 @@ public class AuthService {
 
         String rawToken = tokenService.createPasswordResetToken(user.getId());
 
-        String passwordResetpath = "/auth/novasenha";
+        String passwordResetPath = "/auth/novasenha";
 
-        rabbitSender.sendNewPasswordRequest(rawToken,userEmail, passwordResetpath);
+        rabbitSender.sendNewPasswordRequest(user,rawToken,passwordResetPath);
 
         }catch (Exception e ){
             throw new ResourceNotFindException("erro ao tentar enviar o email");
